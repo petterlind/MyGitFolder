@@ -5,8 +5,7 @@ close all
 % 1) Input 
 % --------------------------------
  nr_of_trusses = 10;
- inputfile_trusses,
-
+inputfile_trusses,
 %inputfile_YounChoi
 
 % Preprocessing, defining parameters for the algorithm from the inputs
@@ -323,12 +322,13 @@ while flag.outer_conv
 
         % no more steps for limit state j if last step was small enough!
         if l>0  
-           %x_values(nr,:,:)
+           if strcmp(gfundata.type,'TRUSS')
+                active_l_conv = Check_step( active_l_conv, alpha_inner, x_values, dp, flag.no_cross, 1e-4);  % 1e-6
            
-           % Works for Youn Choi!
-            active_l_conv = Check_step( active_l, alpha_inner, x_s, x_values(: ,:,:), flag.no_cross, 2);
-          
-          % active_l_conv = Check_step( active, alpha_inner, x_values, dp, flag.no_cross, 1e-4);
+           else % Youn and choi
+               active_l_conv = Check_step( active_l_conv, alpha_inner, x_s, x_values(: ,:,:), flag.no_cross, 2);
+           end
+           
         end
 
         if flag.linprog == 1
