@@ -5,8 +5,9 @@ close all
 % 1) Input 
 % --------------------------------
  nr_of_trusses = 10;
-inputfile_trusses,
-%inputfile_YounChoi
+% inputfile_trusses,
+% inputfile_YounChoi
+inputfile_Madsen
 
 % Preprocessing, defining parameters for the algorithm from the inputs
 nx = rbdo_parameters.nx;   
