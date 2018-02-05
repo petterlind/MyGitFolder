@@ -17,6 +17,7 @@ if flag_spline == 1
     spline_val = @(p) spline_const(1) + spline_const(2)*p + spline_const(3)*p.^2 + spline_const(4)*p.^3;
 end
 
+
 % Plot setup
 p_candidates = [p_s, p_val(end)];
 [~,Imax] = max(abs(p_candidates));
@@ -25,10 +26,10 @@ p_line_full = linspace(-p_candidates(Imax), p_candidates(Imax),num);
 color = ['r','b','g','k','m','r','b','g','k','m','r','b','g','k','m','r','b','g','k','m'];
 
 
-% Real values, note translation to x_Space!
+% Real values
 p_real = nan(num,1);
 for ij= 1:length(p_line_full)
-     p_real(ij) = gvalue_fem('variables', X_space(alpha_values_x * p_line_full(ij) + dp, probdata.marg(:,2), probdata.marg(:,3)), probdata, rbdo_parameters,gfundata,nr, 0,0);
+     p_real(ij) = gvalue_fem('variables', alpha_values_x * p_line_full(ij) + dp, probdata, rbdo_parameters,gfundata,nr, 0,0);
 end
 
 % Plot 

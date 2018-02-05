@@ -7,7 +7,7 @@ close all
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  DATA FIELDS IN 'RBDO_FUNDATA' and 'RBDO_PARAMETERS'  %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-rbdo_fundata.cost = {'mu1+mu2' };     
+rbdo_fundata.cost = {'-mu1-mu2' };     
 
 
 rbdo_fundata.constraint = {   -1e9 * ones(7,1) ; 1e9.* ones(7,1) };                           

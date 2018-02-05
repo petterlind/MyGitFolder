@@ -29,7 +29,7 @@ else %not too close, lets do a spline and investigate!
     
     if strcmp(gfundata.type,'TRUSS')
         [Gt_num, ~] = gvalue_fem('variables', x_values_extra, probdata, rbdo_parameters, gfundata, nr, 1,0);
-    elseif strcmp(gfundata.type,'YounChoi') % Transform dp to x-space!
+    elseif strcmp(gfundata.type,'YounChoi') || strcmp(gfundata.type,'Madsen') %Transform dp to x-space!
         [Gt_num, ~] = gvalue_fem('variables', X_space(x_values_extra, probdata.marg(:,2),probdata.marg(:,3)), probdata, rbdo_parameters, gfundata, nr, 1,0);
     end
         
@@ -63,7 +63,7 @@ else %not too close, lets do a spline and investigate!
             % New experiment
             if strcmp(gfundata.type,'TRUSS')
                 [Gt_num, ~] = gvalue_fem('variables', alpha_values * trend_new + dp, probdata, rbdo_parameters, gfundata, nr, 1,0);
-            elseif strcmp(gfundata.type,'YounChoi') % Transform dp to x-space!
+            elseif strcmp(gfundata.type,'YounChoi') || strcmp(gfundata.type,'Madsen') % Transform dp to x-space!
                 [Gt_num, ~] = gvalue_fem('variables', X_space(alpha_values * trend_new + dp, probdata.marg(:,2),probdata.marg(:,3)), probdata, rbdo_parameters, gfundata, nr, 1,0);
             end
             a_old = a_temp;

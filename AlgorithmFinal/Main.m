@@ -157,7 +157,16 @@ while flag.outer_conv
     alpha_inner = mysqueeze(alpha_values_x(:, k, :))'; % used to be without transpose!
     
     % Update active set based on direction
-    update = alpha_c_new' * alpha_inner  > 0; % KKT !?
+    if strcmp(gfundata.type,'Trusses') || strcmp(gfundata.type,'YounChoi')
+        update = alpha_c_new' * alpha_inner  > 0; % KKT !?
+    
+    elseif  strcmp(gfundata.type,'Madsen')
+        
+        % All are active...
+        update = 1;
+        alpha_inner = alpha_inner';
+    end
+        
     
     %active = active*0;
     %active(number(update)) = 1;
@@ -246,16 +255,16 @@ while flag.outer_conv
                     hold off
                 end
 
-                %figure(fignr)
+                figure(fignr)
                 pnr = mod( nr, 5);
                 if pnr == 0
                     pnr = 5;
                 end
 
                % subplot( 5, 1, pnr);
-                %pplot(mysqueeze(x_values(nr,:,:)), limit_values(nr,:), slope_values(nr,:), dp, alpha_inner(:,nr), mysqueeze(x_s(nr,:,:)), nr, probdata,rbdo_parameters,gfundata, no_cross, p_lim, flag.exit)
-                %ylabel(sprintf('%d,flag=%d',nr, flag.exit))
-                %shg
+                pplot(mysqueeze(x_values(nr,:,:)), limit_values(nr,:), slope_values(nr,:), dp, alpha_inner(:,nr), mysqueeze(x_s(nr,:,:)), nr, probdata,rbdo_parameters,gfundata, no_cross, p_lim, flag.exit)
+                ylabel(sprintf('%d,flag=%d',nr, flag.exit))
+                shg
             end
         end
 
@@ -280,7 +289,6 @@ while flag.outer_conv
             elseif rbdo_parameters.variable == 1
                 b(ii,1 ) = A(ii,:)* (mysqueeze(x_s(nr_lprog, index_xs , : ))) - target_beta;
             end
-            
         end 
         
         if strcmp(gfundata.type,'Trusses')
@@ -323,13 +331,23 @@ while flag.outer_conv
 
         % no more steps for limit state j if last step was small enough!
         if l>0  
-           if strcmp(gfundata.type,'TRUSS')
+           if strcmp(gfundata.type,'TRUSS') || strcmp(gfundata.type,'Madsen') 
                 active_l_conv = Check_step( active_l_conv, alpha_inner, x_values, dp, flag.no_cross, 1e-4);  % 1e-6
            
-           else % Youn and choi
+           elseif strcmp(gfundata.type,'TRUSS') % Youn and choi
                active_l_conv = Check_step( active_l_conv, alpha_inner, x_s, x_values(: ,:,:), flag.no_cross, 2);
            end
            
+        end
+        
+        if strcmp(gfundata.type, 'Madsen') && active_l_conv(1) == 1
+            MPP_real = [ 2.615; -0.831; -1.866; -0.790; 0.037; -0.019; -0.056 ];
+            Dist_Mpp_real = norm( x_s_new - MPP_real);
+            xnum = 1:7;
+            fprintf( 'Probes = %d (extra), beta = %1.3f, Dist to real MPP = %1.3f, \n', l, norm(x_s_new),Dist_Mpp_real)
+            
+            fprintf( '\n MPP:\n')
+            fprintf( '%1.5f \n', x_s_new)
         end
 
         if flag.linprog == 1
@@ -355,9 +373,17 @@ while flag.outer_conv
          l = l+1; 
     end       
         
+    if strcmp(gfundata.type, 'Madsen')
+        xnum = 1:7;
+        fprintf( ' CONVERGED ')
+        fprintf( 'Probes = %d (extra), beta = %1.3f \n', l, norm(x_s_new))
+        fprintf( '%1.5f \n', x_s_new)
         
-        %plot_YounChoi(probdata, dp, x_s)
-        
+        fprintf( '\n Ignore the official result below.... \n')
+        break
+    end
+    
+        %plot_YounChoi(probdata, dp, x_s)    
         dp_old = dp;
         dp_test = dp;
         dp_l_test = dp_l;
@@ -536,11 +562,11 @@ if flag.MC == 1
 
     % Plot the data
     for ij = 1:nx
-        eval(sprintf('figure(7+%d)',ij))
-        eval(sprintf('histogram(g_values(:,%d),100,''Normalization'',''probability'')',ij))
+       fprintf('figure(7+%d)',ij)
+        fprintf('histogram(g_values(:,%d),100,''Normalization'',''probability'')',ij)
         title(sprintf('G%d',ij))
         xlabel('Limit state value [Pa]')
-        eval(sprintf('ylabel(''Probability for each data group based on 10^%d simulations'')', log10(nr_MC)))
+        fprintf('ylabel(''Probability for each data group based on 10^%d simulations'')', log10(nr_MC))
         grid on
     end
 end

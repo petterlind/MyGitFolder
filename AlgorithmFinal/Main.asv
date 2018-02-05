@@ -4,10 +4,10 @@ close all
 % --------------------------------
 % 1) Input 
 % --------------------------------
-% nr_of_trusses = 5;
+ nr_of_trusses = 10;
 % inputfile_trusses,
-
-inputfile_YounChoi
+% inputfile_YounChoi
+inputfile_Madsen
 
 % Preprocessing, defining parameters for the algorithm from the inputs
 nx = rbdo_parameters.nx;   
@@ -85,6 +85,8 @@ dp_old = rbdo_parameters.design_point + [rbdo_parameters.design_point(1)+RBDO_se
 % --------------------------------
 % 2) Main Loop
 % --------------------------------
+
+update = logical(ones(1,nc)); % FIX
 while flag.outer_conv
 
     if k > 10 || l >20
@@ -103,7 +105,9 @@ while flag.outer_conv
     % save the values
     obj_values(k, 1) = obj_new(1);
     alpha_values_c(k, :) = alpha_c_new';
-
+    
+    
+    active = update;
     % Set the indexing for the loop
     number = lst(active);
     nca = sum(active);
@@ -153,7 +157,16 @@ while flag.outer_conv
     alpha_inner = mysqueeze(alpha_values_x(:, k, :))'; % used to be without transpose!
     
     % Update active set based on direction
-    update = alpha_c_new' * alpha_inner  > 0; % KKT !?
+    if strcmp(gfundata.type,'Trusses') || strcmp(gfundata.type,'YounChoi')
+        update = alpha_c_new' * alpha_inner  > 0; % KKT !?
+    
+    elseif  strcmp(gfundata.type,'Madsen')
+        
+        % All are active...
+        update = 1;
+        alpha_inner = alpha_inner';
+    end
+        
     
     %active = active*0;
     %active(number(update)) = 1;
@@ -164,8 +177,9 @@ while flag.outer_conv
 
     % Setup before inner loop
     dp_l = dp;
-    active_l = logical(active_fix)' & update; %& update ; %fix
-    %active_l = update
+    %active_l = logical(active_fix)' & update; %& update ; %fix
+    
+    active_l = update;
     %active_l = update; %fix
     active_l_conv = active_l;
     fignr = 1;
@@ -174,7 +188,7 @@ while flag.outer_conv
     %clf
     %figure(2)
     %clf 
-    hold off
+    % hold off
     %b = nan(nx,1);
    
    % ------------------------
@@ -213,8 +227,10 @@ while flag.outer_conv
             
             % New probe point
             if strcmp(gfundata.type,'TRUSS') || k < 2
-            [x_new, limit_new, slope_new, x_s_new, no_cross, flag.exit, p_lim, active_l_nr, ps] = probe(mysqueeze(x_values(nr,:,:)), limit_values(nr,:), alpha_inner(:,nr), slope_values(nr,:), dp, RBDO_settings, probdata, rbdo_parameters, gfundata, nr, l,k, lb, flag);
-
+                [x_new, limit_new, slope_new, x_s_new, no_cross, flag.exit, p_lim, active_l_nr, ps] = probe(mysqueeze(x_values(nr,:,:)), limit_values(nr,:), alpha_inner(:,nr), slope_values(nr,:), dp, RBDO_settings, probdata, rbdo_parameters, gfundata, nr, l,k, lb, flag);
+            else
+                [x_new, limit_new, slope_new, x_s_new, no_cross, flag.exit, p_lim, active_l_nr, ps] = probe(mysqueeze(x_values(nr,:,:)), limit_values(nr,:), alpha_inner(:,nr), slope_values(nr,:), x_values(nr,:,:), RBDO_settings, probdata, rbdo_parameters, gfundata, nr, l,k, lb, flag);
+            end
             % Save the values
             index_x = min(lst(isnan(x_values(nr,:,1))));
             index_f = min(lst(isnan(flag.no_cross(nr,:))));
@@ -239,16 +255,16 @@ while flag.outer_conv
                     hold off
                 end
 
-                %figure(fignr)
+                figure(fignr)
                 pnr = mod( nr, 5);
                 if pnr == 0
                     pnr = 5;
                 end
 
                % subplot( 5, 1, pnr);
-                %pplot(mysqueeze(x_values(nr,:,:)), limit_values(nr,:), slope_values(nr,:), dp, alpha_inner(:,nr), mysqueeze(x_s(nr,:,:)), nr, probdata,rbdo_parameters,gfundata, no_cross, p_lim, flag.exit)
-                %ylabel(sprintf('%d,flag=%d',nr, flag.exit))
-                %shg
+                pplot(mysqueeze(x_values(nr,:,:)), limit_values(nr,:), slope_values(nr,:), dp, alpha_inner(:,nr), mysqueeze(x_s(nr,:,:)), nr, probdata,rbdo_parameters,gfundata, no_cross, p_lim, flag.exit)
+                ylabel(sprintf('%d,flag=%d',nr, flag.exit))
+                shg
             end
         end
 
@@ -273,7 +289,6 @@ while flag.outer_conv
             elseif rbdo_parameters.variable == 1
                 b(ii,1 ) = A(ii,:)* (mysqueeze(x_s(nr_lprog, index_xs , : ))) - target_beta;
             end
-            
         end 
         
         if strcmp(gfundata.type,'Trusses')
@@ -316,8 +331,23 @@ while flag.outer_conv
 
         % no more steps for limit state j if last step was small enough!
         if l>0  
-           active_l_conv = Check_step( active_l, alpha_inner, x_s, dp, flag.no_cross, 1e-3);  % 1e-6
-           % active_l_conv = Check_step( active, alpha_inner, x_values, dp, flag.no_cross, 1e-4);
+           if strcmp(gfundata.type,'TRUSS') || strcmp(gfundata.type,'Madsen') 
+                active_l_conv = Check_step( active_l_conv, alpha_inner, x_values, dp, flag.no_cross, 1e-4);  % 1e-6
+           
+           elseif strcmp(gfundata.type,'TRUSS') % Youn and choi
+               active_l_conv = Check_step( active_l_conv, alpha_inner, x_s, x_values(: ,:,:), flag.no_cross, 2);
+           end
+           
+        end
+        
+        if strcmp(gfundata.type, 'Madsen') && active_l_conv(1) == 1
+            MPP_real = [ 2.615; -0.831; -1.866; -0.790; 0.037; -0.019; -0.056 ];
+            Dist_Mpp_real = norm( x_s_new - MPP_real);
+            xnum = 1:7;
+            fprintf( 'Probes = %d (extra), beta = %1.3f, Dist to real MPP = %1.3f, \n', l, norm(x_s_new),Dist_Mpp_real)
+            
+            fprintf( 'MPP:')
+            fprintf( '%1.5f \n', x_s_new)
         end
 
         if flag.linprog == 1
@@ -328,12 +358,12 @@ while flag.outer_conv
                   end
                   flag.inner_conv = 0;
 
-              elseif  abs(norm(dp_l-dp_l_old)/norm(dp_l_old)) < RBDO_settings.tol 
-
-                  if flag.debug == 1
-                      fprintf('%d Inner steps, Small relative change of dv \n', l+1)
-                  end
-                  flag.inner_conv = 0;
+%               elseif  abs(norm(dp_l-dp_l_old)/norm(dp_l_old)) < RBDO_settings.tol 
+% 
+%                   if flag.debug == 1
+%                       fprintf('%d Inner steps, Small relative change of dv \n', l+1)
+%                   end
+%                   flag.inner_conv = 0;
               end
 
         else
@@ -343,9 +373,17 @@ while flag.outer_conv
          l = l+1; 
     end       
         
+    if strcmp(gfundata.type, 'Madsen')
+        xnum = 1:7;
+        fprintf( ' CONVERGED ')
+        fprintf( 'Probes = %d (extra), beta = %1.3f \n', l, norm(x_s_new))
+        fprintf( '%1.5f \n', x_s_new)
         
-        %plot_YounChoi(probdata, dp, x_s)
-        
+        fprintf( 'Ignore the official result below....')
+        break
+    end
+    
+        %plot_YounChoi(probdata, dp, x_s)    
         dp_old = dp;
         dp_test = dp;
         dp_l_test = dp_l;
@@ -364,16 +402,17 @@ while flag.outer_conv
         if strcmp(gfundata.type,'TRUSS')
             rbdo_parameters.design_point = dp;
             obj_new = ObjectiveFunction(dp, rbdo_fundata, gfundata);
-            scale_v = 1;
+            variable_diff = abs(dp-dp_old);
         else
             %rbdo_paramters.design_point = dp; % Not used...
             %probdata.marg(:,2) = X_space(dp,probdata.marg(:,2),probdata.marg(:,3));
             obj_new = ObjectiveFunction(X_space(dp, probdata.marg(:,2),probdata.marg(:,3)), rbdo_fundata, gfundata);
-            scale_v = probdata.marg(1,3); % u_space!
+            variable_diff = abs( X_space(dp_old,probdata.marg(:,2),probdata.marg(:,3)) - X_space(dp, probdata.marg(:,2),probdata.marg(:,3)));
         end
             
+     disp(Gnum)
     % Do a convergence check in the outer loop
-    if abs(obj_old - obj_new)/ obj_old < RBDO_settings.tol && max(abs(dp-dp_old))< 1e-3/scale_v
+    if abs(obj_old - obj_new)/ obj_old < RBDO_settings.tol %&& max(variable_diff)< 1e-3
         flag.outer_conv = 0;
     end
 
