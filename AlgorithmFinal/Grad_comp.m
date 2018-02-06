@@ -59,7 +59,7 @@ switch type
             elseif rbdo_parameters.variable == 1
                 
                 
-                DoE = Experiment( dp, rbdo_parameters.target_beta/ 4); % Do it around dp!  % B1 ?
+                DoE = Experiment( dp, rbdo_parameters.target_beta/ 2); % Do it around dp!  % B1 ?
                 
                 dp_x = X_space(zeros(size(dp)), probdata.marg(:,2), probdata.marg(:,3));
                 doe_x = X_space( DoE, dp_x, probdata.marg(:,3));
