@@ -17,7 +17,7 @@ function [position] = Experiment(poi, scale)%, alpha, nr, probdata, rbdo_paramet
 
 
     % Nx+1 experiments
-    position = ones(length(poi)+1,length(poi)).*poi'+ deltax; % DoE
+    position = ones(length(poi)+1,length(poi)).*poi' + deltax; % DoE
    position = position';
     
 %     % Koshal plus

@@ -4,7 +4,7 @@ close all
 % --------------------------------
 % 1) Input 
 % --------------------------------
- nr_of_trusses = 5;
+ nr_of_trusses = 10;
  inputfile_trusses,
 % inputfile_YounChoi
 % inputfile_Madsen
@@ -54,7 +54,6 @@ fignr_old = fignr;
 k = 0;
 savenr = 0;
 
-
 non_fesible = nan(nx,1);
 test_lnf3 = 0;
 test_lnf2 = 0;
@@ -87,6 +86,7 @@ dp_old = rbdo_parameters.design_point + [rbdo_parameters.design_point(1)+RBDO_se
 % --------------------------------
 
 update = logical(ones(1,nc)); % FIX
+
 while flag.outer_conv
 
     if k > 10 || l >20
@@ -145,10 +145,8 @@ while flag.outer_conv
         if strcmp(gfundata.type,'Madsen')
             % Towards Mpp.
             % alpha_x_final = [0.766; -0.244; -0.547; -0.232; 0.011; -0.006; -0.016]/ norm([0.766; -0.244; -0.547; -0.232; 0.011; -0.006; -0.016]);
-            
             % Towards alpha_1
             alpha_x_new = [ 2.401; -0.977; -1.843; -0.921; 0.055; -0.028; -0.083] / norm([ 2.401; -0.977; -1.843; -0.921; 0.055; -0.028; -0.083]);
-            
 %             c_theta = (alpha_x_new'*alpha_x_final)/( norm(alpha_x_new)*norm(alpha_x_final));
 %             ThetaInDegrees = acosd(c_theta);
             
@@ -156,8 +154,6 @@ while flag.outer_conv
             active_fix(nr,1) = active_i;
             non_fesible(nr) = sign(limit_new);
         
-        
-
         % Save the values
         index_x = min(lst(isnan(x_values(nr,:,1))));
         x_values( nr, index_x:index_x, : ) = x_new;     % only nominal value added!
@@ -172,7 +168,7 @@ while flag.outer_conv
     alpha_inner = mysqueeze(alpha_values_x(:, k, :))'; % used to be without transpose!
     
     % Update active set based on direction
-    if strcmp(gfundata.type,'Trusses') || strcmp(gfundata.type,'YounChoi')
+    if strcmp(gfundata.type,'TRUSS') || strcmp(gfundata.type,'YounChoi')
         update = alpha_c_new' * alpha_inner  > 0; % KKT !?
     
     elseif  strcmp(gfundata.type,'Madsen')
