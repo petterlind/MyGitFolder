@@ -102,7 +102,7 @@ if strcmp(gfundata.type,'TRUSS')
     end
     G = eval(constraint{sgn});
     
-elseif strcmp(gfundata.type,'YounChoi')
+elseif strcmp(gfundata.type,'YounChoi') || strcmp(gfundata.type,'Madsen')
     
     G = eval(constraint{constraintNr});
     sgn = nan;

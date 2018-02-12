@@ -5,8 +5,9 @@ close all
 % 1) Input 
 % --------------------------------
  nr_of_trusses = 10;
-inputfile_trusses,
-%inputfile_YounChoi
+% inputfile_trusses,
+% inputfile_YounChoi
+inputfile_Madsen
 
 % Preprocessing, defining parameters for the algorithm from the inputs
 nx = rbdo_parameters.nx;   
@@ -139,8 +140,23 @@ while flag.outer_conv
         
         % FORM estimate of limit states
         [alpha_x_new, x_new, limit_new, slope_x_new, active_i, ~] = Grad_comp(dp, probdata, rbdo_fundata, gfundata, nr, RBDO_settings, lb_opt, 'limitstate', x_s(ii,:,:), rbdo_parameters, alpha_values_x(nr, 1:k , :));
-        active_fix(nr,1) = active_i;
-        non_fesible(nr) = sign(limit_new);
+        
+        % For madsen!
+        if strcmp(gfundata.type,'Madsen')
+            % Towards Mpp.
+            % alpha_x_final = [0.766; -0.244; -0.547; -0.232; 0.011; -0.006; -0.016]/ norm([0.766; -0.244; -0.547; -0.232; 0.011; -0.006; -0.016]);
+            
+            % Towards alpha_1
+            alpha_x_new = [ 2.401; -0.977; -1.843; -0.921; 0.055; -0.028; -0.083] / norm([ 2.401; -0.977; -1.843; -0.921; 0.055; -0.028; -0.083]);
+            
+%             c_theta = (alpha_x_new'*alpha_x_final)/( norm(alpha_x_new)*norm(alpha_x_final));
+%             ThetaInDegrees = acosd(c_theta);
+            
+        end
+            active_fix(nr,1) = active_i;
+            non_fesible(nr) = sign(limit_new);
+        
+        
 
         % Save the values
         index_x = min(lst(isnan(x_values(nr,:,1))));
@@ -156,7 +172,16 @@ while flag.outer_conv
     alpha_inner = mysqueeze(alpha_values_x(:, k, :))'; % used to be without transpose!
     
     % Update active set based on direction
-    update = alpha_c_new' * alpha_inner  > 0; % KKT !?
+    if strcmp(gfundata.type,'Trusses') || strcmp(gfundata.type,'YounChoi')
+        update = alpha_c_new' * alpha_inner  > 0; % KKT !?
+    
+    elseif  strcmp(gfundata.type,'Madsen')
+        
+        % All are active...
+        update = 1;
+        alpha_inner = alpha_inner';
+    end
+        
     
     %active = active*0;
     %active(number(update)) = 1;
@@ -245,16 +270,16 @@ while flag.outer_conv
                     hold off
                 end
 
-                %figure(fignr)
+                figure(fignr)
                 pnr = mod( nr, 5);
                 if pnr == 0
                     pnr = 5;
                 end
 
                % subplot( 5, 1, pnr);
-                %pplot(mysqueeze(x_values(nr,:,:)), limit_values(nr,:), slope_values(nr,:), dp, alpha_inner(:,nr), mysqueeze(x_s(nr,:,:)), nr, probdata,rbdo_parameters,gfundata, no_cross, p_lim, flag.exit)
-                %ylabel(sprintf('%d,flag=%d',nr, flag.exit))
-                %shg
+                pplot(mysqueeze(x_values(nr,:,:)), limit_values(nr,:), slope_values(nr,:), dp, alpha_inner(:,nr), mysqueeze(x_s(nr,:,:)), nr, probdata,rbdo_parameters,gfundata, no_cross, p_lim, flag.exit)
+                ylabel(sprintf('%d,flag=%d',nr, flag.exit))
+                shg
             end
         end
 
@@ -279,7 +304,6 @@ while flag.outer_conv
             elseif rbdo_parameters.variable == 1
                 b(ii,1 ) = A(ii,:)* (mysqueeze(x_s(nr_lprog, index_xs , : ))) - target_beta;
             end
-            
         end 
         
         if strcmp(gfundata.type,'Trusses')
@@ -322,13 +346,28 @@ while flag.outer_conv
 
         % no more steps for limit state j if last step was small enough!
         if l>0  
-           if strcmp(gfundata.type,'TRUSS')
+           if strcmp(gfundata.type,'TRUSS') || strcmp(gfundata.type,'Madsen') 
                 active_l_conv = Check_step( active_l_conv, alpha_inner, x_values, dp, flag.no_cross, 1e-4);  % 1e-6
            
-           else % Youn and choi
+           elseif strcmp(gfundata.type,'TRUSS') % Youn and choi
                active_l_conv = Check_step( active_l_conv, alpha_inner, x_s, x_values(: ,:,:), flag.no_cross, 2);
            end
            
+        end
+        
+        if strcmp(gfundata.type, 'Madsen') && active_l_conv(1) == 1
+            MPP_real = [ 2.615; -0.831; -1.866; -0.790; 0.037; -0.019; -0.056 ];
+            MPP_first = 3.3204*alpha_x_new;
+            Dist_Mpp_real = norm( x_s_new - MPP_real);
+            Dist_Mpp_first = norm( 3.3204*alpha_x_new - MPP_real);
+            xnum = 1:7;
+            
+            fprintf( 'Distance between final guess and first guess;  %1.4f \n', Dist_Mpp_first )
+            
+            fprintf( 'Probes = %d (extra), beta = %1.3f, Dist to real MPP = %1.3f, \n', l, norm(x_s_new),Dist_Mpp_real)
+            
+            fprintf( '\n MPP:\n')
+            fprintf( '%1.5f \n', x_s_new)
         end
 
         if flag.linprog == 1
@@ -354,9 +393,17 @@ while flag.outer_conv
          l = l+1; 
     end       
         
+    if strcmp(gfundata.type, 'Madsen')
+        xnum = 1:7;
+        fprintf( ' CONVERGED ')
+        fprintf( 'Probes = %d (extra), beta = %1.3f \n', l, norm(x_s_new))
+        fprintf( '%1.5f \n', x_s_new)
         
-        %plot_YounChoi(probdata, dp, x_s)
-        
+        fprintf( '\n Ignore the official result below.... \n')
+        break
+    end
+    
+        %plot_YounChoi(probdata, dp, x_s)    
         dp_old = dp;
         dp_test = dp;
         dp_l_test = dp_l;
@@ -535,11 +582,11 @@ if flag.MC == 1
 
     % Plot the data
     for ij = 1:nx
-        eval(sprintf('figure(7+%d)',ij))
-        eval(sprintf('histogram(g_values(:,%d),100,''Normalization'',''probability'')',ij))
+       fprintf('figure(7+%d)',ij)
+        fprintf('histogram(g_values(:,%d),100,''Normalization'',''probability'')',ij)
         title(sprintf('G%d',ij))
         xlabel('Limit state value [Pa]')
-        eval(sprintf('ylabel(''Probability for each data group based on 10^%d simulations'')', log10(nr_MC)))
+        fprintf('ylabel(''Probability for each data group based on 10^%d simulations'')', log10(nr_MC))
         grid on
     end
 end

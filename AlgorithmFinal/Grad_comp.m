@@ -59,7 +59,7 @@ switch type
             elseif rbdo_parameters.variable == 1
                 
                 
-                DoE = Experiment( dp, rbdo_parameters.target_beta/2); % Do it around dp!  % B1 ?
+                DoE = Experiment( dp, rbdo_parameters.target_beta/ 2); % Do it around dp!  % B1 ?
                 
                 dp_x = X_space(zeros(size(dp)), probdata.marg(:,2), probdata.marg(:,3));
                 doe_x = X_space( DoE, dp_x, probdata.marg(:,3));
@@ -100,7 +100,7 @@ gradient(:,1) = const_plane(2:end);
 alpha_vec = - gradient ./ norm(gradient)  ; %norm( gradient );
 
 %step 2
-alpha_vec(abs(alpha_vec)<5e-2) = 0;
+alpha_vec(abs(alpha_vec)<5e-3) = 0;
 alpha = alpha_vec ./ norm(alpha_vec);
 
 % Check if it is a feasible direction. - only relevant for trusses, not
