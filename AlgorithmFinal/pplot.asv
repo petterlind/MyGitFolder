@@ -25,14 +25,14 @@ p_line_full = linspace(-p_candidates(Imax), p_candidates(Imax),num);
 color = ['r','b','g','k','m','r','b','g','k','m','r','b','g','k','m','r','b','g','k','m'];
 
 
-
+% Real values, note translation to x_Space!
 p_real = nan(num,1);
-if strcmp(gfundata.type,'TRUSS')
-    for ij= 1:length(p_line_full) % Already in X_space
+if strcmp(gfundata.type,'TRUSSES')
+    for ij= 1:length(p_line_full)
         p_real(ij) = gvalue_fem('variables', alpha_values_x * p_line_full(ij) + dp, probdata, rbdo_parameters,gfundata,nr, 0,0);
     end   
 else
-    for ij= 1:length(p_line_full) % translation to x_Space!
+    for ij= 1:length(p_line_full)
         p_real(ij) = gvalue_fem('variables', X_space(alpha_values_x * p_line_full(ij) + dp, probdata.marg(:,2), probdata.marg(:,3)), probdata, rbdo_parameters,gfundata,nr, 0,0);
     end
 end
