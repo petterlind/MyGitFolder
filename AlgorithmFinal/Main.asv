@@ -111,16 +111,11 @@ while flag.outer_conv
     active_fix = ones(nca,1);
     gfundata.limitstates = nan(nx,1);
     
-    if strcmp(gfundata.type,'TRUSS')
+    if strcmp(gfundata.type,'TRUSS'
     RBDO_settings.doe_scale = min( norm(dp-dp_old) , RBDO_settings.doe_scale );
     
-    
-        if RBDO_settings.doe_scale < 1e-3
-            RBDO_settings.doe_scale = 1e-3;
-        end
-        
-        %RBDO_settings.scale_RoC = 5*RBDO_settings.doe_scale;
-        RBDO_settings.Roc = 2.5*RBDO_settings.doe_scale;
+    if RBDO_settings.doe_scale < 5e-4
+        RBDO_settings.doe_scale = 5e-4;
     end
     
     for ii = 1:nca %For all active constraints

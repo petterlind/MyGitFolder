@@ -38,16 +38,14 @@ switch type
 
                 dp_x = X_space(zeros(size(dp)), probdata.marg(:,2), probdata.marg(:,3));
                 doe_x = X_space( DoE, dp_x, probdata.marg(:,3));
-                fun_val = nan(length(doe_x),1);
-            
             end
-
+            
+            fun_val = nan(length(doe_x),1);
             for ij = 1:length(doe_x)
                 [fun_val(ij,1), ~] = gvalue_fem('variables', doe_x(:,ij), probdata, rbdo_parameters, gfundata, nr, 1,0);
             end
-            
             A = [ ones(length(DoE),1) (DoE-dp)'];
-
+            
         case 'cost'
             nx = length(dp);
             

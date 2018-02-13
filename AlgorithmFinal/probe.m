@@ -24,7 +24,7 @@ dp_fun = p_fun(1);
 % Intersection with y =0
 p_trial = pm_num - gm_num/k_num;
 
-fprintf('Linear approx: %1.4f \n', p_trial )
+% fprintf('Linear approx: %1.4f \n', p_trial )
 
 [pt_num, step, max_t_bounds, active_l] = Next_probe(p_val, p_fun, p_trial, l, nr, RBDO_settings, dp, alpha_values, lb, dp_fun, flag);
 [pt_final, ps_final, limit_new, slope_new, no_cross, exit_val, active_l] = Check_probe(pt_num, pm_num, gm_num, k_num, step, dp, alpha_values, probdata, rbdo_parameters, gfundata, nr, RBDO_settings, active_l, flag.debug);
