@@ -23,7 +23,8 @@ else
 end
 
 
-rbdo_fundata.constraint = {   0.7854e-4.* ones(nr_of_trusses,1) ; 78.54e-4.* ones(nr_of_trusses,1) };                           
+rbdo_fundata.constraint = {   0.7854e-4.* ones(nr_of_trusses,1) ; 78.54e-4.* ones(nr_of_trusses,1) };   
+%rbdo_fundata.mpp_constraint = { 0.7854e-3.* ones(nr_of_trusses,1) ; 78.54e-3.* ones(nr_of_trusses,1) };
 rbdo_fundata.mpp_constraint = { 1e-7 * ones(nr_of_trusses,1) ; 1* ones(nr_of_trusses,1) };
 rbdo_parameters.target_beta = 3.719;
 rbdo_parameters.design_point =  7e-4.* ones(nr_of_trusses,1); % 7cm^2..
@@ -80,9 +81,10 @@ probdata.p_star = probdata.marg(:,2).* ones(rbdo_parameters.np,rbdo_parameters.n
 
 % Algorithm settings 
  RBDO_settings.doe_scale = 3e-3;%1e-3; %1e-4
+ RBDO_settings.convl = 1e-1;
 % RBDO_settings.tol_non_linear = 0.5; %0.1 was too low?!
 % RBDO_settings.tol = 1e-3;
-RBDO_settings.default_step_t = 1;
-RBDO_settings.scale_RoC = 100;
-RBDO_settings.Roc = 7e-3;
+RBDO_settings.default_step_t = 1e-2; % Limiting distance the first step
+RBDO_settings.scale_RoC = 10; % Limiting distance for probe as function of last step
+%RBDO_settings.Roc = 6e-3; %2*RBDO_settings.doe_scale;
 max_step = 	10e-3; %8e-3; %3e-3;

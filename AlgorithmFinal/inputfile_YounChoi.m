@@ -57,6 +57,7 @@ rbdo_parameters.nc = 3; %Number of constraints
 rbdo_parameters.variable = 1; % 1 if probabalistic variables
 
 
+RBDO_settings.convl = 2;
 RBDO_settings.doe_scale = rbdo_parameters.target_beta/2; 
 RBDO_settings.default_step_t = 10; % defult max step
 RBDO_settings.scale_RoC = 100;
