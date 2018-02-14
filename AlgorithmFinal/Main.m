@@ -4,9 +4,9 @@ close all
 % --------------------------------
 % 1) Input 
 % --------------------------------
- nr_of_trusses = 10;
- inputfile_trusses,
-% inputfile_YounChoi
+% nr_of_trusses = 10;
+% inputfile_trusses,
+ inputfile_YounChoi
 % inputfile_Madsen
 
 % Preprocessing, defining parameters for the algorithm from the inputs
@@ -351,7 +351,7 @@ while flag.outer_conv
            if strcmp(gfundata.type,'TRUSS') || strcmp(gfundata.type,'Madsen') 
                 active_l_conv = Check_step( active_l_conv, alpha_inner, x_values, dp, flag.no_cross, 1e-4);  % 1e-6
            
-           elseif strcmp(gfundata.type,'TRUSS') % Youn and choi
+           elseif strcmp(gfundata.type,'TRUSS') ||  strcmp(gfundata.type,'YounChoi')
                active_l_conv = Check_step( active_l_conv, alpha_inner, x_s, x_values(: ,:,:), flag.no_cross, RBDO_settings.convl);
            end
            

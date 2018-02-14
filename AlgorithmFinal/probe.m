@@ -7,9 +7,6 @@ dp = mysqueeze(dp);
 if numel( dp(1,:) ) > 1
     mpp_index = double(min(lst(isnan(dp(:,1)))) -1);
     dp = dp(mpp_index,:)';
-    % limit_values(1) = []; % one more Mpp than function values at mpp.  D2
-    % limit_not_nan = limit_values(~isnan(limit_values));
-    % limit_values = limit_not_nan(1:end-1); % Remove the one added from gradient!
 end
 
 % Pick values in the alpha direction
@@ -25,7 +22,6 @@ dp_fun = p_fun(1);
 p_trial = pm_num - gm_num/k_num;
 
 % fprintf('Linear approx: %1.4f \n', p_trial )
-
 [pt_num, step, max_t_bounds, active_l] = Next_probe(p_val, p_fun, p_trial, l, nr, RBDO_settings, dp, alpha_values, lb, dp_fun, flag);
 [pt_final, ps_final, limit_new, slope_new, no_cross, exit_val, active_l] = Check_probe(pt_num, pm_num, gm_num, k_num, step, dp, alpha_values, probdata, rbdo_parameters, gfundata, nr, RBDO_settings, active_l, flag.debug);
 
