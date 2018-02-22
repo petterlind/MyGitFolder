@@ -20,7 +20,7 @@ g2 = @(u1,u2) ((dp_x(1) + sigma(1)*u1) + (dp_x(2) + sigma(2)*u2) - 5 )^2 / 30 + 
 g3 = @(u1,u2) 80 / ( (dp_x(1) + sigma(1)*u1).^2 + 8 * (dp_x(2) + sigma(2)*u2) + 5) -1;
 
 intervall = [-10 4 -10 2];
-levels = 0; %linspace(-0.3,0,100);
+levels = linspace(-0.3,0,100);
 fc1 = fcontour(g1, intervall);
 fc1.LevelList = levels; % Possibility to also show gradient here!
 hold on

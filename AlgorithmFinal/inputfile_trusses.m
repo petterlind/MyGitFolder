@@ -80,7 +80,7 @@ probdata.p_star = probdata.marg(:,2).* ones(rbdo_parameters.np,rbdo_parameters.n
 
 
 % Algorithm settings 
- RBDO_settings.doe_scale = 3e-3;%1e-3; %1e-4
+ RBDO_settings.doe_scale = 3e-3;  %1e-3; %1e-4   % 3e-3 works fine for 10 & 15 bar
  RBDO_settings.convl = 1e-1;
 % RBDO_settings.tol_non_linear = 0.5; %0.1 was too low?!
 % RBDO_settings.tol = 1e-3;

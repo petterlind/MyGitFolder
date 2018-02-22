@@ -47,7 +47,6 @@ gfundata(1).expression = {'mu1^2*mu2/20-1'
 gfundata(1).thetaf = { 'mu1' 'mu2' }; % Name of distribution design parameters
 
 % dp
-
 rbdo_parameters.design_point = U_space([ 5; 5], probdata.marg(:,2), probdata.marg(:,3)); % 7 cm^2, in m^2 
 
 % Numbers 
@@ -55,7 +54,6 @@ rbdo_parameters.nx = numel(gfundata.thetaf); %Number of design variables
 rbdo_parameters.np = 0;%Number of probabalistic parameters
 rbdo_parameters.nc = 3; %Number of constraints
 rbdo_parameters.variable = 1; % 1 if probabalistic variables
-
 
 RBDO_settings.convl = 2;
 RBDO_settings.doe_scale = rbdo_parameters.target_beta/2; 

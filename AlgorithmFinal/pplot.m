@@ -11,6 +11,8 @@ if length(p_val) > 1
     end
 end
 
+p_trial = 6.1138;
+
 % fit spline
 if flag_spline == 1
     [~, ~, ~, spline_const] = spline_fun(p_val(end-1), p_fun(end-1), p_val(end), p_fun(end), slope(end-1));
@@ -21,8 +23,10 @@ end
 p_candidates = [p_s, p_val(end)];
 [~,Imax] = max(abs(p_candidates));
 num = 100;
-p_line_full = linspace(-p_candidates(Imax), p_candidates(Imax),num);
-color = ['r','b','g','k','m','r','b','g','k','m','r','b','g','k','m','r','b','g','k','m'];
+%p_line_full = linspace(-p_candidates(Imax), p_candidates(Imax),num);
+p_line_full = linspace(0,11,1000);
+
+color = ['k','r','b','g','k','m','r','b','g','k','m','r','b','g','k','m','r','b','g','k','m'];
 
 
 
@@ -46,15 +50,19 @@ if flag_spline == 1
     hold on
 end
 
-%point
-plot(p_val, p_fun,'MarkerSize',8,'Marker','o','Color', color(nr),'LineStyle','none')
+%point 1
+plot(p_val(1), p_fun(1),'MarkerSize',8,'Marker','o','Color', color(nr),'LineStyle','none')
+hold on
+%point 2
+plot(p_val(2), p_fun(2),'MarkerSize',8,'Marker','o','Color', color(nr),'LineStyle','none')
 hold on
 
 % Mpp
 if no_cross == 0 && ~isempty(p_s)
     hold on
-    plot(p_s(end),0,'MarkerSize',4,'Marker','*','MarkerSize',20,'Color', color(nr))
+    plot(p_trial,0,p_s(end),0,'MarkerSize',4,'Marker','o','MarkerSize',20,'Color', color(nr))
 end
+%plot(9.99,0,'MarkerSize',4,'Marker','o','MarkerSize',20,'Color', color(nr))
 
 %real value
 plot(p_line_full,p_real,'LineWidth',2,'Color', color(nr),'LineStyle','--')
@@ -65,3 +73,19 @@ end
 
 hold on
 grid on
+
+p_trial = 6.1138;
+
+%linear 
+plot([p_val(1), p_trial],[p_fun(1), 0],'LineWidth',2,'Color', color(nr),'LineStyle','--' )
+plot([p_val(2),p_s(end)],[p_fun(2), 0],'LineWidth',2,'Color', color(nr),'LineStyle','--' )
+legend('Nominal value', 'Probe point', 'Mpp Estimates')
+xlabel('\alpha \cdot x')
+ylabel('G(p)')
+
+
+yticks([p_fun(1),p_fun(2)])
+xticks([0 p_trial p_s(end)])
+ytickslabels({'G(0)','G(p_t)'})
+xticklabels({'Nominal point','p_t', 'Mpp-estimate'})
+

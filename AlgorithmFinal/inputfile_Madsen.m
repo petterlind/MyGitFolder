@@ -56,8 +56,26 @@ rbdo_parameters.np = 0;%Number of probabalistic parameters
 rbdo_parameters.nc = 1; %Number of constraints
 rbdo_parameters.variable = 1; % 1 if probabalistic variables
 
-RBDO_settings.doe_scale = rbdo_parameters.target_beta/2; 
+RBDO_settings.doe_scale = rbdo_parameters.target_beta/1e8; 
 RBDO_settings.default_step_t = 10; % defult max step
 RBDO_settings.scale_RoC = 100;
 RBDO_settings.Roc = 100;
 max_step = 	100;
+
+
+%% Results
+
+b_probe = 3.425;
+pf_probe = cdf('Normal',-b_probe,0,1);
+
+b_madsen = 3.41;
+pf_madsen = cdf('Normal',-b_madsen,0,1);
+
+%MC
+%pf_MC = 3.8000e-04; % 1e5 runs
+pf_MC = 3.3900e-04; % 1e6 runs
+
+error_madsen = (pf_madsen-pf_MC) / pf_MC;
+error_probe =  (pf_probe-pf_MC) / pf_MC;
+
+%(pf_probe-pf_madsen)/pf_madsen

@@ -14,7 +14,7 @@ norm_x = sum(x.^2,2);
 x_normed = x./ sqrt(norm_x);
 
 % Check if direction is same as alpha with tolerance
-same_dir = abs((abs(alpha' * x_normed') - 1)) < 1e-3;
+same_dir = abs((abs(alpha' * x_normed') - 1)) < 5e-3;
 
 % Check if dp is in the vector and add it
 dp_pos = find(norm_x ==0);
