@@ -113,7 +113,7 @@ else %not too close, lets do a spline and investigate!
                     end
                 end
             
-                if abs((spline_curve_old(trend_new) - Gt_num) / spline_curve_old(trend_new)) < RBDO_settings.tol_non_linear && sign(trend_old - Gt_old/a_old) == sign(sign_first_step) && (bad_first_slope == 0 || bad_first_slope == 2)
+                if abs((spline_curve_old(trend_new) - Gt_num) / spline_curve_old(trend_new)) < RBDO_settings.tol_non_linear && sign(trend_old - Gt_old/a_old) == sign(sign_first_step) && bad_first_slope == 0
 
                     % SMALL CHANGE OF CURVATURE,  
                     % p_s and p_t should be in same direction
@@ -164,7 +164,7 @@ else %not too close, lets do a spline and investigate!
                     Gt_num = old_g(2);
                     step = abs(pt_num-pm_num);
                     
-                    bad_first_slope = 2; %Reset this stuff!
+                    bad_first_slope = 0; %Reset this stuff!
                     %plotspline([C_fix(4) C_fix(3) C_fix(2) C_fix(1)], -2e-4, 0, alpha_values, dp, probdata, rbdo_parameters, gfundata, nr ) 
                    % plot(old_trends,old_g,'ob')
                    
@@ -188,17 +188,17 @@ else %not too close, lets do a spline and investigate!
                     trend_old = trend_new;
                 end
                 
-%                 if nr ==2
-%                     % plot the spline
-%                     plotspline(spline_const, min(old_trends), max(old_trends), alpha_values, dp, probdata, rbdo_parameters, gfundata, nr )
-% 
-%                     % plot the points
-%                     plot(old_trends,old_g,'ro')
-% 
-%                     % plot the mpp estimate
-%                     %plot(ps_final,0,'ks')
-%                 
-%                 end
+                if nr ==2
+                    % plot the spline
+                    plotspline(spline_const, min(old_trends), max(old_trends), alpha_values, dp, probdata, rbdo_parameters, gfundata, nr )
+
+                    % plot the points
+                    plot(old_trends,old_g,'ro')
+
+                    % plot the mpp estimate
+                    %plot(ps_final,0,'ks')
+                
+                end
             
                       
             else

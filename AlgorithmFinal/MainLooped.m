@@ -4,7 +4,7 @@ close all
 % --------------------------------
 % 1) Input 
 % --------------------------------
- nr_of_trusses = 10;
+% nr_of_trusses = 10;
 % inputfile_trusses,
  inputfile_YounChoi
 % inputfile_Madsen
@@ -17,21 +17,24 @@ rbdo_fundata.constraint = {   -5/0.3                   % Deterministic constrain
                               5/0.3
                           }; % in u-space!
 
-u_div = 30;
+u_div = 175;
+%u_div = 3;
 u1_vec =linspace(-10,4,u_div);
 u2_vec =linspace(-10,2,u_div);
 Loop_res = nan(u_div,u_div);
 Loop_obj = nan(u_div,u_div);
+Loop_final1 = nan(u_div,u_div);
+Loop_final2 = nan(u_div,u_div);
 
 h = waitbar(0,'Please wait...');
-
+non_ui = [];
+non_uj = [];
 
 for  ui = 1:u_div
     for uj = 1:u_div
-
-        
          waitbar(ui / u_div)
-        
+        try
+            
         rbdo_parameters.design_point = [u1_vec(ui);u2_vec(uj)];
         % Preprocessing, defining parameters for the algorithm from the inputs
         nx = rbdo_parameters.nx;   
@@ -245,7 +248,7 @@ for  ui = 1:u_div
 
             plot_trusses(dp, probdata, rbdo_parameters, gfundata, flag, nx, k, dp_plot, dp_color)
            elseif flag.debug == 1 && ( nx == 2 ) %Trusses 
-                plot_YounChoi(probdata, dp, x_s)
+                plot_YounChoi(probdata, dp, x_s, k)
            end
 
            % -----------------------
@@ -265,11 +268,11 @@ for  ui = 1:u_div
                     nr = number(ii);
 
                     % New probe point
-                    if strcmp(gfundata.type,'TRUSS') || k < 2
+                    %if strcmp(gfundata.type,'TRUSS') || k < 2
                         [x_new, limit_new, slope_new, x_s_new, no_cross, flag.exit, p_lim, active_l_nr, ps] = probe(mysqueeze(x_values(nr,:,:)), limit_values(nr,:), alpha_inner(:,nr), slope_values(nr,:), dp, RBDO_settings, probdata, rbdo_parameters, gfundata, nr, l,k, lb, flag);
-                    else
-                        [x_new, limit_new, slope_new, x_s_new, no_cross, flag.exit, p_lim, active_l_nr, ps] = probe(mysqueeze(x_values(nr,:,:)), limit_values(nr,:), alpha_inner(:,nr), slope_values(nr,:), x_values(nr,:,:), RBDO_settings, probdata, rbdo_parameters, gfundata, nr, l,k, lb, flag);
-                    end
+                    %else %WHY?
+                    %    [x_new, limit_new, slope_new, x_s_new, no_cross, flag.exit, p_lim, active_l_nr, ps] = probe(mysqueeze(x_values(nr,:,:)), limit_values(nr,:), alpha_inner(:,nr), slope_values(nr,:), x_values(nr,:,:), RBDO_settings, probdata, rbdo_parameters, gfundata, nr, l,k, lb, flag);
+                    %end
                     % Save the values
                     index_x = min(lst(isnan(x_values(nr,:,1))));
                     index_f = min(lst(isnan(flag.no_cross(nr,:))));
@@ -376,7 +379,7 @@ for  ui = 1:u_div
                         active_l_conv = Check_step( active_l_conv, alpha_inner, x_values, dp, flag.no_cross, 1e-4);  % 1e-6
 
                    elseif strcmp(gfundata.type,'YounChoi')
-                       active_l_conv = Check_step( active_l_conv, alpha_inner, x_s, x_values(: ,:,:), flag.no_cross, RBDO_settings.convl);
+                       active_l_conv = Check_step( active_l_conv, alpha_inner, x_s, dp, flag.no_cross, RBDO_settings.convl);
                    end
 
                 end
@@ -463,14 +466,21 @@ for  ui = 1:u_div
         % Save the result for each inner loop.
         Loop_res(ui,uj) = Gnum;
         Loop_obj(ui,uj) = obj_new;
+        Loop_final1(ui,uj) = dp(1);
+        Loop_final2(ui,uj) = dp(2);
+        catch
+            non_ui = [non_ui, ui];
+            non_uj = [non_uj, uj];
+        end
+        
     end
 end
 
+% Save the result
+%save('LoopYounChoiRes90','Loop_res','Loop_obj','u1_vec','u2_vec','u_div')
+
 close(h) 
 
- %  43    53    53
- %   53    43    43
- %   25    53    54
 
 
 % Display the result
@@ -503,7 +513,7 @@ if flag.debug == 1 && ( nx == 5 || nx == 10 || nx == 15) %Trusses
 
     plot_trusses(dp, probdata, rbdo_parameters, gfundata, flag, nx, k, dp_plot, dp_color)
 elseif flag.debug == 1 && ( nx == 2 ) %Trusses 
-       plot_YounChoi(probdata, dp, x_s)
+       plot_YounChoi(probdata, dp, x_s, k)
 end
 
 

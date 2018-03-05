@@ -1,5 +1,6 @@
 function pplot(x_values, limit_values, slope_values, dp, alpha_values_x, x_s, nr, probdata,rbdo_parameters,gfundata, no_cross, p_lim, exit_flag)
 % Plots splines in p-direction for every limitstate.
+
 flag_spline = 0;
 % Values in p-direction
 [p_val, p_fun, slope] = P_values(x_values, limit_values, alpha_values_x, dp, slope_values);
@@ -74,18 +75,19 @@ end
 hold on
 grid on
 
-p_trial = 6.1138;
+% Plot in report
+%p_trial = 6.1138;
 
 %linear 
-plot([p_val(1), p_trial],[p_fun(1), 0],'LineWidth',2,'Color', color(nr),'LineStyle','--' )
-plot([p_val(2),p_s(end)],[p_fun(2), 0],'LineWidth',2,'Color', color(nr),'LineStyle','--' )
-legend('Nominal value', 'Probe point', 'Mpp Estimates')
-xlabel('\alpha \cdot x')
-ylabel('G(p)')
+%plot([p_val(1), p_trial],[p_fun(1), 0],'LineWidth',2,'Color', color(nr),'LineStyle','--' )
+%plot([p_val(2),p_s(end)],[p_fun(2), 0],'LineWidth',2,'Color', color(nr),'LineStyle','--' )
+%legend('Nominal value', 'Probe point', 'Mpp Estimates')
+%xlabel('\alpha \cdot x')
+%ylabel('G(p)')
 
 
-yticks([p_fun(1),p_fun(2)])
-xticks([0 p_trial p_s(end)])
-ytickslabels({'G(0)','G(p_t)'})
-xticklabels({'Nominal point','p_t', 'Mpp-estimate'})
+%yticks([p_fun(1),p_fun(2)])
+%xticks([0 p_trial p_s(end)])
+%ytickslabels({'G(0)','G(p_t)'})
+%xticklabels({'Nominal point','p_t', 'Mpp-estimate'})
 

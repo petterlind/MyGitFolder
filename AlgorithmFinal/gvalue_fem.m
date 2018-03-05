@@ -72,7 +72,7 @@ if strcmp(gfundata.type,'TRUSS')
     end
 
     if isnan(gfundata.limitstates(constraintNr))
-        if abs(Ft) < 1
+        if abs(Ft) < 0
             Ft = 0;
             sgn = 1;
 

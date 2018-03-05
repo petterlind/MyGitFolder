@@ -50,8 +50,7 @@ elseif abs(max_t_bounds) > abs(p_val(end)) || isnan(max_t_bounds)
     if p_val(end) == 0
         pt_num = p_val(end) + step * sign(p_fun(end));
     else
-        pt_num = p_val(end) + step * sign(p_trial - p_val(end));
-    end
+        pt_num = p_val(end) + step * sign(p_fun(end));
     
     
 else

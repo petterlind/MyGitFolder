@@ -71,11 +71,15 @@ pf_probe = cdf('Normal',-b_probe,0,1);
 b_madsen = 3.41;
 pf_madsen = cdf('Normal',-b_madsen,0,1);
 
+b_linear = 3.32;
+pf_linear = cdf('Normal',-b_linear,0,1);
+
+
 %MC
 %pf_MC = 3.8000e-04; % 1e5 runs
 pf_MC = 3.3900e-04; % 1e6 runs
 
 error_madsen = (pf_madsen-pf_MC) / pf_MC;
 error_probe =  (pf_probe-pf_MC) / pf_MC;
-
+error_linear = (pf_linear-pf_MC) / pf_MC;
 %(pf_probe-pf_madsen)/pf_madsen
