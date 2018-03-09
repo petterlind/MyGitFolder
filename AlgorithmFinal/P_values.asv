@@ -13,8 +13,12 @@ x = xvalues(1:max_valid,:) - dp'.*ones(size(xvalues(1:max_valid,:)));
 norm_x = sum(x.^2,2);
 x_normed = x./ sqrt(norm_x);
 
-% Check if direction is same as alpha with tolerance
+% Check if direction is same as alpha with tolerance, using scalar product.
 same_dir = abs((abs(alpha' * x_normed') - 1)) < 2e-2; % acosd(1-2e-2) = 11 grad
+
+% cross([alpha;0], [x_normed(1,:),0]')
+% cross(alpha)
+% cross(alpha)
 
 % Check if dp is in the vector and add it
 dp_pos = find(norm_x ==0);

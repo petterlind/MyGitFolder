@@ -33,7 +33,7 @@ non_uj = [];
 for  ui = 1:u_div
     for uj = 1:u_div
          waitbar(ui / u_div)
-        try
+        %try
             
         rbdo_parameters.design_point = [u1_vec(ui);u2_vec(uj)];
         % Preprocessing, defining parameters for the algorithm from the inputs
@@ -119,14 +119,17 @@ for  ui = 1:u_div
             l = 0;
             flag.inner_conv = 1;
             test_lnf1 = 0;
-
+            
+            if k== 2
+                disp('brake')
+            end
+            
             % Update objective-gradient direction
             [alpha_c_new, ~, obj_new, ~,~,~] = Grad_comp(dp, probdata, rbdo_fundata, gfundata, 1, RBDO_settings, lb, 'cost', x_s, rbdo_parameters, alpha_values_x(:, k, :));
 
             % save the values
             obj_values(k, 1) = obj_new(1);
             alpha_values_c(k, :) = alpha_c_new';
-
 
             active = update;
             % Set the indexing for the loop
@@ -138,7 +141,6 @@ for  ui = 1:u_div
 
             if strcmp(gfundata.type,'TRUSS')
             RBDO_settings.doe_scale = min( norm(dp-dp_old) , RBDO_settings.doe_scale );
-
 
                 if RBDO_settings.doe_scale < 1e-3
                     RBDO_settings.doe_scale = 1e-3;
@@ -268,11 +270,11 @@ for  ui = 1:u_div
                     nr = number(ii);
 
                     % New probe point
-                    %if strcmp(gfundata.type,'TRUSS') || k < 2
+                    if strcmp(gfundata.type,'TRUSS') || k < 2
                         [x_new, limit_new, slope_new, x_s_new, no_cross, flag.exit, p_lim, active_l_nr, ps] = probe(mysqueeze(x_values(nr,:,:)), limit_values(nr,:), alpha_inner(:,nr), slope_values(nr,:), dp, RBDO_settings, probdata, rbdo_parameters, gfundata, nr, l,k, lb, flag);
-                    %else %WHY?
-                    %    [x_new, limit_new, slope_new, x_s_new, no_cross, flag.exit, p_lim, active_l_nr, ps] = probe(mysqueeze(x_values(nr,:,:)), limit_values(nr,:), alpha_inner(:,nr), slope_values(nr,:), x_values(nr,:,:), RBDO_settings, probdata, rbdo_parameters, gfundata, nr, l,k, lb, flag);
-                    %end
+                    else %WHY?
+                        [x_new, limit_new, slope_new, x_s_new, no_cross, flag.exit, p_lim, active_l_nr, ps] = probe(mysqueeze(x_values(nr,:,:)), limit_values(nr,:), alpha_inner(:,nr), slope_values(nr,:), x_values(nr,:,:), RBDO_settings, probdata, rbdo_parameters, gfundata, nr, l,k, lb, flag);
+                    end
                     % Save the values
                     index_x = min(lst(isnan(x_values(nr,:,1))));
                     index_f = min(lst(isnan(flag.no_cross(nr,:))));
@@ -468,20 +470,18 @@ for  ui = 1:u_div
         Loop_obj(ui,uj) = obj_new;
         Loop_final1(ui,uj) = dp(1);
         Loop_final2(ui,uj) = dp(2);
-        catch
-            non_ui = [non_ui, ui];
-            non_uj = [non_uj, uj];
-        end
+%         catch
+%             non_ui = [non_ui, ui];
+%             non_uj = [non_uj, uj];
+%         end
         
     end
 end
 
-% Save the result
-%save('LoopYounChoiRes90','Loop_res','Loop_obj','u1_vec','u2_vec','u_div')
+%Save the result
+save('LoopYounChoiRes5','Loop_res','Loop_obj','u1_vec','u2_vec','u_div','Loop_final1','Loop_final2')
 
 close(h) 
-
-
 
 % Display the result
 fprintf('\n Number of function evaluation %d', Gnum)

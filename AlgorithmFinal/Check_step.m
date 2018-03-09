@@ -1,4 +1,4 @@
-function active = Check_step( active, alpha_inner, x_s, point, flag_no_cross, tolerance)
+function active = Check_step( active, alpha_inner, x_s, x_val, flag_no_cross, tolerance)
 % Check steplength for the change x_s from the last step.
 
 % Set the indexing for the loop
@@ -13,13 +13,13 @@ for ii = 1:nca
     if flag_no_cross(nr, index_f) == 0
         
 %         %Check if larger than Mpp, pick the last Mpp.
-%         if sum( length( x_val) / numel(x_val) ) ~= 1
-%             x_val_red = mysqueeze(x_val(ii,:,:)); % Test to pick the last x-value for the limitstate. Rest should be in same direction....
-%             mpp_index = double(min(lst(isnan(x_val_red(:,1)))) -1);
-%             point = x_val_red(mpp_index,:)';
-%         else
-%             point = x_val;
-%         end
+        if sum( length( x_val) / numel(x_val) ) ~= 1
+            x_val_red = mysqueeze(x_val(ii,:,:)); % Test to pick the last x-value for the limitstate. Rest should be in same direction....
+            mpp_index = double(min(lst(isnan(x_val_red(:,1)))) -1);
+            point = x_val_red(mpp_index,:)';
+        else
+            point = x_val;
+        end
     
         [p_val, ~, ~] = P_values(mysqueeze(x_s(nr,: ,:)),  nan(1,100), alpha_inner(:,nr), point,  nan(1,100));
         

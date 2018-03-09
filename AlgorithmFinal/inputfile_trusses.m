@@ -110,7 +110,7 @@ probdata.p_star = probdata.marg(:,2).* ones(rbdo_parameters.np,rbdo_parameters.n
 RBDO_settings.default_step_t = 1e-2; % Limiting distance the first step
 RBDO_settings.scale_RoC = 1000; % Limiting distance for probe as function of last step
 RBDO_settings.tol_non_linear = 1000; %0.1 was too low?!
-RBDO_settings.Doe_Roc_ratio = sqrt(nr_of_trusses)/sqrt(5)*2;
+RBDO_settings.Doe_Roc_ratio = sqrt(nr_of_trusses)/sqrt(5)*1.5;
 
 
 

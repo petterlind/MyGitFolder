@@ -9,14 +9,27 @@ if numel( dp(1,:) ) > 1
     dp = dp(mpp_index,:)';
 end
 
+% if sum( length( x_values) / numel(x_values) ) ~= 1
+%     x_val_red = mysqueeze(x_values(ii,:,:)); % Test to pick the last x-value for the limitstate. Rest should be in same direction....
+%     mpp_index = double(min(lst(isnan(x_val_red(:,1)))) -1);
+%     point = x_val_red(mpp_index,:)';
+% else
+%     point = x_val;
+% end
+
 % Pick values in the alpha direction
 [p_val, p_fun, slope] = P_values(x_values, limit_values, alpha_values, dp, slope_values);
-    
+
+try
 % The last one is the latest update.
 gm_num = p_fun(end);
 pm_num = p_val(end);
 k_num = slope(end);
 dp_fun = p_fun(1);
+catch
+    disp('brake')
+end
+
 
 % Intersection with y =0
 p_trial = pm_num - gm_num/k_num;

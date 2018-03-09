@@ -17,7 +17,8 @@ rbdo_fundata.constraint = {   -5/0.3                   % Deterministic constrain
                               5/0.3
                           }; % in u-space!
 
-u_div = 150;
+u_div = 5;
+%u_div = 3;
 u1_vec =linspace(-10,4,u_div);
 u2_vec =linspace(-10,2,u_div);
 Loop_res = nan(u_div,u_div);
@@ -26,13 +27,14 @@ Loop_final1 = nan(u_div,u_div);
 Loop_final2 = nan(u_div,u_div);
 
 h = waitbar(0,'Please wait...');
+non_ui = [];
+non_uj = [];
+
 for  ui = 1:u_div
     for uj = 1:u_div
-
-         ui = 36;
-         uj = 17;
          waitbar(ui / u_div)
-        
+        %try
+            
         rbdo_parameters.design_point = [u1_vec(ui);u2_vec(uj)];
         % Preprocessing, defining parameters for the algorithm from the inputs
         nx = rbdo_parameters.nx;   
@@ -88,7 +90,7 @@ for  ui = 1:u_div
         flag.bigger = 0; % for probe settings, does not allow the probe point to have a bigger value than gm
         flag.no_cross = nan(nc,Lnumber); % nececcary?
         flag.outer_conv = 1;             % outer loop conv flag
-        flag.debug = 1;
+        flag.debug = 0;
         flag.RoC = 1;
         flag.max_step = 1;
 
@@ -267,11 +269,9 @@ for  ui = 1:u_div
 
                     % New probe point
                     %if strcmp(gfundata.type,'TRUSS') || k < 2
-                    if
                         [x_new, limit_new, slope_new, x_s_new, no_cross, flag.exit, p_lim, active_l_nr, ps] = probe(mysqueeze(x_values(nr,:,:)), limit_values(nr,:), alpha_inner(:,nr), slope_values(nr,:), dp, RBDO_settings, probdata, rbdo_parameters, gfundata, nr, l,k, lb, flag);
                     %else %WHY?
                     %    [x_new, limit_new, slope_new, x_s_new, no_cross, flag.exit, p_lim, active_l_nr, ps] = probe(mysqueeze(x_values(nr,:,:)), limit_values(nr,:), alpha_inner(:,nr), slope_values(nr,:), x_values(nr,:,:), RBDO_settings, probdata, rbdo_parameters, gfundata, nr, l,k, lb, flag);
-                    
                     %end
                     % Save the values
                     index_x = min(lst(isnan(x_values(nr,:,1))));
@@ -468,17 +468,18 @@ for  ui = 1:u_div
         Loop_obj(ui,uj) = obj_new;
         Loop_final1(ui,uj) = dp(1);
         Loop_final2(ui,uj) = dp(2);
-        
+        catch
+            non_ui = [non_ui, ui];
+            non_uj = [non_uj, uj];
+        end
         
     end
 end
 
-% Save the result
-%save('LoopYounChoiRes90','Loop_res','Loop_obj','u1_vec','u2_vec','u_div')
+%Save the result
+save('LoopYounChoiRes5','Loop_res','Loop_obj','u1_vec','u2_vec','u_div','Loop_final1','Loop_final2')
 
 close(h) 
-
-
 
 % Display the result
 fprintf('\n Number of function evaluation %d', Gnum)
