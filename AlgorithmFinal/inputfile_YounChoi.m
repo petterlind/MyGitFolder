@@ -5,7 +5,7 @@ close all
 %%  DATA FIELDS IN 'RBDO_FUNDATA' and 'RBDO_PARAMETERS'  %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                                                            % Cost function in the form: c_0 + c_f * p_f
-rbdo_fundata.cost = {'mu1+mu2' };     
+rbdo_fundata.cost = {'mu1+mu2'};     
 
 rbdo_fundata.constraint = {   -100                    % Deterministic constraints: [lower xi, upper xi]
                               -100
@@ -30,6 +30,8 @@ probdata.name =  {};
 probdata.marg =  [  1   5   0.3;
                     1   5   0.3 ;
                    ];
+
+
                
 probdata.stdv = diag(probdata.marg(:,3));
 

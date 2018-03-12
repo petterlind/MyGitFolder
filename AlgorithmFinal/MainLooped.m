@@ -479,7 +479,7 @@ for  ui = 1:u_div
 end
 
 %Save the result
-save('LoopYounChoiRes5','Loop_res','Loop_obj','u1_vec','u2_vec','u_div','Loop_final1','Loop_final2')
+save('LoopYounChoiRes175','Loop_res','Loop_obj','u1_vec','u2_vec','u_div','Loop_final1','Loop_final2')
 
 close(h) 
 
