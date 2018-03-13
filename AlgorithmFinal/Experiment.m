@@ -1,4 +1,4 @@
-function [position] = Experiment(poi, scale)%, alpha, nr, probdata, rbdo_parameters, gfundata)
+function position = Experiment(poi, scale)%, alpha, nr, probdata, rbdo_parameters, gfundata)
 
 % TEST
 

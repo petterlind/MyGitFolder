@@ -1,15 +1,12 @@
-function c = ObjectiveFunction(points, rbdo_fundata, gfundata)
+function c = ObjectiveFunction(Opt_set, obj, pdata)
 
 global Cnum
 Cnum = Cnum + 1;
-
-nx = length(points);
-cost = rbdo_fundata.cost;
-
+points = Opt_set.dp_x;
 % Set variables equal to points
-for ii = 1:nx
-    eval( sprintf( '%s =  points(ii);',gfundata.thetaf{ii}));
+for ii = 1:pdata.nx
+    eval( sprintf( '%s =  points(ii);',pdata.name_x{ii}));
 end
 
 % Function value
-c = eval(char(cost));
+c = eval(obj.expression{1});

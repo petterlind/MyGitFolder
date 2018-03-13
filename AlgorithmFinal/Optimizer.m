@@ -1,12 +1,30 @@
 classdef Optimizer
    properties
+       % Outer loop
         dp_x               % Design point in x-space
         dp_u               % Design point in u-space
  
         dp_x_old           % Old design point in x-space
         dp_u_old           % Old design point in u-space
         
-        constraint
+        ob_val             % Objective function value
+        ob_val_old = nan   % Old objective function value
+        
+        % Inner loop
+        dpl_x = nan;
+        dpl_u = nan;
+
+        dpl_x_old
+        dpl_u_old
+        
+        lb
+        ub
+        RoC                % Something that enforces some kind of move-limit.
+        inner_conv = 1;
+        outer_conv = 1;
+        
+        l = nan;
+        k = 0;
         
       
    end

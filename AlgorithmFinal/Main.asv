@@ -167,8 +167,11 @@ fprintf('\n dp = %f ',Opt_set.dp_x)
 fprintf('\n DONE! \n')
 
 % And plot the last step
-Opt_set.k = Opt_set.k +1;
-plotiter(pdata, Opt_set, LS)
+Opt_set
+   % ------------------------
+   % plot the iteration - youn choi.
+   % ------------------------
+   plotiter(pdata, Opt_set, LS)
 
 
 % % if RBDO_s.debug == 1
