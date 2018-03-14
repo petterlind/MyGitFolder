@@ -1,7 +1,8 @@
 classdef Probdata
    properties
-    marg                % [distribution (0 1 2 - det, normal, log), mean, stdv, type (0 1 - para, variable)]
-    name                % Name of the parameters and variables
+    margd                % deterministic dv
+    margx                % probibilistic dv
+    margp                % probibilistic dp
     
     name_x
     name_p

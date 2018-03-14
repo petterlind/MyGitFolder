@@ -12,7 +12,7 @@ case 'variables'
 
     %1)DoE - koshal
     obj.doe_u = Experiment(obj.nominal_u, obj.target_beta/2);
-    obj.doe_x = X_space( obj.doe_u, pdata.margx(:,2) , pdata.margx(:,3)); % Transformation back to X-space
+    obj.doe_x = X_space( obj.doe_u, pdata.marg(:,2) , pdata.marg(:,3)); % Transformation back to X-space
 
     %2)Experiment - in x-space!
     obj.doe_val = nan(pdata.nx+1,1);
@@ -34,9 +34,7 @@ gradient(:,1) = const_plane(2:end);
 switch type
     
     case 'variables'
-    %obj.alpha_x = -( diag(pdata.marg(:,3))*gradient ) / norm(diag(pdata.marg(:,3)) * gradient); %SLA
-    obj.alpha_x = -( gradient ) / norm(gradient); %SLA
-    
+    obj.alpha_x = - gradient ./ norm(gradient);
     obj.slope =  obj.alpha_x(:,1)' * gradient;
     
     [obj.p_x, obj.p_val] = P_val(obj.doe_x, obj.doe_val, obj);

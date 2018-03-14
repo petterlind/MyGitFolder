@@ -6,8 +6,9 @@ close all
 % --------------------------------
 % nr_of_trusses = 15;
 % inputfile_trusses,
-inputfile_YounChoi
+%inputfile_YounChoi
 % inputfile_Madsen
+inputfile_Cheng
 
 %dp_plot = nan(nx,100);
 %dp_color = nan(nx,100);
@@ -39,10 +40,13 @@ while Opt_set.outer_conv
 
     for ii = 1:numel(LS) %For all active constraints
         if LS(ii).active == true
+            
             if pdata.np > 0
-                error('MORE CODE NEEDED')
-%                 Grad
-%                 
+                
+                
+                
+              LS(ii).MPPx = Grad(LS(ii), pdata, RBDO_s, 'variables')
+                
 %                 p_star = X_space( alpha_p_new * target_beta, probdata.marg(:,2), probdata.marg(:,3));
 % 
 %                 probdata.p_star(:,nr) = p_star;
@@ -92,10 +96,6 @@ while Opt_set.outer_conv
         % Optimizer
         options = optimoptions('linprog','Algorithm','dual-simplex','OptimalityTolerance', 1e-10,'ConstraintTolerance',1e-3);
         [ Opt_set.dpl_x, fval, RBDO_s.f_linprog, output] = linprog(f, A, b, [],[], Opt_set.lb, Opt_set.ub,options); 
-
-%         test = U_space(Opt_set.dpl_x, pdata.marg(:,2), pdata.marg(:,3))
-%         hold on
-%         plot(test(1),test(2),'or')
         
         if RBDO_s.f_linprog == 1 % linprog converged to a solution X
             
@@ -169,104 +169,6 @@ fprintf('\n DONE! \n')
 % And plot the last step
 Opt_set.k = Opt_set.k +1;
 plotiter(pdata, Opt_set, LS)
-
-
-% % if RBDO_s.debug == 1
-% %     for ii = 1:nx
-% %         [a, ~] = gvalue_fem('variables', dp, probdata, rbdo_parameters, gfundata, ii,0,0);
-% %         fprintf(' \n g%d: %1.7f \n', ii, a )
-% %     end
-% % end
-% % 
-% % 
-% % % Plot last step
-% % k=k+1;
-% % if RBDO_s.debug == 1 && ( nx == 5 || nx == 10 || nx == 15) %Trusses
-% %        
-% %     a = nan(nx,1);
-% %     for ii = 1:nx
-% %         [a(ii), ~] = gvalue_fem('variables', dp, probdata, rbdo_parameters, gfundata, ii,0,0);
-% %     end
-% % 
-% %     dp_plot(:,k) = dp;
-% %     dp_color(:,k) =sign(a);
-% % 
-% %     plot_trusses(dp, probdata, rbdo_parameters, gfundata, RBDO_s, nx, k, dp_plot, dp_color)
-% % elseif RBDO_s.debug == 1 && ( nx == 2 ) %Trusses 
-% %        plot_YounChoi(probdata, dp, x_s, k)
-% % end
-% % 
-% % 
-% % % Monte Carlo simulations.
-% % RBDO_s.MC = 0;
-% % 
-% % if RBDO_s.MC == 1
-% %     nr_MC = 1e6;
-% %     % Plocka värden på p börja med 1000 st
-% % 
-% %     
-% %     p_star_mc = probdata.marg(:,2) + probdata.marg(:,3).*randn(numel(probdata.marg(:,3)),nr_MC);
-% %     h = waitbar(0,'Soon...');
-% % 
-% %     if strcmp(gfundata.type,'TRUSS')
-% %         g_values = nan(nr_MC,length(dp));
-% %         
-% %     for ii = 1:nr_MC
-% % 
-% %         probdata.p_star = p_star_mc(:,ii);
-% %         % Gör funktionsanrop till G, A7
-% %         g_vec = gvalue_fem_mc('variables', dp, probdata, rbdo_parameters, gfundata, 0,0);
-% %         g_values(ii,:) = g_vec';
-% % 
-% %         if mod(ii, (0.1*nr_MC)) == 0
-% %          waitbar(ii / nr_MC)
-% %          shg
-% %         end
-% %     end
-% % 
-% %     % Results
-% %     fails = g_values < 0;
-% %     pf_mc = sum(fails)/nr_MC;
-% % 
-% %     % Plot the data
-% %     for ij = 1:nx
-% %        fprintf('figure(7+%d)',ij)
-% %         fprintf('histogram(g_values(:,%d),100,''Normalization'',''probability'')',ij)
-% %         title(sprintf('G%d',ij))
-% %         xlabel('Limit state value [Pa]')
-% %         fprintf('ylabel(''Probability for each data group based on 10^%d simulations'')', log10(nr_MC))
-% %         grid on
-% %     end
-% %         
-% % elseif strcmp(gfundata.type,'Madsen') %Copy paste this block directly into window.
-% %     
-% %     g_values = nan(nr_MC,1);
-% %     for ii = 1:nr_MC
-% %         % Gör funktionsanrop till G,
-% %         g_vec = gvalue_fem('variables', p_star_mc(:,ii), probdata, rbdo_parameters, gfundata, 1, 0,0);
-% %         g_values(ii,:) = g_vec';
-% % 
-% %         if mod(ii, (0.1*nr_MC)) == 0
-% %          waitbar(ii / nr_MC)
-% %          shg
-% %         end
-% %     end
-% % 
-% %     % Results
-% %     fails = g_values < 0;
-% %     pf_mc = sum(fails)/nr_MC;
-% % 
-% %     % Plot the data
-% %     figure
-% %     histogram(g_values, 100, 'Normalization', 'probability')
-% %     xlabel('Limit state value [Nm]')
-% %     eval(sprintf('ylabel(''Probability for each data group based on 10^%d simulations'')', log10(nr_MC)))
-% %     grid on
-% %    
-% % 
-% %     end
-% % end
-
 
 
 
