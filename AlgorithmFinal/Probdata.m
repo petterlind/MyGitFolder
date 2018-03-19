@@ -1,9 +1,9 @@
 classdef Probdata
    properties
-    margd                % deterministic dv
-    margx                % probibilistic dv
+    marg                 %  [  distribuiton(0 - det, 1- normal, 2-lognormal) mean stdv  (0 - parameter, 1 - variable)]
     margp                % probibilistic dp
     
+    name
     name_x
     name_p
     name_d
@@ -20,15 +20,17 @@ classdef Probdata
          pos_nd =  marg(:,1) == 0;
          pos_np = (marg(:,1) == 1 | marg(:,1) ==2) & marg(:,4) == 0;
          
+         obj.name_d = obj.name(pos_nd);
          obj.name_x = obj.name(pos_nx);
-         obj.name_p = obj.name(pos_np);
          
          obj.nd = sum( pos_nd & marg(:,4) == 1);
          obj.nx = sum( pos_nx & marg(:,4) == 1);
-         obj.np = sum( pos_np & marg(:,4) == 0);
          
          obj.stdv_x = diag(marg(pos_nx, 3));
-         obj.stdv_p = diag(marg(pos_np, 3));
+         if sum(pos_np) >0
+             obj.stdv_p = diag(obj.margp(pos_np, 3));
+         end
+         
          
          % Add correlation here aswell?!
      end

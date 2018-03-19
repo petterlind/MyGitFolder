@@ -3,30 +3,32 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 pdata = Probdata; %Specify the class
-pdata.name_x = {'A1','A2','A3','A4','A5','A6','A7','A8','A9','A10'};
+pdata.name = {'A1','A2','A3','A4','A5','A6','A7','A8','A9','A10'};
 pdata.name_p = {'P1' ,'P2' ,'sy'};
 
-pdata.margd =  [  0   6.452e-3   0 1
-                 0   6.452e-3   0 1
-                 0   6.452e-3   0 1
-                 0   6.452e-3   0 1
-                 0   6.452e-3   0 1
-                 0   6.452e-3   0 1
-                 0   6.452e-3   0 1
-                 0   6.452e-3   0 1
-                 0   6.452e-3   0 1
-                 0   6.452e-3   0 1];
-             
-pdata.margx =  [];
-             
-pdata.margp =  [ 2   4.448e5    2.224e4 0
-                 2   4.448e5    2.224e4 0
-                 1   1.724e8    1.724e7 0];
+%OPTIMAL VALUES
+optimum =  [ 12.2; 7.5; 15.5; 1.5; 1.5; 1.5; 10.2; 8.1; 2.5; 10.1].*64.5e-4;
+
+
+pdata.marg =  [  0  64.516e-4   0 1
+                 0   64.516e-4   0 1
+                 0   64.516e-4   0 1
+                 0   64.516e-4   0 1
+                 0   64.516e-4   0 1
+                 0   64.516e-4   0 1
+                 0   64.516e-4   0 1
+                 0   64.516e-4   0 1
+                 0   64.516e-4   0 1
+                 0   64.516e-4   0 1];
+              
+             %pdata.marg(:,2)= optimum
+
+pdata.margp =  [ 2   4.448e5    2.224e3 0
+                 2   4.448e5    2.224e3 0
+                 1   1.724e8    1.724e6 0]; % Less variation! Allt en tiopotens ned!
           
-%pdata = set_numbers(pdata, pdata.marg);
-pdata.nx = numel(pdata.margx);
-pdata.nd = numel(pdata.margd);
-pdata.np = numel(pdata.margp);
+pdata = set_numbers(pdata, pdata.marg);
+pdata.np = numel(pdata.margp(:,2));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Optimizer settings
@@ -35,8 +37,11 @@ pdata.np = numel(pdata.margp);
 Opt_set = Optimizer;
 Opt_set.lb = [6.45e-8, 6.45e-8, 6.45e-8, 6.45e-8, 6.45e-8, 6.45e-8, 6.45e-8, 6.45e-8, 6.45e-8, 6.45e-8]; 
 Opt_set.ub = [1.61e-3, 1.61e-3, 1.61e-3, 1.61e-3, 1.61e-3, 1.61e-3, 1.61e-3, 1.61e-3, 1.61e-3, 1.61e-3];
-Opt_set.dp_x = pdata.margd(:,2);
-%Opt_set.dp_u = U_space(Opt_set.dp_x, pdata.marg(1:nx,2), pdata.marg(1:nx,3));
+Opt_set.dp_x = pdata.marg(:,2);
+
+if pdata.nx > 0
+    Opt_set.dp_u = U_space(Opt_set.dp_x, pdata.marg(:,2), pdata.marg(:,3));
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Functions, Obj and Limitstate
@@ -48,6 +53,7 @@ obj = Limitstate;
 obj.expression = {'9.144*(A1+A2+A3+A4+A5+A6) + sqrt(2)*9.144*(A8+A9+A10)'};
 %obj.nominal_u = Opt_set.dp_u;
 obj.nominal_x = Opt_set.dp_x;
+obj.Mpp_p = pdata.margp(:,2);
 
 G1 = Limitstate; G1.nr = 1; % Displacement
 G2 = Limitstate; G2.nr = 2; % Tension
@@ -66,13 +72,17 @@ G1.nominal_x = Opt_set.dp_x; % First guess of Mpp
 G2.nominal_x = Opt_set.dp_x;
 G3.nominal_x = Opt_set.dp_x;
 
+G1.Mpp_p = pdata.margp(:,2); % Start Mpp_p guess
+G2.Mpp_p = pdata.margp(:,2);
+G3.Mpp_p = pdata.margp(:,2);
+
 G1.func = {'[F, U] = Cheng(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,P1,P2,0)'};
 G2.func = {'[F, U] = Cheng(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,P1,P2,0)'};
 G3.func = {'[F, U] = Cheng(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,P1,P2,0)'};
 
-G1.expression = {'0.1143 - max(U(:,1))'}; % X OR Y DISPLACEMENT, SHOULD BE X!
-G2.expression = {'sy - max(F./Avec)'};
-G3.expression = {'sy- min(F./Avec)'};
+G1.expression = {'0.1143 - max(abs(U(1,:)))'}; % X OR Y DISPLACEMENT, SHOULD BE X!
+G2.expression = {'sy - max(F./[A1,A2,A3,A4,A5,A6,A7,A8,A9,A10] )'};
+G3.expression = {'sy + min(F./[A1,A2,A3,A4,A5,A6,A7,A8,A9,A10])'};
 LS = [G1, G2, G3];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -81,5 +91,13 @@ LS = [G1, G2, G3];
 
 RBDO_s = Rbdo_settings;
 RBDO_s.name = 'Cheng';
-RBDO_s.f_one_probe = 1;
+
+RBDO_s.f_RoC = true;
+RBDO_s.RoC_d = 0.0052; % 8 sq inch^2..
+RBDO_s.RoC_d = 0.0052/2; 
+RBDO_s.det_step = 1e-3;
 RBDO_s.f_debug = 1;
+RBDO_s.f_one_probe = 1;
+
+
+

@@ -3,7 +3,6 @@ C=[D.Coord;D.Coord+Sc*U];e=D.Con(1,:);f=D.Con(2,:);
 for i=1:6
     M=[C(i,e);C(i,f);repmat(NaN,size(e))];X(:,i)=M(:);    
 end
-figure(4)
 plot3(X(:,4),X(:,5),X(:,6),':m');
 hold on
 % for ij = 1:length(X(:,1))*3;

@@ -8,6 +8,7 @@ pdata.name = {'mu1','mu2'};
 pdata.marg =  [  1   5   0.3 1;
                  1   5   0.3 1;
               ];
+pdata.margp =  [];
           
 pdata = set_numbers(pdata, pdata.marg);
 
@@ -19,8 +20,10 @@ Opt_set = Optimizer;
 Opt_set.lb = [0; 0]; 
 Opt_set.ub = [10; 10];
 Opt_set.dp_x = [5;5];
-Opt_set.dp_u = U_space([ 5; 5], pdata.marg(:,2), pdata.marg(:,3));
 
+if pdata.nx > 0
+    Opt_set.dp_u = U_space(Opt_set.dp_x, pdata.marg(:,2), pdata.marg(:,3));
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Functions, Obj and Limitstate
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -60,5 +63,8 @@ LS = [G1, G2, G3];
 
 RBDO_s = Rbdo_settings;
 RBDO_s.name = 'YounChoi';
-RBDO_s.f_one_probe = 1;
-RBDO_s.f_debug = 1;
+
+
+RBDO_s.f_one_probe = true;
+RBDO_s.f_RoC = false;
+RBDO_s.f_debug = true;

@@ -1,5 +1,16 @@
 function [F, U] = Cheng(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,P1,P2, flag_plot)
 
+
+
+% t = num2cell(pdata.marg(:,2));
+% t = num2cell(optimum);
+% [A1,A2,A3,A4,A5,A6,A7,A8,A9,A10] = deal(t{:});
+% 
+% t2 = num2cell(pdata.margp(1:end-1,2));
+% [P1,P2] = deal(t2{:});
+% 
+% [F, U] = Cheng(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,P1,P2, 1)
+
 Enum = 6.895e10;
 
 L = 9.144;
@@ -49,7 +60,7 @@ D=struct('Coord',Coord','Con',Con','Re',Re','Load',Load','E',E','A',A');
 
 % Plot whats going on.
 if flag_plot == 1
-    TP(D,U,100, Ft) ;
+    TP(D,U,100, F) ;
 end
 
 end

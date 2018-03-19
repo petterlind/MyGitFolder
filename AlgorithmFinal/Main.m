@@ -6,9 +6,9 @@ close all
 % --------------------------------
 % nr_of_trusses = 15;
 % inputfile_trusses,
-%inputfile_YounChoi
+ inputfile_YounChoi
 % inputfile_Madsen
-inputfile_Cheng
+% inputfile_Cheng
 
 %dp_plot = nan(nx,100);
 %dp_color = nan(nx,100);
@@ -36,25 +36,18 @@ while Opt_set.outer_conv
     Opt_set.inner_conv = 1;
     
     % Update objective-gradient direction, doe, alpha
-    obj = Grad(obj, pdata, RBDO_s, 'variables');
+    obj = Grad(obj, pdata, Opt_set, RBDO_s, 'variables');
 
     for ii = 1:numel(LS) %For all active constraints
         if LS(ii).active == true
-            
             if pdata.np > 0
                 
-                
-                
-              LS(ii).MPPx = Grad(LS(ii), pdata, RBDO_s, 'variables')
-                
-%                 p_star = X_space( alpha_p_new * target_beta, probdata.marg(:,2), probdata.marg(:,3));
-% 
-%                 probdata.p_star(:,nr) = p_star;
-%                 alpha_p_old = alpha_p_new;
+                % Update MPP-estimate in probabilistic space
+                LS(ii) = Grad(LS(ii), pdata, Opt_set, RBDO_s, 'parameters');
             end
         
             % FORM estimate of limit states
-            LS(ii) = Grad(LS(ii), pdata, RBDO_s, 'variables');
+            LS(ii) = Grad(LS(ii), pdata, Opt_set, RBDO_s, 'variables');
         end
         
          LS(ii).active = obj.alpha_x' * LS(ii).alpha_x  >  cosd(135);
@@ -64,7 +57,7 @@ while Opt_set.outer_conv
    % ------------------------
    % plot the iteration - youn choi.
    % ------------------------
-   plotiter(pdata, Opt_set, LS)
+   plotiter(pdata, Opt_set, RBDO_s.name, LS)
    
    % -----------------------
    % Inner loop - one step
@@ -79,7 +72,7 @@ while Opt_set.outer_conv
             if LS(ii).active
 
                 % New probe point and Mpp estimate
-                LS(ii) = do_probe(LS(ii), pdata, RBDO_s);
+                LS(ii) = do_probe(LS(ii), pdata, Opt_set, RBDO_s);
             end
         end
 
@@ -91,12 +84,25 @@ while Opt_set.outer_conv
         active = [LS.active];
         A = [LS(active).alpha_x]';
         xs = [LS(active).Mpp_x];
-        b = diag(A*xs) - target_beta.*pdata.marg(:,3); %only for the probabalistic dv. Otherwise without target_beta..
         
+        %if pdata.nx > 0 
+            %only for the probabalistic dv. Otherwise without target_beta..
+            b = diag(A*xs) - target_beta.*pdata.marg(:,3); 
+        %elseif pdata.nx == 0 && pdata.nd ~=0 
+         %   b = diag(A*xs);
+        %else
+        %    error('Add the last option in b')
+        %end
+           
         % Optimizer
         options = optimoptions('linprog','Algorithm','dual-simplex','OptimalityTolerance', 1e-10,'ConstraintTolerance',1e-3);
-        [ Opt_set.dpl_x, fval, RBDO_s.f_linprog, output] = linprog(f, A, b, [],[], Opt_set.lb, Opt_set.ub,options); 
+        [ Opt_set.dpl_x, fval, RBDO_s.f_linprog, output] = linprog(f, A, b, [],[], Opt_set.lb, Opt_set.ub*100,options); 
         
+        if RBDO_s.f_RoC
+            RoC_p = RoC(RBDO_s, pdata, Opt_set); % ENFORCE LIMITS?!
+            Opt_set.dpl_x = RoC_p;
+        end
+           
         if RBDO_s.f_linprog == 1 % linprog converged to a solution X
             
             if RBDO_s.f_one_probe == 1
@@ -104,7 +110,7 @@ while Opt_set.outer_conv
                 Opt_set.inner_conv = 0;
                 
                 if RBDO_s.f_debug == 1
-                    fprintf('One_probe \n')
+                    fprintf('One probe \n')
                 end
 
             elseif sum(active_l_conv) == 0 
@@ -167,11 +173,6 @@ fprintf('\n dp = %f ',Opt_set.dp_x)
 fprintf('\n DONE! \n')
 
 % And plot the last step
-Opt_set.k = Opt_set.k +1;
-plotiter(pdata, Opt_set, LS)
-
-
-
-
-
+Opt_set.k = Opt_set.k + 1;
+plotiter(pdata, Opt_set, RBDO_s.name, LS)
 
