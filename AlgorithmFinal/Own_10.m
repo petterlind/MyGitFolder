@@ -1,6 +1,4 @@
-function [F, U] = Cheng(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,P1,P2, flag_plot)
-
-
+function [F, U] = Own_10(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,P1,P2, flag_plot)
 
 % t = num2cell(pdata.marg(:,2));
 % %t = num2cell(optimum);
@@ -23,16 +21,6 @@ Coord = [ L 2*L 0
     0 0 0];
 %  Connectivity
 
-% Con = [ 5 3
-%     3 1
-%     6 4
-%     4 2
-%     1 2
-%     4 3
-%     6 3
-%     5 4
-%     2 3
-%     1 4];
 Con = [ 6 4
     4 2
     5 3
@@ -43,6 +31,7 @@ Con = [ 6 4
     5 4
     4 1
     3 2];
+
 
 
 % Definition of Degree of freedom (free=0 &  fixed=1); for 2-D trusses the last column is equal to 1
@@ -62,11 +51,32 @@ E=ones(1,size(Con,1))*Enum;
 % or:   E=[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]*1e7;
 
 % Definition of Area
-%syms A1 A2 A3 A4 A5 A6 A7 A8 A9 A10 'positive'
 A=[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10];
+
+
+c = 1;
+s = 0;
+
+T90 =[ c s 0 0
+    -s c 0 0
+    0 0 c s
+    0 0 -s c];
+
+T45 = [ cosd(45) sind(45) 0 0
+    -sind(45)  cosd(45) 0 0
+    0 0  cosd(45) sind(45)
+    0 0 -sind(45)  cosd(45)];
+
+
+k = AE/L
+
+
+kp = AE/L
+
 
 % Convert to structure array
 D=struct('Coord',Coord','Con',Con','Re',Re','Load',Load','E',E','A',A');
+
 [F,U,~]=ST(D);
 
 % Plot whats going on.

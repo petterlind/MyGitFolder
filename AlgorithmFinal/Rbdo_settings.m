@@ -7,24 +7,26 @@ classdef Rbdo_settings
     
     
     % Solver settings
-    det_step
-    RoC_d           % minimum step size deterministic variables, absolute numbers
+    RoC_d             % minimum step size deterministic variables, absolute numbers
     RoC_x = 3;        % Minimum step size probibalistic variables, times \beta^T
+    
+    DoE_size_x      % DoE size in u-space
+    DoE_size_d      % DoE size in x-space ( deterministic variables)
     tol = 1e-3;
-    max_k = 10;
-    max_l = 20;
-    doe_scale 
-    default_step_t 
-    scale_RoC 
-    Roc 
-    max_step
+    max_k = 10000;
+    max_l = 100;
+    
+    lb_probe         % Lowest probe point
+
     
     %Flags
     f_one_probe
-    f_RoC = true;
+    f_RoC = true;        % Step box constraint with move in feasible dir first!
+    f_RoC_step = false;  % Step length constraint
     f_maxstep = 0;
     f_debug
     f_linprog
-
-   end
+    f_COV = false;
+    f_probe = true; % Runs probe algorithm
+ end
 end

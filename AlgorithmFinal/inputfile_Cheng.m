@@ -50,7 +50,7 @@ end
 target_beta = 3;
 
 obj = Limitstate;
-obj.expression = {'9.144*(A1+A2+A3+A4+A5+A6) + sqrt(2)*9.144*(A8+A9+A10)'};
+obj.expression = {'G = 9.144*(A1+A2+A3+A4+A5+A6) + sqrt(2)*9.144*(A7+A8+A9+A10)'};
 %obj.nominal_u = Opt_set.dp_u;
 obj.nominal_x = Opt_set.dp_x;
 obj.Mpp_p = pdata.margp(:,2);

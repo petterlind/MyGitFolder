@@ -1,4 +1,4 @@
-function G = gvalue_fem(type, point, pdata, Opt_set, RBDO_s, obj, f_count,f_plot)
+function G = gvalue_fem(type, point, pdata, Opt_set, RBDO_s, obj, f_count, f_plot)
                     
 global Gnum
 if f_count == 1
@@ -52,12 +52,12 @@ end
 
 % Function call
 if ~isempty(obj.func)
-    eval(sprintf( '%s;',obj.func{1}));
+    eval(sprintf( '%s',obj.func{1}));
 end
 
 % Evaluate expression
 if ~isempty(obj.expression)
-    eval(sprintf(' G = %s;',obj.expression{1}))
+    eval(sprintf('%s',obj.expression{1}))
 end
 
 

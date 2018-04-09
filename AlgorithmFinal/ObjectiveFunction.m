@@ -1,4 +1,4 @@
-function c = ObjectiveFunction(Opt_set, obj, pdata)
+function G = ObjectiveFunction(Opt_set, obj, pdata)
 
 global Cnum
 Cnum = Cnum + 1;
@@ -14,4 +14,4 @@ for ij = 1:pdata.nd
 end
 
 % Function value
-c = eval(obj.expression{1});
+eval(obj.expression{1});

@@ -11,6 +11,7 @@ classdef Probdata
     np                  % Number of probabalistic parameters
     nd                  % Numbers of determensitic variables
     
+    cov
     stdv_x
     stdv_p
    end

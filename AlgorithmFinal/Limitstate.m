@@ -17,8 +17,7 @@ classdef Limitstate
       p_trial               % Linear estimate for probe point from DoE.
       p_x                   % pvalues
       p_val                 % p funtion values (based on probe points)
-      probe_x               % probe coordinate in x-space
-      probe_p               % probe coordinate in p-space
+      probe_p               % probe coordinate in p-space - x-space! from nominal!
       probe_val             % probe function value
       probe_s               % probe Mpp estimate
       
@@ -26,17 +25,18 @@ classdef Limitstate
       
       alpha_p               % Steepest decent direction probabalistic para
       alpha_x               % Steepest decent direction probabalistic variables
+      beta_v = 0
       
       Mpp_p                 % Paramter set beta- away in u space in alpha p-dir.
       Mpp_x                 % Mpp estimate from probe
+      Mpp_x_old             % Old Mpp LS.
       Mpp_u                 % Mpp estimate from probe, u-space
+      G_p_old
       
       no_cross = 0;
        
       func                  % Demands a function call
       expression            % expression for the limit state surface.
-      
-      target_beta           % target beta.
       
    end
 %    methods
