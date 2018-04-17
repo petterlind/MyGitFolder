@@ -9,39 +9,6 @@ pdata.name_p = {'P1' ,'P2' ,'sy'};
 %OPTIMAL VALUES
 optimum =  [ 12.2; 7.5; 15.5; 1.5; 1.5; 1.5; 10.2; 8.1; 2.5; 10.1].*64.5e-4;
 
-optimum = [
-   0.019210408575632
-   0.005083657104998
-   0.019074543823912
-   0.007839977398629
-   0.004148144092974
-   0.005082014879844
-   0.010943074906560
-   0.011042072761935
-   0.010757148093904
-   0.006133603547812];
-
-optimum = [
-   0.019684671671653
-   0.003018913386598
-   0.019339142840207
-   0.008517968703146
-   0.001412403567711
-   0.003019604620377
-   0.008757470084177
-   0.012398424894531
-   0.012195633687363
-   0.004382662267042];
-optimum =[ 0.019351 
-  0.000296 
-  0.015217 
-  0.009353 
-  0.000296 
-  0.000296 
-  0.004581 
-  0.012909 
-  0.012425 
-  0.000296 ]; 
 
 pdata.marg =  [  0  10   0 1
                  0   10   0 1
@@ -68,8 +35,8 @@ pdata.np = 0;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Opt_set = Optimizer;
-Opt_set.lb = 0.001 *ones(10,1).* (2.54e-2)^2; % 0.1 in TANA! 
-Opt_set.ub = [1.61, 1.61, 1.61, 1.61, 1.61, 1.61, 1.61, 1.61, 1.61, 1.61].*100; % REALLY BIG! = no limit
+Opt_set.lb = 0.001 *ones(10,1).* (2.54e-2)^2; % 0.001 in SAP! 0.1 in TANA
+Opt_set.ub = 25* ones(10,1).* (2.54e-2)^2;
 
 Opt_set.dp_x = pdata.marg(:,2);
 %Opt_set.target_beta = 3;
@@ -79,7 +46,7 @@ Opt_set.dp_x = pdata.marg(:,2);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 obj = Limitstate; 
-obj.expression = {'G = 0.1 * (360*2.54e-2*((A1+A2+A3+A4+A5+A6) + sqrt(2)*(A7+A8+A9+A10))) /(2.54e-2)^3;'}; % in lb!
+obj.expression = {'G = (3.048*((A1+A2+A3+A4+A5+A6) + sqrt(2)*(A7+A8+A9+A10)));'};
 obj.nr = 0; 
 obj.nominal_u = Opt_set.dp_u;
 obj.nominal_x = Opt_set.dp_x;
@@ -121,21 +88,21 @@ G10.func = G1.func;G11.func = G1.func;
 
 
 % 2 inch^2 in TANA!
-G1.expression = {'G = 4.5*(2.54e-2) - max(abs(U(1,:)));'}; % X OR Y DISPLACEMENT, SHOULD BE X!
-G2.expression = {' G = 172.3689e6 - abs(max(F./[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10]));'};
-G3.expression = {' G = 172.3689e6 - abs(min(F./[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10]));'};
-%  G2.expression = {'F = abs(F(1)); G = 172.3689 - 1e-6*F/A1;'};
-%  G3.expression = {'F = abs(F(2)); G = 172.3689 - 1e-6*F/A2;'};
-%  G4.expression = {'F = abs(F(3)); G = 172.3689 - 1e-6*F/A3;'};
-%  G5.expression = {'F = abs(F(4)); G = 170.3689 - 1e-6*F/A4;'};
-%  G6.expression = {'F = abs(F(5)); G = 172.3689 - 1e-6*F/A5;'};
-%  G7.expression = {'F = abs(F(6)); G = 172.3689 - 1e-6*F/A6;'};
-%  G8.expression = {'F = abs(F(7)); G = 172.3689 - 1e-6*F/A7;'};
-%  G9.expression = {'F = abs(F(8)); G = 172.3689 - 1e-6*F/A8;'};
-%  G10.expression = {'F = abs(F(9)); G = 172.3689 - 1e-6*F/A9;'};
-%  G11.expression = {'F = abs(F(10)); G = 172.3689 - 1e-6*F/A10;'};
-%  LS = [G1, G2, G3, G4, G5, G6, G7, G8, G9, G10, G11];
-LS = [G1, G2, G3];
+ G1.expression = {'G = 4.5*(2.54e-2) - max(max(abs(U(:,:))));'}; % X OR Y DISPLACEMENT, SHOULD BE X!
+%G2.expression = {' G = 172.3689 - 1e-6*abs(max(F./[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10]));'};
+%G3.expression = {' G = 172.3689 - 1e-6*(min(F./[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10]));'};
+ G2.expression = {'F = abs(F(1)); G = 172.3689 - 1e-6*F/A1;'};
+ G3.expression = {'F = abs(F(2)); G = 172.3689 - 1e-6*F/A2;'};
+ G4.expression = {'F = abs(F(3)); G = 172.3689 - 1e-6*F/A3;'};
+ G5.expression = {'F = abs(F(4)); G = 170.3689 - 1e-6*F/A4;'};
+ G6.expression = {'F = abs(F(5)); G = 172.3689 - 1e-6*F/A5;'};
+ G7.expression = {'F = abs(F(6)); G = 172.3689 - 1e-6*F/A6;'};
+ G8.expression = {'F = abs(F(7)); G = 172.3689 - 1e-6*F/A7;'};
+ G9.expression = {'F = abs(F(8)); G = 172.3689 - 1e-6*F/A8;'};
+ G10.expression = {'F = abs(F(9)); G = 172.3689 - 1e-6*F/A9;'};
+ G11.expression = {'F = abs(F(10)); G = 172.3689 - 1e-6*F/A10;'};
+  LS = [ G2, G3, G4, G5, G6, G7, G8, G9, G10, G11];
+%LS = [G1, G2, G3];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % General settings
@@ -144,9 +111,9 @@ LS = [G1, G2, G3];
 RBDO_s = Rbdo_settings;
 RBDO_s.name = 'Cheng';
 
-RBDO_s.f_RoC = false;
-RBDO_s.f_RoC_step = true;
-RBDO_s.RoC_d = 5*(2.54e-2)^2; % Max deterministic update of dv.
+RBDO_s.f_RoC = true;
+RBDO_s.f_RoC_step = false;
+RBDO_s.RoC_d = 3*(2.54e-2)^2; % Max deterministic update of dv.
 RBDO_s.DoE_size_d = 0.01*(2.54e-2)^2; % 0.1 inch.
 RBDO_s.f_debug = 1;
 RBDO_s.f_one_probe = 1;

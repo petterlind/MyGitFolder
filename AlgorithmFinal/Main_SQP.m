@@ -5,13 +5,12 @@ close all
 % 1) Input
 % --------------------------------
 % nr_of_trusses = 15;
-% inputfile_trusses,
+ inputfile_trusses,
 % inputfile_YounChoi
 % inputfile_Madsen
 % inputfile_Cheng
 % inputfile_Cheng10
-
-inputfile_Cheng10_det
+% inputfile_Cheng10_det
 % inputfile_Cheng3_det
 % inputfile_TANA
 
@@ -22,8 +21,18 @@ inputfile_Cheng10_det
 %non_fesible = nan(nx,1);
 
 % Globals
-global Gnum
+global Gnum Opt_set LS
 Gnum = 0;
+
+Opt_set.l = 0;
+options = optimoptions('fmincon','Display','iter','Algorithm','sqp','ConstraintTolerance',1e-3,'FunctionTolerance',1e-3,'StepTolerance',1e-3);
+FUN = @(X) gvalue_fem('variables', X, pdata, Opt_set, RBDO_s, obj, 1,0);
+CONS = @(X) mycon(X, pdata, Opt_set, RBDO_s, LS);
+Opt_set.dp_x = fmincon(FUN,Opt_set.dp_x,[],[],[],[],Opt_set.lb, Opt_set.ub',CONS,options);
+
+Opt_set.k = Opt_set.k+1;
+plotiter(pdata, Opt_set, RBDO_s, LS)
+
 
 % --------------------------------
 % 2) Main Loop
@@ -104,7 +113,7 @@ while Opt_set.outer_conv
 
         % Set up optimization
         f = -obj.alpha_x; % x-space
-        active = [LS.active] & ~[LS.no_cross] ;
+        active = [LS.active];
         A = [LS(active).alpha_x]';
         xs = [LS(active).Mpp_x]; % Add some shifted xs!?!!
 
@@ -130,14 +139,10 @@ while Opt_set.outer_conv
         FUN = @(X1) norm(X1-Opt_set.dp_x);
         feas_x = fmincon(FUN,Opt_set.dp_x,A,b,[],[],Opt_set.lb, Opt_set.ub');
         
-        % RoC
+        % Step length
         if RBDO_s.f_RoC
             RoC_p = RoC(RBDO_s, pdata, Opt_set, Opt_set.dpl_x, Opt_set.dp_x, feas_x,Opt_set.lb);
-            if RoC_p ~= Opt_set.dpl_x
-                fprintf('RoC-move \n')    
-                Opt_set.dpl_x = RoC_p;
-            end
-            
+            Opt_set.dpl_x = RoC_p;
             
         elseif RBDO_s.f_RoC_step
             step = Opt_set.dpl_x- Opt_set.dp_x;
@@ -145,7 +150,8 @@ while Opt_set.outer_conv
             if norm_s > RBDO_s.RoC_d %step is larger then allowed.
                 
                 Opt_set.dpl_x = Opt_set.dp_x + RBDO_s.RoC_d*step/norm_s;
-                fprintf('Stepsize %d, With Roc %d \n',norm_s, RBDO_s.RoC_d);  
+                fprintf('Stepsize %d, With Roc %d \n',norm_s, RBDO_s.RoC_d);
+                
             end
         end
 
@@ -196,8 +202,8 @@ while Opt_set.outer_conv
     if ~isempty(Opt_set.ob_val_old)
         v_diff = abs(Opt_set.dp_x_old- Opt_set.dp_x); 
         if abs(Opt_set.ob_val - Opt_set.ob_val_old)/ Opt_set.ob_val_old < RBDO_s.tol && max(v_diff)< RBDO_s.tol
-           %Opt_set.outer_conv = 0; 
-           disp('NEVER CONVERGE!!!')
+           Opt_set.outer_conv = 0; 
+           %disp('NEVER CONVERGE!!!')
         end
     end
     
@@ -215,12 +221,12 @@ while Opt_set.outer_conv
         fprintf(' \n The maximum difference in u since last step is (componentwise): %1.7f \n', Opt_set.dp_x - Opt_set.dp_x_old)
     end
     
-    counter = counter + 1;
-    if counter == 10
-        fprintf('-')
-        counter = 0;
-        LS(1).G_p_old
-    end
+%     counter = counter + 1;
+%     if counter == 10
+%         fprintf('-')
+%         counter = 0;
+%         LS(1).G_p_old
+%     end
         
 
 end

@@ -1,4 +1,4 @@
-function Ft_nt = Truss_force10(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,F,P,Enum,nt, flag_plot)
+function Ft_nt = Aoues(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,F,P,Enum,nt, flag_plot)
 
 % Validation
 %Truss_force10(design_point(1),design_point(2),design_point(3),design_point(4),design_point(5),design_point(6),design_point(7),design_point(8),design_point(9),design_point(10),F,P,Enum,nt)

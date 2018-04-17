@@ -117,9 +117,9 @@ RBDO_s.f_RoC = true;
 RBDO_s.RoC_x = 3; % Times beta - max step in probabalistic space.
 
 %RBDO_s.det_step = 
-RBDO_s.DoE_size_x = RBDO_s.RoC_x/6;
+RBDO_s.DoE_size_x = RBDO_s.RoC_x/60;
 %RBDO_s.RoC_size_d = 5e-4;
 
-RBDO_s.f_COV = true;
+RBDO_s.f_COV = false;
 RBDO_s.f_debug = 1;
 RBDO_s.f_one_probe = 1;

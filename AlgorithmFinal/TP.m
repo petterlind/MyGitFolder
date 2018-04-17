@@ -10,7 +10,9 @@ hold on
 n1 = 1;
 
 % Linewidth!
-lw_ref = 20*(2.54e-2)^2;
+lw_ref = 3*(2.54e-2)^2;
+
+%lw_ref = 7e-4;
 
 for ii = 1:length(Ft)
     

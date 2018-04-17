@@ -215,12 +215,12 @@ while Opt_set.outer_conv
         fprintf(' \n The maximum difference in u since last step is (componentwise): %1.7f \n', Opt_set.dp_x - Opt_set.dp_x_old)
     end
     
-    counter = counter + 1;
-    if counter == 10
-        fprintf('-')
-        counter = 0;
-        LS(1).G_p_old
-    end
+%     counter = counter + 1;
+%     if counter == 10
+%         fprintf('-')
+%         counter = 0;
+%         LS(1).G_p_old
+%     end
         
 
 end

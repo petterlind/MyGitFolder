@@ -3,12 +3,13 @@ function obj = do_probe(obj, pdata, Opt_set, RBDO_s)
 %  1) RoC for probe point!
 if RBDO_s.f_RoC
 
-   % probe_x_pos = RoC(RBDO_s, pdata, Opt_set, obj.alpha_x * obj.p_trial + obj.nominal_x, obj.nominal_x,[], RBDO_s.lb_probe );
+   test = RoC(RBDO_s, pdata, Opt_set, obj.alpha_x * obj.p_trial + obj.nominal_x, obj.nominal_x,[], RBDO_s.lb_probe );
     
-    test = obj.alpha_x * obj.p_trial + obj.nominal_x;
-    probe_x_pos = nan(size(test));
-    if test < Opt_set.lb
-        probe_x_pos(test < Opt_set.lb) = Opt_set.lb
+%     test = obj.alpha_x * obj.p_trial + obj.nominal_x;
+%     probe_x_pos = nan(size(test));
+    if test < RBDO_s.lb_probe 
+        % probe_x_pos(test < Opt_set.lb) = Opt_set.lb;
+        error('LS %d, Probe outside bounds for probe!')
     else
         probe_x_pos = test;
     end
@@ -16,7 +17,7 @@ if RBDO_s.f_RoC
     obj.probe_p = obj.alpha_x' * (probe_x_pos-obj.nominal_x);
 
     if obj.probe_p ~= obj.p_trial
-        fprintf('LS %d, RoC probe \n',obj.nr)
+        % fprintf('LS %d, RoC probe \n',obj.nr)
     end
     
     if obj.probe_p == 0

@@ -14,7 +14,13 @@ switch RBDO_s.name
 
             for ij = 1:pdata.nd
                 hold on
-                plot( [Opt_set.k-1 , Opt_set.k] , [Opt_set.dp_x_old(ij) Opt_set.dp_x(ij)]./(2.54e-2)^2, '-ok')
+                try
+
+                    plot( [Opt_set.k-1 , Opt_set.k] , [Opt_set.dp_x_old(ij) Opt_set.dp_x(ij)]./(2.54e-2)^2, '-ok')
+                catch
+                    error('in Plotiter')
+                end
+   
             end
 
             grid on
@@ -37,7 +43,9 @@ switch RBDO_s.name
             P2 = P1;
         end
         
+        clf
         [~,~] = Cheng(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,P1,P2, 1);
+        %[~,~] = Aoues(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,P1,P2, 1);
         
         catch
         t = num2cell(Opt_set.dp_x);

@@ -78,18 +78,13 @@ switch type
         obj.x_trial = X_space( obj.nominal_u + alpha_u*(-obj.nominal_val/obj.slope),pdata.marg(:,2),pdata.marg(:,3));
         obj.p_trial = obj.alpha_x.'*(obj.x_trial-obj.nominal_x);
         
-        if ~RBDO_s.f_probe % if not probe, take this one as MPP! (SLA?)
+        if ~RBDO_s.f_probe % if not probe, take this one as MPP!
         obj.Mpp_x = obj.x_trial;
         end        
     end
     
     if pdata.nd > 0
         obj.alpha_x = alpha_u;
-%          obj.alpha_x(5) = 0;
-%          obj.alpha_x(2) = 0;
-%          obj.alpha_x(10) = 0;
-%         obj.alpha_x(6) = 0;
-%          obj.alpha_x(7) = 0;
         obj.slope =  obj.alpha_x' * gradient;
         
         [obj.p_x, obj.p_val] = P_val(obj.doe_x, obj.doe_val, obj.nominal_x, obj.alpha_x);
@@ -101,10 +96,11 @@ switch type
         if ~RBDO_s.f_probe % if not probe, take this one as MPP!
             % Check ROC!
         
-            if RBDO_s.f_RoC
-                obj.x_trial  = RoC(RBDO_s, pdata, Opt_set, obj.alpha_x * obj.p_trial + obj.nominal_x, obj.nominal_x, [], RBDO_s.lb_probe);
-                %obj.x_trial = %obj.nominal_x + (probe_x-obj.nominal_x) * obj.alpha_x'; 
-            end
+%             if RBDO_s.f_RoC
+%                 obj.x_trial  = RoC(RBDO_s, pdata, Opt_set, obj.alpha_x * obj.p_trial + obj.nominal_x, obj.nominal_x, [], RBDO_s.lb_probe);
+%                 %obj.x_trial = %obj.nominal_x + (probe_x-obj.nominal_x) * obj.alpha_x'; 
+%             end
+            
             obj.Mpp_x = obj.x_trial;
         end
 
