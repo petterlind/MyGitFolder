@@ -7,7 +7,7 @@ pdata.name = {'A1','A2','A3','A4','A5','A6','A7','A8','A9','A10'};
 pdata.name_p = {'P1' ,'P2' ,'sy'};
 
 %OPTIMAL VALUES
-optimum =  [ 12.2; 7.5; 15.5; 1.5; 1.5; 1.5; 10.2; 8.1; 2.5; 10.1].*64.5e-4;
+%optimum =  [ 12.2; 7.5; 15.5; 1.5; 1.5; 1.5; 10.2; 8.1; 2.5; 10.1].*64.5e-4;
 
 
 pdata.marg =  [  0  10   0 1
@@ -22,7 +22,7 @@ pdata.marg =  [  0  10   0 1
                  0   10   0 1];
               
 % Conversion between in^2 and m^2
-%pdata.marg(:,2) = optimum;
+
 pdata.marg(:,2) = pdata.marg(:,2)*(2.54e-2)^2;
 
 pdata.margp =  []; 
@@ -88,9 +88,18 @@ G10.func = G1.func;G11.func = G1.func;
 
 
 % 2 inch^2 in TANA!
- G1.expression = {'G = 4.5*(2.54e-2) - max(max(abs(U(:,:))));'}; % X OR Y DISPLACEMENT, SHOULD BE X!
-%G2.expression = {' G = 172.3689 - 1e-6*abs(max(F./[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10]));'};
-%G3.expression = {' G = 172.3689 - 1e-6*(min(F./[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10]));'};
+
+% Displacement
+ %G1.expression = {'G = 4.5*(2.54e-2) - abs(U(1,1));'}; % X OR Y DISPLACEMENT, SHOULD BE X! 
+ %G2.expression = {'G = 4.5*(2.54e-2) - abs(U(1,2));'}; % X OR Y DISPLACEMENT, SHOULD BE X!
+ %G3.expression = {'G = 4.5*(2.54e-2) - abs(U(1,3));'}; % X OR Y DISPLACEMENT, SHOULD BE X!
+ %G4.expression = {'G = 4.5*(2.54e-2) - abs(U(1,4));'}; % X OR Y DISPLACEMENT, SHOULD BE X!
+ 
+ 
+ %G2.expresion = {'G = P*L/(A1*A3*E) * (4*sqrt(2)*A1^3 * (24*A2^2+ A3^2) + A3^3*(7*a1^2 + 26 A2^2)/Dt-));'};
+ 
+ % Stress
+ %G12.expression = {'F = abs(F(1)); G = 172.3689 - 1e-6*F/A1;'};
  G2.expression = {'F = abs(F(1)); G = 172.3689 - 1e-6*F/A1;'};
  G3.expression = {'F = abs(F(2)); G = 172.3689 - 1e-6*F/A2;'};
  G4.expression = {'F = abs(F(3)); G = 172.3689 - 1e-6*F/A3;'};
@@ -102,7 +111,7 @@ G10.func = G1.func;G11.func = G1.func;
  G10.expression = {'F = abs(F(9)); G = 172.3689 - 1e-6*F/A9;'};
  G11.expression = {'F = abs(F(10)); G = 172.3689 - 1e-6*F/A10;'};
   LS = [ G2, G3, G4, G5, G6, G7, G8, G9, G10, G11];
-%LS = [G1, G2, G3];
+%LS = [G1, G2, G3, G4];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % General settings
@@ -113,13 +122,14 @@ RBDO_s.name = 'Cheng';
 
 RBDO_s.f_RoC = true;
 RBDO_s.f_RoC_step = false;
-RBDO_s.RoC_d = 3*(2.54e-2)^2; % Max deterministic update of dv.
-RBDO_s.DoE_size_d = 0.01*(2.54e-2)^2; % 0.1 inch.
+RBDO_s.RoC_d = 2*(2.54e-2)^2; % Max deterministic update of dv.
+RBDO_s.DoE_size_d = 1e-2*(2.54e-2)^2; % 0.01 inch.
 RBDO_s.f_debug = 1;
 RBDO_s.f_one_probe = 1;
-
+RBDO_s.f_corrector = true;
 RBDO_s.f_probe = true; % Removes probe algorithm
 
 RBDO_s.lb_probe = ones(10,1)*1e-12;
 
 counter = 0;
+%Corr = nan;

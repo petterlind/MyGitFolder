@@ -6,12 +6,11 @@ close all
 % --------------------------------
 % nr_of_trusses = 15;
 % inputfile_trusses,
-% inputfile_YounChoi
+ inputfile_YounChoi
 % inputfile_Madsen
 % inputfile_Cheng
-% inputfile_Cheng10
 
-inputfile_Cheng10_det
+% inputfile_Cheng10_det
 % inputfile_Cheng3_det
 % inputfile_TANA
 
@@ -53,7 +52,10 @@ while Opt_set.outer_conv
     for ii = 1:numel(LS)
         %LS(ii).nominal_x = Opt_set.dp_x + LS(ii).beta_v;
         LS(ii).nominal_x = RoC(RBDO_s, pdata, Opt_set, Opt_set.dp_x + LS(ii).beta_v, Opt_set.dp_x,[],Opt_set.lb);
-        LS(ii).nominal_u = U_space(LS(ii).nominal_x, pdata.marg(:,2), pdata.marg(:,3)); % LS object
+        
+        if ~sum(pdata.marg(:,1)) == 0 % If probabilistic variables!
+            LS(ii).nominal_u = U_space(LS(ii).nominal_x, pdata.marg(:,2), pdata.marg(:,3), pdata.marg(:,1)); % LS object
+        end     
     end
 
     % Update objective-gradient direction, doe, alpha
@@ -92,7 +94,7 @@ while Opt_set.outer_conv
                     if RBDO_s.f_probe
                         % New probe point and Mpp estimate
                         
-                        LS(ii) = do_probe(LS(ii), pdata, Opt_set, RBDO_s);
+                       LS(ii) = do_probe(LS(ii), pdata, Opt_set, RBDO_s);
                     end
                 end
                 
@@ -148,17 +150,55 @@ while Opt_set.outer_conv
                 fprintf('Stepsize %d, With Roc %d \n',norm_s, RBDO_s.RoC_d);  
             end
         end
+        
+         % Corrector_step
+        if RBDO_s.f_corrector
+            
+            % Den med lägst värde förra vändan
+           [~,In_cor] = min([LS([LS.active]).nominal_val]); % Min of active
+           LSA = LS([LS.active]);
+           %In_cor = 1
+           In_cor
+           G_plus = gvalue_fem('variables', Opt_set.dpl_x, pdata, Opt_set, RBDO_s, LSA(In_cor), 1,0);
+           
+           %if G_plus < 0 
 
-        % Enforce UB:
-        % too_large = Opt_set.dpl_x > Opt_set.ub';
-        % Opt_set.dpl_x(too_large) = Opt_set.ub(1);
+               lambda =  (Opt_set.dpl_x- LSA(In_cor).probe_x_pos ) / norm(Opt_set.dpl_x - LSA(In_cor).probe_x_pos);
+           
+               %G_pp = ;    
+               OFUN = @(x) -obj.alpha_x'*x;
+               Opt_set.dpl_xc = fmincon(OFUN,Opt_set.dp_x,A,b,[],[],Opt_set.lb, Opt_set.ub', @(x)G_ppFUN(x, LSA, In_cor, lambda, Opt_set, G_plus));
+               
+               % Update
+               Corr.lambda = lambda;
+               Corr.In_cor = In_cor;
+               Corr.G_plus = G_plus;
+               
+               %test 
+               %G_test1 = gvalue_fem('variables', Opt_set.dpl_xc, pdata, Opt_set, RBDO_s, LS(In_cor), 1,0);
+                       % RoC
+                       if RBDO_s.f_RoC
+                           RoC_p = RoC(RBDO_s, pdata, Opt_set, Opt_set.dpl_xc, Opt_set.dpl_x, [], Opt_set.lb);
+                           if RoC_p ~= Opt_set.dpl_xc
+                               fprintf('RoC-move in corrector \n')    
+                               Opt_set.dpl_x = RoC_p;
+                           end
+                       else
+                           Opt_set.dpl_x = Opt_set.dpl_xc;
+                       end
+                       
+                        %test 
+               %G_test2 = gvalue_fem('variables', Opt_set.dpl_x, pdata, Opt_set, RBDO_s, LS(In_cor), 1,0);
+           %end
+        end
+
 
         if RBDO_s.f_linprog == 1 % linprog converged to a solution X
 
            % ------------------------
            % plot the iteration
            % ------------------------
-           LS = plotiter(pdata, Opt_set, RBDO_s, LS);
+           LS = plotiter(pdata, Opt_set, RBDO_s, LS, Corr);
 
             if RBDO_s.f_one_probe == 1
                 % One probe, then stop.
@@ -205,7 +245,10 @@ while Opt_set.outer_conv
     Opt_set.dp_x_old = Opt_set.dp_x;
     Opt_set.dp_u_old = Opt_set.dp_u;
     Opt_set.dp_x = Opt_set.dpl_x;
-    Opt_set.dp_u = U_space(Opt_set.dpl_x, pdata.marg(:,2),pdata.marg(:,3));
+    
+    if ~sum(pdata.marg(:,1)) == 0 % If probabilistic variables!
+        Opt_set.dp_u = U_space(Opt_set.dpl_x, pdata.marg(:,2),pdata.marg(:,3),pdata.marg(:,1));
+    end
 
     if RBDO_s.f_debug == 1
         fprintf('---------------------------------------')
@@ -216,7 +259,7 @@ while Opt_set.outer_conv
     end
     
     counter = counter + 1;
-    if counter == 10
+    if counter == 5
         fprintf('-')
         counter = 0;
         LS(1).G_p_old

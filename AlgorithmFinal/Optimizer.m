@@ -14,6 +14,7 @@ classdef Optimizer
         
         % Inner loop
         dpl_x = nan;
+        dpl_xc            % Corrected step
         dpl_u = nan;
 
         dpl_x_old

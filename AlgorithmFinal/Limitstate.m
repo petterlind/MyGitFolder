@@ -20,6 +20,7 @@ classdef Limitstate
       probe_p               % probe coordinate in p-space - x-space! from nominal!
       probe_val             % probe function value
       probe_s               % probe Mpp estimate
+      probe_x_pos           % Position of probe in x-space!
       
       spline                % Spline constants
       

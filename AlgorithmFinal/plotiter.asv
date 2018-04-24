@@ -122,7 +122,7 @@ switch RBDO_s.name
         
         % Plot the corr function
         if RBDO_s.f_corrector
-        g4 = @(mu1,mu2) G_ppFUN([mu1;mu2], LS([LS.active]), Corr.In_cor, Corr.lambda, Opt_set, Corr.G_plus); 
+        g4 = @(mu1,mu2) G_ppFUN([mu1;mu2], LS, Corr.In_cor, Corr.lambda, Opt_set, Corr.G_plus); 
         hold on
         
         p_size = 100;
@@ -139,9 +139,7 @@ switch RBDO_s.name
             end
         end
         
-        %Zp(Zp < -0.5  | Zp > 0.5) = nan;
-        Zp(Zp < 0 ) = nan;
-        Zp = Zp/ (max(max(Zp)));
+        Zp(Zp < -0.1  | Zp > 0.1) = nan;
         hold on    
         surf(Xp,Yp,Zp)
         end
@@ -193,7 +191,6 @@ switch RBDO_s.name
         % plot points
         plot(Opt_set.dp_x(1),Opt_set.dp_x(2),'ok','MarkerSize', 10,'MarkerFaceColor','k')
         hold on
-        plot(Opt_set.dpl_x(1),Opt_set.dpl_x(2),'ok','MarkerSize', 10)
         grid on
         xlabel('X_1')
         ylabel('X_2')

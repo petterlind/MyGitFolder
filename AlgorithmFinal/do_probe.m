@@ -3,18 +3,14 @@ function obj = do_probe(obj, pdata, Opt_set, RBDO_s)
 %  1) RoC for probe point!
 if RBDO_s.f_RoC
 
-   test = RoC(RBDO_s, pdata, Opt_set, obj.alpha_x * obj.p_trial + obj.nominal_x, obj.nominal_x,[], RBDO_s.lb_probe );
+   obj.probe_x_pos = RoC(RBDO_s, pdata, Opt_set, obj.alpha_x * obj.p_trial + obj.nominal_x, obj.nominal_x,[], RBDO_s.lb_probe );
     
-%     test = obj.alpha_x * obj.p_trial + obj.nominal_x;
-%     probe_x_pos = nan(size(test));
-    if test < RBDO_s.lb_probe 
+    if obj.probe_x_pos < RBDO_s.lb_probe 
         % probe_x_pos(test < Opt_set.lb) = Opt_set.lb;
         error('LS %d, Probe outside bounds for probe!')
-    else
-        probe_x_pos = test;
     end
     
-    obj.probe_p = obj.alpha_x' * (probe_x_pos-obj.nominal_x);
+    obj.probe_p = obj.alpha_x' * (obj.probe_x_pos-obj.nominal_x);
 
     if obj.probe_p ~= obj.p_trial
         % fprintf('LS %d, RoC probe \n',obj.nr)
@@ -30,6 +26,7 @@ if RBDO_s.f_RoC
     
 else
     obj.probe_p = obj.p_trial;
+    obj.probe_x_pos = obj.alpha_x * obj.probe_p + obj.nominal_x;
 end
 
 
@@ -68,6 +65,8 @@ end
 % 6) Update the Mpp
 %p_spline(obj)
 
-obj.Mpp_x = obj.nominal_x + obj.probe_s*obj.alpha_x;
-obj.Mpp_u = U_space(obj.Mpp_x, pdata.marg(:,2),pdata.marg(:,3));
+obj.Mpp_x = obj.nominal_x + obj.probe_s * obj.alpha_x;
+if ~sum(pdata.marg(:,1)) == 0 % If probabilistic variables!
+    obj.Mpp_u = U_space(obj.Mpp_x, pdata.marg(:,2),pdata.marg(:,3),pdata.marg(:,1));
+end
 

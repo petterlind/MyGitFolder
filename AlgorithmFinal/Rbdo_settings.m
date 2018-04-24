@@ -28,5 +28,6 @@ classdef Rbdo_settings
     f_linprog
     f_COV = false;
     f_probe = true; % Runs probe algorithm
+    f_corrector
  end
 end

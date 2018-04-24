@@ -6,9 +6,10 @@
 pdata = Probdata; %Specify the class
 pdata.name = {'mu1','mu2'};
 
-pdata.marg =  [  1   5   0.3 1;
-                 1   5   0.3 1;
+pdata.marg =  [  1   5   0.3 1
+                 1   5   0.3 1
               ];
+          
 pdata.margp =  [];
           
 pdata = set_numbers(pdata, pdata.marg);
@@ -25,7 +26,7 @@ Opt_set.dp_x = [5;5];
 Opt_set.target_beta = 3;
 
 if pdata.nx > 0
-    Opt_set.dp_u = U_space(Opt_set.dp_x, pdata.marg(:,2), pdata.marg(:,3));
+    Opt_set.dp_u = U_space(Opt_set.dp_x, pdata.marg(:,2), pdata.marg(:,3), pdata.marg(:,1));
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Functions, Obj and Limitstate
@@ -61,10 +62,16 @@ LS = [G1, G2, G3];
 RBDO_s = Rbdo_settings;
 RBDO_s.name = 'YounChoi';
 
-RBDO_s.DoE_size_x = Opt_set.target_beta/2;
+RBDO_s.DoE_size_x = Opt_set.target_beta/20;
 RBDO_s.RoC_x = 3;
 
 RBDO_s.f_one_probe = true;
 RBDO_s.f_RoC = false;
 RBDO_s.f_debug = true;
-RBDO_s.f_probe = false   % NO PROBE!
+RBDO_s.f_probe = true; 
+
+counter = 0;
+
+RBDO_s.f_corrector = true;
+
+%Corr = nan;
