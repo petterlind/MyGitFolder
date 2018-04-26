@@ -72,6 +72,6 @@ RBDO_s.f_probe = true;
 
 counter = 0;
 
-RBDO_s.f_corrector = true;
+RBDO_s.f_corrector = false;
 
-%Corr = nan;
+Corr = nan;

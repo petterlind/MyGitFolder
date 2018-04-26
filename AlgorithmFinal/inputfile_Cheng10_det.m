@@ -90,7 +90,7 @@ G10.func = G1.func;G11.func = G1.func;
 % 2 inch^2 in TANA!
 
 % Displacement
- %G1.expression = {'G = 4.5*(2.54e-2) - abs(U(1,1));'}; % X OR Y DISPLACEMENT, SHOULD BE X! 
+ G1.expression = {'G = 4.5*(2.54e-2) - abs(U(1,1));'}; % X OR Y DISPLACEMENT, SHOULD BE X! 
  %G2.expression = {'G = 4.5*(2.54e-2) - abs(U(1,2));'}; % X OR Y DISPLACEMENT, SHOULD BE X!
  %G3.expression = {'G = 4.5*(2.54e-2) - abs(U(1,3));'}; % X OR Y DISPLACEMENT, SHOULD BE X!
  %G4.expression = {'G = 4.5*(2.54e-2) - abs(U(1,4));'}; % X OR Y DISPLACEMENT, SHOULD BE X!
@@ -110,7 +110,7 @@ G10.func = G1.func;G11.func = G1.func;
  G9.expression = {'F = abs(F(8)); G = 172.3689 - 1e-6*F/A8;'};
  G10.expression = {'F = abs(F(9)); G = 172.3689 - 1e-6*F/A9;'};
  G11.expression = {'F = abs(F(10)); G = 172.3689 - 1e-6*F/A10;'};
-  LS = [ G2, G3, G4, G5, G6, G7, G8, G9, G10, G11];
+  LS = [ G1, G2, G3, G4, G5, G6, G7, G8, G9, G10, G11];
 %LS = [G1, G2, G3, G4];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%

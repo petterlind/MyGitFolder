@@ -6,11 +6,11 @@ close all
 % --------------------------------
 % nr_of_trusses = 15;
 % inputfile_trusses,
- inputfile_YounChoi
+% inputfile_YounChoi
 % inputfile_Madsen
 % inputfile_Cheng
 
-% inputfile_Cheng10_det
+ inputfile_Cheng10_det
 % inputfile_Cheng3_det
 % inputfile_TANA
 
@@ -113,10 +113,6 @@ while Opt_set.outer_conv
 
         if pdata.nx > 0
            xs_new = [LS(active).Mpp_x] - [LS(active).beta_v];
-             
-            %only for the probabalistic dv. Otherwise without target_beta..
-            % b = diag(A*xs) - target_beta.*pdata.marg(:,3); % OLD STYLE,
-            % worked with Youn Choi!
              b = diag(A*xs_new);
         elseif pdata.nx == 0 && pdata.nd ~=0
            b = diag(A*xs);
@@ -156,20 +152,26 @@ while Opt_set.outer_conv
             
             % Den med lägst värde förra vändan
            [~,In_cor] = min([LS([LS.active]).nominal_val]); % Min of active
-           G_plus = gvalue_fem('variables', Opt_set.dpl_x, pdata, Opt_set, RBDO_s, LS(In_cor), 1,0);
+           LSA = LS([LS.active]);
+           %In_cor = 1
+           In_cor
+           G_plus = gvalue_fem('variables', Opt_set.dpl_x, pdata, Opt_set, RBDO_s, LSA(In_cor), 1,0);
            
            %if G_plus < 0 
-
-               lambda =  (Opt_set.dpl_x- LS(In_cor).probe_ ) / norm(Opt_set.dpl_x- LS(In_cor).Mpp_x);
+                
+               A0 = (Opt_set.dpl_x - LS(In_cor).nominal_x);
+               lambda = (A0 - A0'*LSA(In_cor).alpha_x *LSA(In_cor).alpha_x) / norm(A0 - A0'*LSA(In_cor).alpha_x*LSA(In_cor).alpha_x);
+               %lambda =  (Opt_set.dpl_x- LSA(In_cor).probe_x_pos ) / norm(Opt_set.dpl_x - LSA(In_cor).probe_x_pos);
            
                %G_pp = ;    
                OFUN = @(x) -obj.alpha_x'*x;
-               Opt_set.dpl_xc = fmincon(OFUN,Opt_set.dp_x,A,b,[],[],Opt_set.lb, Opt_set.ub', @(x)G_ppFUN(x, LS, In_cor, lambda, Opt_set, G_plus));
+               Opt_set.dpl_xc = fmincon(OFUN,Opt_set.dp_x,A,b,[],[],Opt_set.lb, Opt_set.ub', @(x)G_ppFUN(x, LSA, In_cor, lambda, Opt_set, G_plus));
                
                % Update
                Corr.lambda = lambda;
                Corr.In_cor = In_cor;
                Corr.G_plus = G_plus;
+               
                %test 
                %G_test1 = gvalue_fem('variables', Opt_set.dpl_xc, pdata, Opt_set, RBDO_s, LS(In_cor), 1,0);
                        % RoC
@@ -177,10 +179,10 @@ while Opt_set.outer_conv
                            RoC_p = RoC(RBDO_s, pdata, Opt_set, Opt_set.dpl_xc, Opt_set.dpl_x, [], Opt_set.lb);
                            if RoC_p ~= Opt_set.dpl_xc
                                fprintf('RoC-move in corrector \n')    
-                               Opt_set.dpl_x = RoC_p;
+                               dpl_xf = RoC_p;
                            end
                        else
-                           Opt_set.dpl_x = Opt_set.dpl_xc;
+                           dpl_xf = Opt_set.dpl_xc;
                        end
                        
                         %test 
@@ -240,7 +242,7 @@ while Opt_set.outer_conv
     % Update optimal coordinates, old and new for the outer loop
     Opt_set.dp_x_old = Opt_set.dp_x;
     Opt_set.dp_u_old = Opt_set.dp_u;
-    Opt_set.dp_x = Opt_set.dpl_x;
+    Opt_set.dp_x = dpl_xf;
     
     if ~sum(pdata.marg(:,1)) == 0 % If probabilistic variables!
         Opt_set.dp_u = U_space(Opt_set.dpl_x, pdata.marg(:,2),pdata.marg(:,3),pdata.marg(:,1));
@@ -255,7 +257,7 @@ while Opt_set.outer_conv
     end
     
     counter = counter + 1;
-    if counter == 10
+    if counter == 5
         fprintf('-')
         counter = 0;
         LS(1).G_p_old

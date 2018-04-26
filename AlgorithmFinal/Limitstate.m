@@ -39,6 +39,7 @@ classdef Limitstate
       func                  % Demands a function call
       expression            % expression for the limit state surface.
       
+      
    end
 %    methods
 %    % Add a spline plot here, 

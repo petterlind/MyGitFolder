@@ -113,10 +113,6 @@ while Opt_set.outer_conv
 
         if pdata.nx > 0
            xs_new = [LS(active).Mpp_x] - [LS(active).beta_v];
-             
-            %only for the probabalistic dv. Otherwise without target_beta..
-            % b = diag(A*xs) - target_beta.*pdata.marg(:,3); % OLD STYLE,
-            % worked with Youn Choi!
              b = diag(A*xs_new);
         elseif pdata.nx == 0 && pdata.nd ~=0
            b = diag(A*xs);
@@ -162,8 +158,10 @@ while Opt_set.outer_conv
            G_plus = gvalue_fem('variables', Opt_set.dpl_x, pdata, Opt_set, RBDO_s, LSA(In_cor), 1,0);
            
            %if G_plus < 0 
-
-               lambda =  (Opt_set.dpl_x- LSA(In_cor).probe_x_pos ) / norm(Opt_set.dpl_x - LSA(In_cor).probe_x_pos);
+                
+               A0 = (Opt_set.dpl_x - LS(In_cor).nominal_x);
+               lambda = (A0 - A0'*LSA(In_cor).alpha_x *LSA(In_cor).alpha_x) / norm(A0 - A0'*LSA(In_cor).alpha_x*LSA(In_cor).alpha_x);
+               %lambda =  (Opt_set.dpl_x- LSA(In_cor).probe_x_pos ) / norm(Opt_set.dpl_x - LSA(In_cor).probe_x_pos);
            
                %G_pp = ;    
                OFUN = @(x) -obj.alpha_x'*x;
@@ -244,7 +242,7 @@ while Opt_set.outer_conv
     % Update optimal coordinates, old and new for the outer loop
     Opt_set.dp_x_old = Opt_set.dp_x;
     Opt_set.dp_u_old = Opt_set.dp_u;
-    Opt_set.dp_x = Opt_set.dpl_x;
+    Opt_set.dp_x =Opt_set.dpl_x;
     
     if ~sum(pdata.marg(:,1)) == 0 % If probabilistic variables!
         Opt_set.dp_u = U_space(Opt_set.dpl_x, pdata.marg(:,2),pdata.marg(:,3),pdata.marg(:,1));

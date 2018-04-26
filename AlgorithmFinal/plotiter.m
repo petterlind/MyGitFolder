@@ -94,7 +94,6 @@ switch RBDO_s.name
         warning('off','all');
         sigma = pdata.marg(:,3);
         figure(1)
-        clf
         hold on
 
         g1 = @(mu1,mu2) mu1^2*mu2/20-1;
