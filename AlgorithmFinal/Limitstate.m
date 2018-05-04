@@ -5,8 +5,11 @@ classdef Limitstate
       nr                    % number.
       
       nominal_x             % Nominal x (DP)
+      nominal_x_old
       nominal_u
       nominal_val           % Nominal value (at DP)
+      nominal_val_old
+      lambda  =0 % dummy    % Direction orthogonal to alpha towards new nominal point
       
       doe_x                 % Doe coordinates - in x-space
       doe_u                 % Doe coordinates - in u-space
@@ -23,16 +26,18 @@ classdef Limitstate
       probe_x_pos           % Position of probe in x-space!
       
       spline                % Spline constants
+      c = 0;                    % penalize constant
       
       alpha_p               % Steepest decent direction probabalistic para
       alpha_x               % Steepest decent direction probabalistic variables
+      alpha_x_old           % Old -- || --
       beta_v = 0
       
       Mpp_p                 % Paramter set beta- away in u space in alpha p-dir.
       Mpp_x                 % Mpp estimate from probe
       Mpp_x_old             % Old Mpp LS.
       Mpp_u                 % Mpp estimate from probe, u-space
-      G_p_old
+      
       
       no_cross = 0;
        

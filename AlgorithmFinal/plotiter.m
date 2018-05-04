@@ -65,27 +65,16 @@ switch RBDO_s.name
         
             figure(4)
             for ii = 1:numel(LS)
-                G_p = gvalue_fem('variables', LS(ii).nominal_x , pdata, Opt_set, RBDO_s, LS(ii), 0,0);
+                
                 hold on
-                plot( [Opt_set.k-1 , Opt_set.k] , [LS(ii).G_p_old, G_p], '-sb')
-                LS(ii).G_p_old = G_p;
+                plot( [Opt_set.k-1 , Opt_set.k] , [LS(ii).nominal_val_old, LS(ii).nominal_val], '-sb')
             end
 
             grid on
             xlabel('Iteration number [-]')
             ylabel('LS value')
-            
-        else
-            for ii = 1:numel(LS)
-                LS(ii).G_p_old = gvalue_fem('variables', LS(ii).nominal_x , pdata, Opt_set, RBDO_s, LS(ii), 0,0);
-            end
         end
-        
-        
-        
-        
-        
-        
+
         otherwise
         % Probably youn choi....
 
@@ -120,6 +109,43 @@ switch RBDO_s.name
         hold on
         
         % Plot the corr function
+        if RBDO_s.f_penal && true
+        g4 = @(mu1,mu2) penalfun([mu1;mu2], LS); 
+        hold on
+
+        p_size = 100;
+        X =linspace(0,10,p_size);
+        Y = X;
+        Zp1 = nan(p_size,p_size);
+        Zp2 = nan(p_size,p_size);
+        Xp = nan(p_size,p_size);
+        Yp = nan(p_size,p_size);
+        for ij = 1:p_size
+            for ii = 1:p_size
+                
+                all_values = g4(X(ii),Y(ij));
+                Zp1(ii,ij) = all_values(1);
+                Zp2(ii,ij) = all_values(2);
+                Xp(ii,ij) = X(ii);
+                Yp(ii,ij) = Y(ij);
+            end
+        end
+        
+        %Zp(Zp < -0.5  | Zp > 0.5) = nan;
+       %Zp1(Zp1 < -1000 | Zp1 > 1000 ) = nan;
+       %Zp2(Zp2 < -1 | Zp2 > 1 ) = nan;
+        %Zp = Zp/ (max(max(Zp)));
+        hold on    
+        figure(3)
+        clf
+        surf(Xp,Yp,Zp1)
+        figure(4)
+        clf
+        hold on
+        surf(Xp,Yp,Zp2)
+        end
+        figure(1)
+        
         if RBDO_s.f_corrector
         g4 = @(mu1,mu2) G_ppFUN([mu1;mu2], LS([LS.active]), Corr.In_cor, Corr.lambda, Opt_set, Corr.G_plus); 
         hold on

@@ -120,16 +120,19 @@ G10.func = G1.func;G11.func = G1.func;
 RBDO_s = Rbdo_settings;
 RBDO_s.name = 'Cheng';
 
-RBDO_s.f_RoC = true;
-RBDO_s.f_RoC_step = false;
-RBDO_s.RoC_d = 2*(2.54e-2)^2; % Max deterministic update of dv.
+RBDO_s.f_RoC = false;
+RBDO_s.f_RoC_step = true;
+RBDO_s.RoC_d = 3*(2.54e-2)^2; % Max deterministic update of dv.
 RBDO_s.DoE_size_d = 1e-2*(2.54e-2)^2; % 0.01 inch.
 RBDO_s.f_debug = 1;
 RBDO_s.f_one_probe = 1;
-RBDO_s.f_corrector = true;
+RBDO_s.f_corrector = false;
 RBDO_s.f_probe = true; % Removes probe algorithm
 
 RBDO_s.lb_probe = ones(10,1)*1e-12;
 
+RBDO_s.f_linprog = false; 
+RBDO_s.f_penal = true;
+
 counter = 0;
-%Corr = nan;
+Corr = nan;

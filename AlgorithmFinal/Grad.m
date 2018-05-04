@@ -33,12 +33,15 @@ case 'variables'
         for ij=1:(pdata.nx+1) % Assumes that the objective is only dependent on probabalistic variables.
             obj.doe_val(ij,1) = gvalue_fem('variables', obj.doe_x(:,ij), pdata, Opt_set, RBDO_s, obj, 1,0);    
         end
+        obj.nominal_val_old = obj.nominal_val;
         obj.nominal_val = obj.doe_val(1);
+        
         A = [ ones( pdata.nx+1,1) obj.doe_u.'];
         A_x =  [ ones( pdata.nx+1,1) obj.doe_x.']; % TEST
         
         const_plane_x = A_x\obj.doe_val;
         gradient_x(:,1) = const_plane_x(2:end); 
+        obj.alpha_x_old = obj.alpha_x;
         obj.alpha_x = - gradient_x / norm(gradient_x);
     
     end

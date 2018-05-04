@@ -1,7 +1,6 @@
 function [c, ceq] = G_ppFUN(x, LS, In_cor, lambda, Opt_set, G_plus)
 
 % Shiftad en sträcka beta_v?!
-
 ceq = 0;
 p = @(x) LS(In_cor).alpha_x'*(x - LS(In_cor).nominal_x);
 Gspline = @(x)  LS(In_cor).spline(1) + LS(In_cor).spline(2)* p(x) + LS(In_cor).spline(3)*p(x)^2 + LS(In_cor).spline(4)* p(x).^3;

@@ -29,5 +29,7 @@ classdef Rbdo_settings
     f_COV = false;
     f_probe = true; % Runs probe algorithm
     f_corrector
+    f_penal         % penalization algorithm
+
  end
 end

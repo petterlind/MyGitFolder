@@ -86,6 +86,8 @@ end
 index_lb = DP_current < lbp;
 index_lb_dp0 = DP_nom == lbp;
 
+
+
 if sum( index_lb & index_lb_dp0) > 0 %Minskar från lb, skip the loop!
     DP1 = DP_nom;
     f_loop = false;

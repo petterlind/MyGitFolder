@@ -50,7 +50,7 @@ while Opt_set.outer_conv
 
     % Update the MPP search point. If pdata.marg(:,3) == 0 nothing changes.
     for ii = 1:numel(LS)
-        %LS(ii).nominal_x = Opt_set.dp_x + LS(ii).beta_v;
+        LS(ii).nominal_x_old = LS(ii).nominal_x;
         LS(ii).nominal_x = RoC(RBDO_s, pdata, Opt_set, Opt_set.dp_x + LS(ii).beta_v, Opt_set.dp_x,[],Opt_set.lb);
         
         if ~sum(pdata.marg(:,1)) == 0 % If probabilistic variables!
@@ -104,32 +104,66 @@ while Opt_set.outer_conv
         % save previous value
         Opt_set.dpl_x_old = Opt_set.dpl_x;
 
-        % Set up optimization
-        f = -obj.alpha_x; % x-space
-        active = [LS.active] & ~[LS.no_cross] ;
-        A = [LS(active).alpha_x]';
-        xs = [LS(active).Mpp_x]; % Add some shifted xs!?!!
+        
+        if RBDO_s.f_linprog
+            
+            % Set up optimization
+            f = -obj.alpha_x; % x-space
+            active = [LS.active] & ~[LS.no_cross] ;
+            A = [LS(active).alpha_x]';
+            xs = [LS(active).Mpp_x]; % Add some shifted xs!?!!
+
+            if pdata.nx > 0
+               xs_new = [LS(active).Mpp_x] - [LS(active).beta_v];
+                 b = diag(A*xs_new);
+            elseif pdata.nx == 0 && pdata.nd ~=0
+               b = diag(A*xs);
+            else
+               error('Add the last option in b')
+            end
 
 
-        if pdata.nx > 0
-           xs_new = [LS(active).Mpp_x] - [LS(active).beta_v];
-             b = diag(A*xs_new);
-        elseif pdata.nx == 0 && pdata.nd ~=0
-           b = diag(A*xs);
-        else
-           error('Add the last option in b')
+
+            % Optimizer
+            options = optimoptions('linprog','Algorithm','dual-simplex','OptimalityTolerance', 1e-10,'ConstraintTolerance',1e-3);
+            [ Opt_set.dpl_x, fval, RBDO_s.f_linprog, output] = linprog(f, A, b, [],[], Opt_set.lb, Opt_set.ub',options);
+        
+        elseif RBDO_s.f_penal
+           
+                  % Update lambda for the limit states
+                  list = 1:100;
+                  act_con = list(LS.active);
+
+                  if ~isempty([LS.alpha_x_old])
+                      list = 1:100;
+                      act_con = list([LS.active]);
+                      for ii = 1:sum([LS.active])
+                            
+                          % lambda
+                          A0 = LS(act_con(ii)).nominal_x - LS(act_con(ii)).nominal_x_old  ;
+                          LS(act_con(ii)).lambda = (A0 - A0'*LS(act_con(ii)).alpha_x_old *LS(act_con(ii)).alpha_x_old) / norm(A0 - A0'*LS(act_con(ii)).alpha_x_old*LS(act_con(ii)).alpha_x_old);
+                          
+                          %c
+                          LS(act_con(ii)).c = (LS(act_con(ii)).nominal_val - LS(act_con(ii)).nominal_val_old) / ((LS(act_con(ii)).lambda' * (LS(act_con(ii)).nominal_x - LS(act_con(ii)).nominal_x_old)) )^2;        
+                      end
+                  end
+                    
+                  options = optimoptions('fmincon','Display','notify','StepTolerance',1e-10,'Algorithm','sqp','MaxFunctionEvaluations',1000);
+                  OFUN = @(x) -obj.alpha_x'*x;
+                  Opt_set.dpl_x = fmincon(OFUN,Opt_set.dp_x,[],[],[],[],Opt_set.lb, Opt_set.ub', @(x) penalfun(x, LS), options);
+
         end
+        
 
-        % Optimizer
-        options = optimoptions('linprog','Algorithm','dual-simplex','OptimalityTolerance', 1e-10,'ConstraintTolerance',1e-3);
-        [ Opt_set.dpl_x, fval, RBDO_s.f_linprog, output] = linprog(f, A, b, [],[], Opt_set.lb, Opt_set.ub',options);
-
-        % Feasible step
-        FUN = @(X1) norm(X1-Opt_set.dp_x);
-        feas_x = fmincon(FUN,Opt_set.dp_x,A,b,[],[],Opt_set.lb, Opt_set.ub');
         
         % RoC
         if RBDO_s.f_RoC
+            
+                    % Feasible step
+        FUN = @(X1) norm( X1 - Opt_set . dp_x)^2;
+        %options = optimoptions('fmincon','Display','notify','StepTolerance',1e-10,'Algorithm','sqp','MaxFunctionEvaluations',3000);
+        %feas_x = fmincon(FUN,Opt_set.dp_x,A,b,[],[],Opt_set.lb, Opt_set.ub');
+        feas_x = fmincon(FUN,Opt_set.dp_x*2,[],[],[],[],Opt_set.lb, Opt_set.ub', @(x) penalfun(x, LS), options);
             RoC_p = RoC(RBDO_s, pdata, Opt_set, Opt_set.dpl_x, Opt_set.dp_x, feas_x,Opt_set.lb);
             if RoC_p ~= Opt_set.dpl_x
                 fprintf('RoC-move \n')    
@@ -154,7 +188,6 @@ while Opt_set.outer_conv
            [~,In_cor] = min([LS([LS.active]).nominal_val]); % Min of active
            LSA = LS([LS.active]);
            %In_cor = 1
-           In_cor
            G_plus = gvalue_fem('variables', Opt_set.dpl_x, pdata, Opt_set, RBDO_s, LSA(In_cor), 1,0);
            
            %if G_plus < 0 
@@ -189,9 +222,8 @@ while Opt_set.outer_conv
                %G_test2 = gvalue_fem('variables', Opt_set.dpl_x, pdata, Opt_set, RBDO_s, LS(In_cor), 1,0);
            %end
         end
-
-
-        if RBDO_s.f_linprog == 1 % linprog converged to a solution X
+        
+       % if RBDO_s.f_linprog == 1 % linprog converged to a solution X
 
            % ------------------------
            % plot the iteration
@@ -217,12 +249,12 @@ while Opt_set.outer_conv
                 Opt_set.l = Opt_set.l+1;
             end
 
-        else
+        %else
             %linprog does not converge in first attempt
             %dp_l = dp_l_old;
             Opt_set.l = Opt_set.l+1;
             %error('linprog exited without converging')
-        end
+       %end
     end
 
     % Update objective value and dp
@@ -260,7 +292,6 @@ while Opt_set.outer_conv
     if counter == 5
         fprintf('-')
         counter = 0;
-        LS(1).G_p_old
     end
         
 
