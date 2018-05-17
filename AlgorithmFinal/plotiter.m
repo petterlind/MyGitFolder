@@ -49,15 +49,17 @@ switch RBDO_s.name
         
         catch
         t = num2cell(Opt_set.dp_x);
-        [A1,A2,A3] = deal(t{:});
+        [A1,A2,A3,A4,A5] = deal(t{:});
         if pdata.np > 0 
-            t2 = num2cell(pdata.margp(1:end-1,2));
-            [P1] = deal(t2{:});
+            t2 = num2cell(pdata.margp(1:end,2));
+            [F,P,~,E] = deal(t2{:});
         else
-            P1 = 4.4482e5;
+            F = 20e3;
+            P = 15e3;
+            E = 68950e6;
         end
         
-        [~,~] = Cheng3(A1,A2,A3,P1, 1);
+        [~,~] = Cheng5(A1,A2,A3,A4,A5,F,P,E,1);
             
         end
         % Plot Ls at nominal point!

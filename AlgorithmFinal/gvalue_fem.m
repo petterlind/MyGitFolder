@@ -58,6 +58,7 @@ end
 % Evaluate expression
 if ~isempty(obj.expression)
     eval(sprintf('%s',obj.expression{1}));
+
 end
 
 

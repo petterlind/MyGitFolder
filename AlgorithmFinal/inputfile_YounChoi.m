@@ -64,13 +64,15 @@ RBDO_s = Rbdo_settings;
 RBDO_s.name = 'YounChoi';
 
 RBDO_s.DoE_size_x = Opt_set.target_beta/20;
-RBDO_s.RoC_x = 0.1; % 3
+RBDO_s.RoC_x = 0.1*ones(pdata.nx,1); % 3
 RBDO_s.lb_probe = Opt_set.lb; % x-space?
 
 RBDO_s.f_one_probe = true;
-RBDO_s.f_RoC = true;
+RBDO_s.f_RoC = false;
+RBDO_s.f_SRoC = false;
 RBDO_s.f_debug = true;
 RBDO_s.f_probe = true; 
+
 
 counter = 0;
 

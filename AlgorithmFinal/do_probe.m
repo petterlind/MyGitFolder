@@ -2,7 +2,7 @@ function obj = do_probe(obj, pdata, Opt_set, RBDO_s)
 
 %  1) RoC for probe point!
 if RBDO_s.f_RoC
-   obj.probe_x_pos = RoC(RBDO_s, pdata, Opt_set, obj.alpha_x * obj.p_trial + obj.nominal_x, obj.nominal_x,[], RBDO_s.lb_probe );
+   obj.probe_x_pos = RoC(RBDO_s, pdata, Opt_set, obj.alpha_x * obj.p_trial + obj.nominal_x, obj.nominal_x, RBDO_s.lb_probe, [] );
 
 
     if obj.probe_x_pos < RBDO_s.lb_probe 
@@ -38,8 +38,8 @@ if obj.probe_p ~= 0
     % 4) adapt spline  
     [obj.spline, obj.probe_s] = spline(obj, 1);
     
-   % clf
-   %p_spline(obj, pdata, Opt_set, RBDO_s)
+    %clf
+    % p_spline(obj, pdata, Opt_set, RBDO_s)
 
     % 5) Has to be in same direction as the trial point. Otherwise no cross
     sign_first_step = sign(obj.p_trial); %corresponds to the nominal step, has to elaborate a bit if more steps is to be conducted.
@@ -51,8 +51,8 @@ if obj.probe_p ~= 0
 
             if RBDO_s.f_debug
                 fprintf('No cross LS: %d \n',obj.nr)
-                figure
-                p_spline(obj, pdata, Opt_set, RBDO_s)
+                %figure
+                %p_spline(obj, pdata, Opt_set, RBDO_s)
             end
         else
             

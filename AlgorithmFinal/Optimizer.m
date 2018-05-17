@@ -7,6 +7,9 @@ classdef Optimizer
         dp_x_old           % Old design point in x-space
         dp_u_old           % Old design point in u-space
         
+        delta = nan %dummy % step between current and last iteration
+        delta_old          % step before that
+        
         target_beta         % target beta
         
         ob_val             % Objective function value

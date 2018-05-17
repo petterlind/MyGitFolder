@@ -4,13 +4,12 @@ close all
 % --------------------------------
 % 1) Input
 % --------------------------------
-% nr_of_trusses = 15;
-% inputfile_trusses,
- inputfile_YounChoi
+% inputfile_trusses
+% inputfile_YounChoi
 % inputfile_Madsen
 % inputfile_Cheng
 
-% inputfile_Cheng10_det
+ inputfile_Cheng10_det
 % inputfile_Cheng3_det
 % inputfile_TANA
 
@@ -23,6 +22,9 @@ close all
 % Globals
 global Gnum
 Gnum = 0;
+
+% Set the Roc_dist
+RBDO_s.roc_dist = Update_RoC(RBDO_s, Opt_set, pdata);
 
 % --------------------------------
 % 2) Main Loop
@@ -51,7 +53,12 @@ while Opt_set.outer_conv
     % Update the MPP search point. If pdata.marg(:,3) == 0 nothing changes.
     for ii = 1:numel(LS)
         LS(ii).nominal_x_old = LS(ii).nominal_x;
-        LS(ii).nominal_x = RoC(RBDO_s, pdata, Opt_set, Opt_set.dp_x + LS(ii).beta_v, Opt_set.dp_x,[],Opt_set.lb);
+        
+        if RBDO_s.f_RoC
+            LS(ii).nominal_x = RoC(RBDO_s, pdata, Opt_set, Opt_set.dp_x + LS(ii).beta_v, Opt_set.dp_x,Opt_set.lb,[]);
+        else
+            LS(ii).nominal_x = Opt_set.dp_x + LS(ii).beta_v;
+        end
         
         if ~sum(pdata.marg(:,1)) == 0 % If probabilistic variables!
             LS(ii).nominal_u = U_space(LS(ii).nominal_x, pdata.marg(:,2), pdata.marg(:,3), pdata.marg(:,1)); % LS object
@@ -160,11 +167,16 @@ while Opt_set.outer_conv
         if RBDO_s.f_RoC
             
                     % Feasible step
-        FUN = @(X1) norm( X1 - Opt_set . dp_x)^2;
+        FUN = @(X1) norm( X1 - Opt_set.dp_x)^2;
         %options = optimoptions('fmincon','Display','notify','StepTolerance',1e-10,'Algorithm','sqp','MaxFunctionEvaluations',3000);
-        %feas_x = fmincon(FUN,Opt_set.dp_x,A,b,[],[],Opt_set.lb, Opt_set.ub');
-        feas_x = fmincon(FUN,Opt_set.dp_x*2,[],[],[],[],Opt_set.lb, Opt_set.ub', @(x) penalfun(x, LS), options);
-            RoC_p = RoC(RBDO_s, pdata, Opt_set, Opt_set.dpl_x, Opt_set.dp_x, feas_x,Opt_set.lb);
+        feas_x = fmincon(FUN, Opt_set.dp_x, A, b,[],[],Opt_set.lb, Opt_set.ub');
+        %feas_x = fmincon(FUN,Opt_set.dp_x,[],[],[],[],Opt_set.lb, Opt_set.ub', @(x) penalfun(x, LS), options);
+            RoC_p = RoC(RBDO_s, pdata, Opt_set, feas_x, Opt_set.dp_x, Opt_set.lb, []);
+            
+            if RoC_p == feas_x %feasible was inside Roc, go towards optimum value!
+                RoC_p = RoC(RBDO_s, pdata, Opt_set, Opt_set.dpl_x, feas_x, Opt_set.lb, feas_x-Opt_set.dp_x);
+            end
+            
             if RoC_p ~= Opt_set.dpl_x
                 fprintf('RoC-move \n')    
                 Opt_set.dpl_x = RoC_p;
@@ -209,7 +221,7 @@ while Opt_set.outer_conv
                %G_test1 = gvalue_fem('variables', Opt_set.dpl_xc, pdata, Opt_set, RBDO_s, LS(In_cor), 1,0);
                        % RoC
                        if RBDO_s.f_RoC
-                           RoC_p = RoC(RBDO_s, pdata, Opt_set, Opt_set.dpl_xc, Opt_set.dpl_x, [], Opt_set.lb);
+                           RoC_p = RoC(RBDO_s, pdata, Opt_set, Opt_set.dpl_xc, Opt_set.dpl_x, Opt_set.lb, []);
                            if RoC_p ~= Opt_set.dpl_xc
                                fprintf('RoC-move in corrector \n')    
                                Opt_set.dpl_x = RoC_p;
@@ -271,11 +283,20 @@ while Opt_set.outer_conv
         end
     end
     
-    % Update optimal coordinates, old and new for the outer loop
+    % vector move
+    Opt_set.delta_old = Opt_set.delta;
+    Opt_set.delta = Opt_set.dpl_x - Opt_set.dp_x;
+    
+    % Update DP, old and new for the outer loop
     Opt_set.dp_x_old = Opt_set.dp_x;
     Opt_set.dp_u_old = Opt_set.dp_u;
-    Opt_set.dp_x =Opt_set.dpl_x;
+    Opt_set.dp_x = Opt_set.dpl_x;
     
+    % Update side length based on last and second last move!
+    if RBDO_s.f_SRoC && (Opt_set.k > 1)
+         RBDO_s.roc_dist = Update_RoC(RBDO_s, Opt_set, pdata);
+    end
+
     if ~sum(pdata.marg(:,1)) == 0 % If probabilistic variables!
         Opt_set.dp_u = U_space(Opt_set.dpl_x, pdata.marg(:,2),pdata.marg(:,3),pdata.marg(:,1));
     end
@@ -289,7 +310,7 @@ while Opt_set.outer_conv
     end
     
     counter = counter + 1;
-    if counter == 5
+    if counter == 10
         fprintf('-')
         counter = 0;
     end

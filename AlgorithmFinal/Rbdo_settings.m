@@ -9,6 +9,8 @@ classdef Rbdo_settings
     % Solver settings
     RoC_d             % minimum step size deterministic variables, absolute numbers
     RoC_x = 3;        % Minimum step size probibalistic variables, times \beta^T
+    roc_dist          % sidelength of the RoC-cube!
+    roc_scale         % Scale of the Roc-cube
     
     DoE_size_x      % DoE size in u-space
     DoE_size_d      % DoE size in x-space ( deterministic variables)
@@ -23,6 +25,7 @@ classdef Rbdo_settings
     f_one_probe
     f_RoC = true;        % Step box constraint with move in feasible dir first!
     f_RoC_step = false;  % Step length constraint
+    f_SRoC               % Scaling Roc!
     f_maxstep = 0;
     f_debug
     f_linprog
