@@ -29,8 +29,8 @@ pdata.np = numel(pdata.margp(:,2));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Opt_set = Optimizer;
-Opt_set.lb = 0.7854e-4 *ones(10,1); % 0.001 in SAP! 0.1 in TANA
-Opt_set.ub =  78.54e-4 * ones(10,1);
+Opt_set.lb = 0.7854e-4 *ones(5,1); % 0.001 in SAP! 0.1 in TANA
+Opt_set.ub =  78.54e-4 * ones(5,1);
 
 Opt_set.dp_x = pdata.marg(:,2);
 Opt_set.target_beta = 3.719;
@@ -111,7 +111,7 @@ G10.func = G1.func;G11.func = G1.func;
  %Circular
  %I = A^2/(4*pi);
  
- LS = [ G1,G2, G3, G4, G5, G6, G7, G8, G9, G10];
+ LS = [ G1, G2, G3, G4, G5, G6, G7, G8, G9, G10];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % General settings
@@ -124,17 +124,18 @@ RBDO_s.f_RoC = true;
 RBDO_s.f_RoC_step = false;
 RBDO_s.f_SRoC = true;
 
-RBDO_s.RoC_d = 4*(2.54e-2)^2 .*ones(pdata.nd,1); % Max deterministic update of dv.
+RBDO_s.RoC_d = 1e-3 .*ones(pdata.nd,1); % Max deterministic update of dv.
 
-RBDO_s.roc_scale = 0.4;
-RBDO_s.DoE_size_x = Opt_set.target_beta/2;
-RBDO_s.DoE_size_d = 1e-2*(2.54e-2)^2; % 0.01 inch.
+RBDO_s.roc_scale_down = 0.99;
+RBDO_s.roc_scale_up = 1.2;
+RBDO_s.DoE_size_x = Opt_set.target_beta/4;
+RBDO_s.DoE_size_d =  1e-6;%1e-2*(2.54e-2)^2; % 0.01 inch.
 RBDO_s.f_debug = 1;
 RBDO_s.f_one_probe = 1;
 RBDO_s.f_corrector = false;
-RBDO_s.f_probe = true; % Removes probe algorithm
+RBDO_s.f_probe = true; % probe algorithm
 
-RBDO_s.lb_probe = ones(5,1)*1e-5;
+RBDO_s.lb_probe = Opt_set.lb*1e-2;
 
 RBDO_s.f_linprog = true; 
 RBDO_s.f_penal = false;

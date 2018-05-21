@@ -9,8 +9,8 @@ close all
 % inputfile_Madsen
 % inputfile_Cheng
 
- inputfile_Cheng10_det
-% inputfile_Cheng3_det
+% inputfile_Cheng10_det
+inputfile_Cheng3_det
 % inputfile_TANA
 
 %dp_plot = nan(nx,100);
@@ -55,7 +55,7 @@ while Opt_set.outer_conv
         LS(ii).nominal_x_old = LS(ii).nominal_x;
         
         if RBDO_s.f_RoC
-            LS(ii).nominal_x = RoC(RBDO_s, pdata, Opt_set, Opt_set.dp_x + LS(ii).beta_v, Opt_set.dp_x,Opt_set.lb,[]);
+            LS(ii).nominal_x = RoC(RBDO_s, pdata, Opt_set, Opt_set.dp_x + LS(ii).beta_v, Opt_set.dp_x,Opt_set.lb);
         else
             LS(ii).nominal_x = Opt_set.dp_x + LS(ii).beta_v;
         end
@@ -129,12 +129,24 @@ while Opt_set.outer_conv
                error('Add the last option in b')
             end
 
+ 
+            % Uppdatera Move Limits
+            
+            lb = max([ Opt_set.lb'; (Opt_set.dp_x' - RBDO_s.roc_dist')]);
+            %ub = min([ Opt_set.ub'; (Opt_set.dp_x' + RBDO_s.roc_dist')]);
+            ub = Opt_set.ub';
+            
+            % Optimizer, towards feasible
+            FUN = @(X1) norm( X1 - Opt_set.dp_x)^2;
+            options = optimoptions('fmincon','Display','notify','StepTolerance',1e-10,'Algorithm','sqp','MaxFunctionEvaluations',3000);
+            Opt_set.dpl_x = fmincon(FUN, Opt_set.dp_x, A, b,[],[],lb, ub);
 
-
-            % Optimizer
-            options = optimoptions('linprog','Algorithm','dual-simplex','OptimalityTolerance', 1e-10,'ConstraintTolerance',1e-3);
-            [ Opt_set.dpl_x, fval, RBDO_s.f_linprog, output] = linprog(f, A, b, [],[], Opt_set.lb, Opt_set.ub',options);
-        
+            % Check if inside ROC, then towards optimum.
+            if  sum ( abs(Opt_set.dpl_x - Opt_set.dp_x) < RBDO_s.roc_dist ) > 0
+                options = optimoptions('linprog','Algorithm','dual-simplex','OptimalityTolerance', 1e-10,'ConstraintTolerance',1e-3);
+                [ Opt_set.dpl_x, fval, RBDO_s.f_linprog, output] = linprog(f, A, b, [],[], lb, ub,options);
+            end
+            
         elseif RBDO_s.f_penal
            
                   % Update lambda for the limit states
@@ -160,39 +172,37 @@ while Opt_set.outer_conv
                   Opt_set.dpl_x = fmincon(OFUN,Opt_set.dp_x,[],[],[],[],Opt_set.lb, Opt_set.ub', @(x) penalfun(x, LS), options);
 
         end
-        
 
-        
         % RoC
-        if RBDO_s.f_RoC
-            
-                    % Feasible step
-        FUN = @(X1) norm( X1 - Opt_set.dp_x)^2;
-        %options = optimoptions('fmincon','Display','notify','StepTolerance',1e-10,'Algorithm','sqp','MaxFunctionEvaluations',3000);
-        feas_x = fmincon(FUN, Opt_set.dp_x, A, b,[],[],Opt_set.lb, Opt_set.ub');
-        %feas_x = fmincon(FUN,Opt_set.dp_x,[],[],[],[],Opt_set.lb, Opt_set.ub', @(x) penalfun(x, LS), options);
-            RoC_p = RoC(RBDO_s, pdata, Opt_set, feas_x, Opt_set.dp_x, Opt_set.lb, []);
-            
-            if RoC_p == feas_x %feasible was inside Roc, go towards optimum value!
-                RoC_p = RoC(RBDO_s, pdata, Opt_set, Opt_set.dpl_x, feas_x, Opt_set.lb, feas_x-Opt_set.dp_x);
-            end
-            
-            if RoC_p ~= Opt_set.dpl_x
-                fprintf('RoC-move \n')    
-                Opt_set.dpl_x = RoC_p;
-            end
-            
-            
-        elseif RBDO_s.f_RoC_step
-            step = Opt_set.dpl_x- Opt_set.dp_x;
-            norm_s = norm(step);
-            if norm_s > RBDO_s.RoC_d %step is larger then allowed.
-                
-                Opt_set.dpl_x = Opt_set.dp_x + RBDO_s.RoC_d*step/norm_s;
-                fprintf('Stepsize %d, With Roc %d \n',norm_s, RBDO_s.RoC_d);  
-            end
-        end
-        
+%         if RBDO_s.f_RoC
+%             
+%                     % Feasible step
+%         FUN = @(X1) norm( X1 - Opt_set.dp_x)^2;
+%         %options = optimoptions('fmincon','Display','notify','StepTolerance',1e-10,'Algorithm','sqp','MaxFunctionEvaluations',3000);
+%         feas_x = fmincon(FUN, Opt_set.dp_x, A, b,[],[],Opt_set.lb, Opt_set.ub');
+%         %feas_x = fmincon(FUN,Opt_set.dp_x,[],[],[],[],Opt_set.lb, Opt_set.ub', @(x) penalfun(x, LS), options);
+%             RoC_p = RoC(RBDO_s, pdata, Opt_set, feas_x, Opt_set.dp_x, Opt_set.lb, []);
+%             
+%             if RoC_p == feas_x %feasible was inside Roc, go towards optimum value!
+%                 RoC_p = RoC(RBDO_s, pdata, Opt_set, Opt_set.dpl_x, feas_x, Opt_set.lb, feas_x-Opt_set.dp_x);
+%             end
+%             
+%             if RoC_p ~= Opt_set.dpl_x
+%                 fprintf('RoC-move \n')    
+%                 Opt_set.dpl_x = RoC_p;
+%             end
+%             
+%             
+%         elseif RBDO_s.f_RoC_step
+%             step = Opt_set.dpl_x- Opt_set.dp_x;
+%             norm_s = norm(step);
+%             if norm_s > RBDO_s.RoC_d %step is larger then allowed.
+%                 
+%                 Opt_set.dpl_x = Opt_set.dp_x + RBDO_s.RoC_d*step/norm_s;
+%                 fprintf('Stepsize %d, With Roc %d \n',norm_s, RBDO_s.RoC_d);  
+%             end
+%         end
+%         
          % Corrector_step
         if RBDO_s.f_corrector
             
@@ -310,7 +320,7 @@ while Opt_set.outer_conv
     end
     
     counter = counter + 1;
-    if counter == 10
+    if counter == 40
         fprintf('-')
         counter = 0;
     end

@@ -1,6 +1,6 @@
 function p_spline(obj, pdata, Opt_set, RBDO_s)
 
-nr_p = 100; % Number of points in plots for lines!
+nr_p = 1000; % Number of points in plots for lines!
 
 figure(3)
 spline_curve = @(p)  obj.spline(1) + obj.spline(2)*p + obj.spline(3)*p.^2 + obj.spline(4)*p.^3;

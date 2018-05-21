@@ -10,7 +10,8 @@ classdef Rbdo_settings
     RoC_d             % minimum step size deterministic variables, absolute numbers
     RoC_x = 3;        % Minimum step size probibalistic variables, times \beta^T
     roc_dist          % sidelength of the RoC-cube!
-    roc_scale         % Scale of the Roc-cube
+    roc_scale_down         % Scale (shirnking) of the Roc-cube
+    roc_scale_up           % Scale (growing= of the Roc_cube
     
     DoE_size_x      % DoE size in u-space
     DoE_size_d      % DoE size in x-space ( deterministic variables)

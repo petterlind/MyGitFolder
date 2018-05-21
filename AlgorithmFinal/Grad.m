@@ -18,6 +18,8 @@ case 'parameters'
         %A = [ ones( pdata.np+1,1) (obj.doe_x - pdata.margp(:,2))'];
         A = [ ones( pdata.np+1,1) obj.doe_u.']; % U-space!
         
+        
+        
 case 'variables'
     
     % Separate deterministic and probabilistic
@@ -117,7 +119,7 @@ switch type
     
     case 'parameters'
        obj.Mpp_p = X_space( alpha_u * Opt_set.target_beta, pdata.margp(:,2),pdata.margp(:,3),pdata.margp(:,1));
-
+        
     otherwise
         error('Unknown type in Grad.m')
 end

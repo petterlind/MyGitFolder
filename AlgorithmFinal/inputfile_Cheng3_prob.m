@@ -3,26 +3,17 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 pdata = Probdata; %Specify the class
-pdata.name = {'A1','A2','A3','A4','A5','A6','A7','A8','A9','A10'};
+pdata.name = {'A1','A2','A3'};
 pdata.name_p = {'P1' ,'P2' ,'sy'};
 
 %OPTIMAL VALUES
-%optimum =  [ 12.2; 7.5; 15.5; 1.5; 1.5; 1.5; 10.2; 8.1; 2.5; 10.1].*64.5e-4;
 
-
-pdata.marg =  [  0  10   0 1
+pdata.marg =  [  0  10    0 1
                  0   10   0 1
-                 0   10   0 1
-                 0   10   0 1
-                 0   10   0 1
-                 0   10   0 1
-                 0   10   0 1
-                 0   10   0 1
-                 0   10   0 1
-                 0   10   0 1];
+                 0   10   0 1 ];
               
 % Conversion between in^2 and m^2
-
+%pdata.marg(:,2) = optimum;
 pdata.marg(:,2) = pdata.marg(:,2)*(2.54e-2)^2;
 
 pdata.margp =  []; 
@@ -35,8 +26,8 @@ pdata.np = 0;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Opt_set = Optimizer;
-Opt_set.lb = 0.001 *ones(10,1).* (2.54e-2)^2; % 0.001 in SAP! 0.1 in TANA
-Opt_set.ub = 25* ones(10,1).* (2.54e-2)^2;
+Opt_set.lb = 0.001 *ones(3,1).* (2.54e-2)^2; % 0.1 in TANA! 
+Opt_set.ub = [1.61, 1.61, 1.61 ].*100; % REALLY BIG! = no limit
 
 Opt_set.dp_x = pdata.marg(:,2);
 %Opt_set.target_beta = 3;
@@ -46,7 +37,7 @@ Opt_set.dp_x = pdata.marg(:,2);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 obj = Limitstate; 
-obj.expression = {'G = (3.048*((A1+A2+A3+A4+A5+A6) + sqrt(2)*(A7+A8+A9+A10)));'};
+obj.expression = {'G = 0.1 * (360*2.54e-2*((A1+A3) + sqrt(2)*(A2))) /(2.54e-2)^3;'}; % in lb!
 obj.nr = 0; 
 obj.nominal_u = Opt_set.dp_u;
 obj.nominal_x = Opt_set.dp_x;
@@ -81,37 +72,28 @@ G10.nominal_x = Opt_set.dp_x; G11.nominal_x = Opt_set.dp_x;
 % G7.Mpp_p = G1.Mpp_p;G8.Mpp_p = G1.Mpp_p;G9.Mpp_p = G1.Mpp_p;
 % G10.Mpp_p = G1.Mpp_p;G11.Mpp_p = G1.Mpp_p;
 
-G1.func = {'[F, U] = Cheng(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,4.4482e5,4.4482e5, 0);'};
+G1.func = {'[F, U] = Cheng3(A1,A2,A3,4.4482e5, 0);'};
 G2.func = G1.func;G3.func = G1.func;G4.func = G1.func;G5.func = G1.func;
 G6.func = G1.func;G7.func = G1.func;G8.func = G1.func;G9.func = G1.func;
 G10.func = G1.func;G11.func = G1.func;
 
 
 % 2 inch^2 in TANA!
-
-% Displacement
- G1.expression = {'G = 4.5*(2.54e-2) - abs(U(1,1));'}; % X OR Y DISPLACEMENT, SHOULD BE X! 
- %G2.expression = {'G = 4.5*(2.54e-2) - abs(U(1,2));'}; % X OR Y DISPLACEMENT, SHOULD BE X!
- %G3.expression = {'G = 4.5*(2.54e-2) - abs(U(1,3));'}; % X OR Y DISPLACEMENT, SHOULD BE X!
- %G4.expression = {'G = 4.5*(2.54e-2) - abs(U(1,4));'}; % X OR Y DISPLACEMENT, SHOULD BE X!
- 
- 
- %G2.expresion = {'G = P*L/(A1*A3*E) * (4*sqrt(2)*A1^3 * (24*A2^2+ A3^2) + A3^3*(7*a1^2 + 26 A2^2)/Dt-));'};
- 
- % Stress
- %G12.expression = {'F = abs(F(1)); G = 172.3689 - 1e-6*F/A1;'};
- G2.expression = {'F = abs(F(1)); G = 17.23689 - 1e-6*F/A1;'};
- G3.expression = {'F = abs(F(2)); G = 1723689 - 1e-6*F/A2;'};
- G4.expression = {'F = abs(F(3)); G = 172.3689 - 1e-6*F/A3;'};
- G5.expression = {'F = abs(F(4)); G = 172.3689 - 1e-6*F/A4;'};
- G6.expression = {'F = abs(F(5)); G = 172.3689 - 1e-6*F/A5;'};
- G7.expression = {'F = abs(F(6)); G = 172.3689 - 1e-6*F/A6;'};
- G8.expression = {'F = abs(F(7)); G = 172.3689 - 1e-6*F/A7;'};
- G9.expression = {'F = abs(F(8)); G = 172.3689 - 1e-6*F/A8;'};
- G10.expression = {'F = abs(F(9)); G = 172.3689 - 1e-6*F/A9;'};
- G11.expression = {'F = abs(F(10)); G = 172.3689 - 1e-6*F/A10;'};
-  LS = [ G1, G2, G3, G4, G5, G6, G7, G8, G9, G10, G11];
-%LS = [G1, G2, G3, G4];
+G1.expression = {'G = 4.5*(2.54e-2) - max(abs(U(1,:)));'}; % X OR Y DISPLACEMENT, SHOULD BE X!
+G2.expression = {' G = 172.3689e6 - abs(max(F./[A1, A2, A3]));'};
+G3.expression = {' G = 172.3689e6 - abs(min(F./[A1, A2, A3]));'};
+%  G2.expression = {'F = abs(F(1)); G = 172.3689 - 1e-6*F/A1;'};
+%  G3.expression = {'F = abs(F(2)); G = 172.3689 - 1e-6*F/A2;'};
+%  G4.expression = {'F = abs(F(3)); G = 172.3689 - 1e-6*F/A3;'};
+%  G5.expression = {'F = abs(F(4)); G = 170.3689 - 1e-6*F/A4;'};
+%  G6.expression = {'F = abs(F(5)); G = 172.3689 - 1e-6*F/A5;'};
+%  G7.expression = {'F = abs(F(6)); G = 172.3689 - 1e-6*F/A6;'};
+%  G8.expression = {'F = abs(F(7)); G = 172.3689 - 1e-6*F/A7;'};
+%  G9.expression = {'F = abs(F(8)); G = 172.3689 - 1e-6*F/A8;'};
+%  G10.expression = {'F = abs(F(9)); G = 172.3689 - 1e-6*F/A9;'};
+%  G11.expression = {'F = abs(F(10)); G = 172.3689 - 1e-6*F/A10;'};
+%  LS = [G1, G2, G3, G4, G5, G6, G7, G8, G9, G10, G11];
+LS = [G1, G2, G3];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % General settings
@@ -123,19 +105,18 @@ RBDO_s.name = 'Cheng';
 RBDO_s.f_RoC = true;
 RBDO_s.f_RoC_step = false;
 RBDO_s.f_SRoC = true;
+RBDO_s.roc_scale_down = 0.99;
+RBDO_s.roc_scale_up = 1.2;
 
-RBDO_s.RoC_d = 4*(2.54e-2)^2 .*ones(pdata.nd,1); % Max deterministic update of dv.
-RBDO_s.roc_scale = 0.4;
-RBDO_s.DoE_size_d = 1e-2*(2.54e-2)^2; % 0.01 inch.
+RBDO_s.RoC_d = 4*(2.54e-2)^2 .*ones(pdata.nd,1);
+RBDO_s.DoE_size_d = 0.01*(2.54e-2)^2; % 0.1 inch.
 RBDO_s.f_debug = 1;
 RBDO_s.f_one_probe = 1;
-RBDO_s.f_corrector = false;
-RBDO_s.f_probe = true; % Removes probe algorithm
 
-RBDO_s.lb_probe = ones(10,1)*1e-12;
+RBDO_s.f_probe = false; % Removes probe algorithm
+RBDO_s.lb_probe = Opt_set.lb*1e-2;
 
 RBDO_s.f_linprog = true; 
 RBDO_s.f_penal = false;
-
 counter = 0;
 Corr = nan;

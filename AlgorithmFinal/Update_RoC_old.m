@@ -17,14 +17,14 @@ else
     
     Delta = (Opt_set.delta_old + Opt_set.delta)./2;
     
-    index_short = Delta <= 0;
-    index_long =  Delta > 0;
-    %index_different = sign(Opt_set.delta) ~= sign(Opt_set.delta_old);
-    RBDO_s.roc_dist(index_short) = RBDO_s.roc_dist(index_short )* RBDO_s.roc_scale_down;
-   % RBDO_s.roc_dist(index_long) = RBDO_s.roc_dist(index_long) * RBDO_s.roc_scale_up;
+    index_short = abs(Delta) < RBDO_s.roc_dist.*0.7;
+    index_long =  abs(Delta) > RBDO_s.roc_dist.*0.9;
+    index_different = sign(Opt_set.delta) ~= sign(Opt_set.delta_old);
+    RBDO_s.roc_dist(index_short & index_different) = RBDO_s.roc_dist(index_short & index_different)*(1-RBDO_s.roc_scale);% abs(Delta(index_short));
+   % RBDO_s.roc_dist(index_long & index_different) = RBDO_s.roc_dist(index_long & index_different) *(1+RBDO_s.roc_scale);% abs(Delta(index_long))*1.5; % distance to wanted step?
     roc_dist = RBDO_s.roc_dist;
     
-    % Lower and upper value on Roc. ?!
+    % Lower and upper value on Roc.
     
     
     % Largest value of change

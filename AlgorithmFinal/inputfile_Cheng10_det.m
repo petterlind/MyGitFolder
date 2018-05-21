@@ -125,14 +125,15 @@ RBDO_s.f_RoC_step = false;
 RBDO_s.f_SRoC = true;
 
 RBDO_s.RoC_d = 4*(2.54e-2)^2 .*ones(pdata.nd,1); % Max deterministic update of dv.
-RBDO_s.roc_scale = 0.4;
+RBDO_s.roc_scale_down = 0.6;
+RBDO_s.roc_scale_up = 1.2;
 RBDO_s.DoE_size_d = 1e-2*(2.54e-2)^2; % 0.01 inch.
 RBDO_s.f_debug = 1;
 RBDO_s.f_one_probe = 1;
 RBDO_s.f_corrector = false;
 RBDO_s.f_probe = true; % Removes probe algorithm
 
-RBDO_s.lb_probe = ones(10,1)*1e-12;
+RBDO_s.lb_probe = Opt_set.lb*1e-3;
 
 RBDO_s.f_linprog = true; 
 RBDO_s.f_penal = false;

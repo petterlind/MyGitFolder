@@ -1,4 +1,4 @@
-function DP1 = RoC(RBDO_s, pdata, Opt_set, DP1, DP0, lbp, shift)
+function DP1 = RoC(RBDO_s, pdata, Opt_set, DP1, DP0, lbp)
 % DP0, nominal point
 % DP1, New suggested point
 % DPF, feasible point
@@ -10,13 +10,7 @@ function DP1 = RoC(RBDO_s, pdata, Opt_set, DP1, DP0, lbp, shift)
 % allowed.
 
 % 1) Input
-
-% Shift it!
-if isempty(shift)
-    shift = zeros(numel(RBDO_s.roc_dist),1);
-end
-
-roc_dist = RBDO_s.roc_dist-shift;
+roc_dist = min([RBDO_s.roc_dist'; Opt_set.dp_x' - lbp; Opt_set.ub' - Opt_set.dp_x'])';
 
 if pdata.nx > 0 && pdata.nd > 0
     error('More code needed in RoC.m!') % and below aswell!

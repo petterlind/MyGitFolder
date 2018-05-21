@@ -9,14 +9,14 @@ switch RBDO_s.name
     
             for ij = 1:pdata.nx
                 hold on
-                plot( [Opt_set.k-1 , Opt_set.k] , [Opt_set.dp_x_old(ij) Opt_set.dp_x(ij)]./(2.54e-2)^2, '-ok')
+                plot( [Opt_set.k-1 , Opt_set.k] , [Opt_set.dp_x_old(ij) Opt_set.dp_x(ij)], '-ok') %./(2.54e-2)^2
             end
 
             for ij = 1:pdata.nd
                 hold on
                 try
 
-                    plot( [Opt_set.k-1 , Opt_set.k] , [Opt_set.dp_x_old(ij) Opt_set.dp_x(ij)]./(2.54e-2)^2, '-ok')
+                    plot( [Opt_set.k-1 , Opt_set.k] , [Opt_set.dp_x_old(ij) Opt_set.dp_x(ij)], '-ok') %./(2.54e-2)^2
                 catch
                     error('in Plotiter')
                 end
@@ -32,36 +32,57 @@ switch RBDO_s.name
         end
         % Plot fig of trusses
         figure(2)
-        try
-        t = num2cell(Opt_set.dp_x);
-        [A1,A2,A3,A4,A5,A6,A7,A8,A9,A10] = deal(t{:});
-        if pdata.np > 0 
-            t2 = num2cell(pdata.margp(1:end-1,2));
-            [P1,P2] = deal(t2{:});
-        else
-            P1 = 4.4482e5;
-            P2 = P1;
-        end
-        
         clf
-        [~,~] = Cheng(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,P1,P2, 1);
-        %[~,~] = Aoues(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,P1,P2, 1);
+            if numel(Opt_set.dp_x) == 10
+                t = num2cell(Opt_set.dp_x);
+                [A1,A2,A3,A4,A5,A6,A7,A8,A9,A10] = deal(t{:});
+
+                if pdata.np > 0 
+                    t2 = num2cell(pdata.margp(1:end-1,2));
+                    [P1,P2] = deal(t2{:});
+                else
+                    P1 = 4.4482e5;
+                    P2 = P1;
+                end
+
+                clf
+                [~,~] = Cheng(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,P1,P2, 1);
+                %[~,~] = Aoues(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,P1,P2, 1);
+                
+            elseif numel(Opt_set.dp_x) == 5
+                
+                t = num2cell(Opt_set.dp_x);
+                [A1,A2,A3,A4,A5] = deal(t{:});
+                if pdata.np > 0 
+                    t2 = num2cell(pdata.margp(1:end,2));
+                    [F,P,~,E] = deal(t2{:});
+                else
+                    F = 20e3;
+                    P = 15e3;
+                    E = 68950e6;
+                end
+
+                [~,~] = Cheng5(A1,A2,A3,A4,A5,F,P,E,1);
+                
+            elseif numel(Opt_set.dp_x) == 3
+                
+                 t = num2cell(Opt_set.dp_x);
+                [A1,A2,A3] = deal(t{:});
+                if pdata.np > 0 
+                    t2 = num2cell(pdata.margp(1:end,2));
+                    [P,~,E] = deal(t2{:});
+                else
+                    %F =
+                    P = 15e3;
+                    E = 68950e6;
+                end
+                
+                [~,~] = Cheng3(A1,A2,A3,P,1);
+                
+            else
+                error('Number of DV does not match any truss structure. in plotiter.m')
+            end
         
-        catch
-        t = num2cell(Opt_set.dp_x);
-        [A1,A2,A3,A4,A5] = deal(t{:});
-        if pdata.np > 0 
-            t2 = num2cell(pdata.margp(1:end,2));
-            [F,P,~,E] = deal(t2{:});
-        else
-            F = 20e3;
-            P = 15e3;
-            E = 68950e6;
-        end
-        
-        [~,~] = Cheng5(A1,A2,A3,A4,A5,F,P,E,1);
-            
-        end
         % Plot Ls at nominal point!
         if Opt_set.k>1
         
