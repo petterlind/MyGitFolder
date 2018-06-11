@@ -1,4 +1,4 @@
-function roc_dist = Update_RoC(RBDO_s, Opt_set,pdata)
+function [roc_dist, DoE_size_d, DoE_size_x ] = Update_RoC(RBDO_s, Opt_set,pdata)
 
 
 if isnan(Opt_set.delta)
@@ -15,19 +15,35 @@ if isnan(Opt_set.delta)
     roc_dist =  RBDO_s.roc_dist;
 else
     
-    Delta = (Opt_set.delta_old + Opt_set.delta)./2;
+    %Delta = (Opt_set.delta_old + Opt_set.delta)./2;
+    
+    Delta = Opt_set.delta_old .* Opt_set.delta;
     
     index_short = Delta <= 0;
     index_long =  Delta > 0;
-    %index_different = sign(Opt_set.delta) ~= sign(Opt_set.delta_old);
-    RBDO_s.roc_dist(index_short) = RBDO_s.roc_dist(index_short )* RBDO_s.roc_scale_down;
+    
+    % lb check -> if 1, then ok!
+    lb = RBDO_s.roc_dist > RBDO_s.roc_lb;
+    % ub =...
+    
+   roc_dist = RBDO_s.roc_dist;
+   DoE_size_d = RBDO_s.DoE_size_d;
+   DoE_size_x = RBDO_s.DoE_size_x;
+   
+   % Shrink
+   roc_dist(index_short & lb)  = RBDO_s.roc_dist(index_short & lb)* RBDO_s.roc_scale_down;
+   %DoE_size_x(index_short & lb) = RBDO_s.DoE_size_x(index_short & lb )* RBDO_s.roc_scale_down;
+   if sum(pdata.nx) > 0 && sum(pdata.nd) == 0
+        DoE_size_x(index_short & lb) = RBDO_s.DoE_size_x(index_short & lb )* RBDO_s.roc_scale_down;
+   elseif sum(pdata.nd) > 0 && sum(pdata.nx) == 0
+       DoE_size_d(index_short & lb) = RBDO_s.DoE_size_d(index_short & lb )* RBDO_s.roc_scale_down;
+   elseif sum(pdata.nx) > 0 && sum(pdata.nd) > 0
+       error('More code needed in Update_RoC')
+   end
+   
+   % Grow
    % RBDO_s.roc_dist(index_long) = RBDO_s.roc_dist(index_long) * RBDO_s.roc_scale_up;
-    roc_dist = RBDO_s.roc_dist;
-    
-    % Lower and upper value on Roc. ?!
-    
-    
-    % Largest value of change
+    end
 end
 
 

@@ -2,7 +2,10 @@ function obj = do_probe(obj, pdata, Opt_set, RBDO_s)
 
 %  1) RoC for probe point!
 if RBDO_s.f_RoC
-   obj.probe_x_pos = RoC(RBDO_s, pdata, Opt_set, obj.alpha_x * obj.p_trial + obj.nominal_x, obj.nominal_x, RBDO_s.lb_probe);
+   
+    %obj.probe_x_pos = obj.alpha_x * obj.p_trial + obj.nominal_x;
+    warning('no RoC on probe')
+    obj.probe_x_pos = RoC(RBDO_s, pdata, Opt_set, obj.alpha_x * obj.p_trial + obj.nominal_x, obj.nominal_x, RBDO_s.lb_probe);
 
 
     if obj.probe_x_pos < RBDO_s.lb_probe 
@@ -42,31 +45,42 @@ if obj.probe_p ~= 0
     sign_first_step = sign(obj.p_trial); %corresponds to the nominal step, has to elaborate a bit if more steps is to be conducted.
 
     if sign(obj.probe_s) ~= sign(sign_first_step)
-
+            
+        try
         if obj.nominal_val >1 && obj.probe_val > 1 % Both are positive
             obj.no_cross = 1;
 
             if RBDO_s.f_debug
                 fprintf('No cross LS: %d \n',obj.nr)
-                figure
                 p_spline(obj, pdata, Opt_set, RBDO_s)
             end
         elseif isnan(obj.probe_s)
             error('In do_probe.m, p_s is NaN')
             
-                    % Should not move backwards from trial unless zero cross!
-        elseif sign(obj.p_val) == sign(obj.probe_val) && abs(obj.probe_s) < abs(obj.p_trial)
+        % Should not move backwards from trial unless zero cross!
+        elseif sign(obj.nominal_val) == sign(obj.probe_val) && sign(obj.probe_val)*obj.probe_s < sign(obj.probe_val)*obj.p_trial
             obj.probe_s = obj.p_trial;
             if RBDO_s.f_debug
                 fprintf('p_s = p_trial, bacwards attempt: %d \n',obj.nr)
+            end
+            
+        % If difference between probe and trial is small, they are the
+        % same.
+        elseif abs(obj.probe_s -obj.p_trial) < 1e-14
+            obj.probe_s = obj.p_trial;
+            if RBDO_s.f_debug
+                fprintf('p_s = p_trial, no difference: %d \n',obj.nr)
             end
             
         else
             error('In do_probe.m, p_s is going opposite direction')
         end
         
-
-    
+        catch
+            error('in do_probe')
+        end
+        
+        
     end
 end
 

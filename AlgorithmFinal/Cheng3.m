@@ -15,9 +15,9 @@ Enum = 6.895e10; %CHENG and TANA!
 
 L = 9.144;
 
-Coord = [L/2 L 0
-    L/2 0 0
+Coord = [L L 0
     L 0 0
+    2*L 0 0
     0 0 0];
 
 %  Connectivity

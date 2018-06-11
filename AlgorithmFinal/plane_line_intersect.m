@@ -11,7 +11,7 @@ N = -dot(n,w); % negative projection plane normal, connection plane line
 sI = N / D; % Ratio 
 
 % Outside of segment!
-if (sI > 0 && sI < 1)
+if (sI >= 0 && sI < 1)
     sol_dp = L0 + sI.*u; %Intersection point
 else % no intersection
     sol_dp = nan(numel(L0),1);

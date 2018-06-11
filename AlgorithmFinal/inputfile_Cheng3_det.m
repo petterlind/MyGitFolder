@@ -16,7 +16,7 @@ pdata.marg =  [  0  10    0 1
 %pdata.marg(:,2) = optimum;
 pdata.marg(:,2) = pdata.marg(:,2)*(2.54e-2)^2;
 
-%pdata.margp =  [  0  10    0 1];
+pdata.margp =  [];
 
 pdata = set_numbers(pdata, pdata.marg);
 pdata.np = 0;
@@ -113,7 +113,7 @@ RBDO_s.DoE_size_d = 0.01*(2.54e-2)^2; % 0.1 inch.
 RBDO_s.f_debug = 1;
 RBDO_s.f_one_probe = 1;
 
-RBDO_s.f_probe = false; % Removes probe algorithm
+RBDO_s.f_probe = true; % Removes probe algorithm
 RBDO_s.lb_probe = Opt_set.lb*1e-2;
 
 RBDO_s.f_linprog = true; 

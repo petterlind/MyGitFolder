@@ -6,7 +6,10 @@ switch type
 case 'parameters'
     
     % Probabilistic parameters
-        obj.doe_u = Experiment(U_space(obj.Mpp_p, pdata.margp(:,2), pdata.margp(:,3), pdata.margp(:,1)), RBDO_s.DoE_size_x );
+    
+        [u_vec, psedo_dist] = U_space(obj.Mpp_p, pdata.margp(:,5), pdata.margp(:,6), pdata.margp(:,1));
+        pdata.margp(:,2:3) = psedo_dist;
+        obj.doe_u = Experiment(u_vec, RBDO_s.DoE_size_p );
         obj.doe_x = X_space( obj.doe_u, pdata.margp(:,2) ,pdata.margp(:,3),pdata.margp(:,1)); % Transformation back to X-space
 
         % Experiment - in x-space!
@@ -118,8 +121,12 @@ switch type
     end
     
     case 'parameters'
-       obj.Mpp_p = X_space( alpha_u * Opt_set.target_beta, pdata.margp(:,2),pdata.margp(:,3),pdata.margp(:,1));
+       
         
+       obj.Mpp_p = X_space( alpha_u * Opt_set.target_beta, pdata.margp(:,2),pdata.margp(:,3),pdata.margp(:,1));
+       
+%        if pdata.np == 1
+%            obj.Mpp_p= X_space
     otherwise
         error('Unknown type in Grad.m')
 end

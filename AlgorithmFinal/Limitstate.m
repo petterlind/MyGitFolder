@@ -35,6 +35,7 @@ classdef Limitstate
       
       Mpp_p                 % Paramter set beta- away in u space in alpha p-dir.
       Mpp_x                 % Mpp estimate from probe
+      Mpp_sx                % Shifted Mpp for dv
       Mpp_x_old             % Old Mpp LS.
       Mpp_u                 % Mpp estimate from probe, u-space
       

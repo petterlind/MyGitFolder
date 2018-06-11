@@ -9,14 +9,14 @@ switch RBDO_s.name
     
             for ij = 1:pdata.nx
                 hold on
-                plot( [Opt_set.k-1 , Opt_set.k] , [Opt_set.dp_x_old(ij) Opt_set.dp_x(ij)], '-ok') %./(2.54e-2)^2
+                plot( [Opt_set.k-1 , Opt_set.k] , [Opt_set.dp_x_old(ij) Opt_set.dp_x(ij)]./(2.54e-2)^2, '-ok') %
             end
 
             for ij = 1:pdata.nd
                 hold on
                 try
 
-                    plot( [Opt_set.k-1 , Opt_set.k] , [Opt_set.dp_x_old(ij) Opt_set.dp_x(ij)], '-ok') %./(2.54e-2)^2
+                    plot( [Opt_set.k-1 , Opt_set.k] , [Opt_set.dp_x_old(ij) Opt_set.dp_x(ij)]./(2.54e-2)^2, '-ok') %
                 catch
                     error('in Plotiter')
                 end
@@ -73,8 +73,8 @@ switch RBDO_s.name
                     [P,~,E] = deal(t2{:});
                 else
                     %F =
-                    P = 15e3;
-                    E = 68950e6;
+                    P = 4.4482e5;
+                    %E = 68950e6;
                 end
                 
                 [~,~] = Cheng3(A1,A2,A3,P,1);
@@ -109,7 +109,14 @@ switch RBDO_s.name
         hold on
 
         g1 = @(mu1,mu2) mu1^2*mu2/20-1;
-        g2 = @(mu1,mu2)(mu1+mu2-5)^2/30+(mu1-mu2-12)^2/120-1;
+        if strcmp(RBDO_s.name, 'Jeong_Park')
+            Y = @(mu1,mu2)0.9063*mu1 + 0.4226*mu2 ;
+            Z = @(mu1,mu2)0.4226*mu1-0.9063*mu2 ;
+            g2 = @(mu1,mu2) -1*(-1+(Y(mu1,mu2)-6)^2+(Y(mu1,mu2)-6)^3-0.6*(Y(mu1,mu2)-6)^4+Z(mu1,mu2));
+        else
+            g2 = @(mu1,mu2)(mu1+mu2-5)^2/30+(mu1-mu2-12)^2/120-1;
+        end
+        
         g3 = @(mu1,mu2) 80/(mu1^2+8*mu2+5)-1;
 
         %intervall = [-10 4 -10 2];

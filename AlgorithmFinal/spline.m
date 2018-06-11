@@ -5,7 +5,7 @@ function [parameters, p_s] = spline(obj, p_I)
                             gm_num = obj.p_val(p_I); 
                             pt_num = obj.probe_p;
                             Gt_num = obj.probe_val;
-                            k_num = obj.slope; % i-u_space ?!
+                            k_num = obj.slope; 
                             
                             syms r(p) A B C D gm Gt pm pt k
 

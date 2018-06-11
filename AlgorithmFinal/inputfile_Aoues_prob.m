@@ -6,12 +6,10 @@ close all
 % --------------------------------
 % inputfile_trusses
 % inputfile_YounChoi
-% inputfile_Jeong_Park
 % inputfile_Madsen
 % inputfile_Cheng
 
- inputfile_Cheng10_prob
-% inputfile_Cheng10_det
+ inputfile_Cheng10_det
 % inputfile_Cheng3_det
 %  inputfile_Cheng3_prob
 % inputfile_TANA
@@ -58,10 +56,7 @@ while Opt_set.outer_conv
         LS(ii).nominal_x_old = LS(ii).nominal_x;
         
         if RBDO_s.f_RoC
-            warning('No Roc on nominal point!')
-             % LS(ii).nominal_x = RoC(RBDO_s, pdata, Opt_set, Opt_set.dp_x + LS(ii).beta_v, Opt_set.dp_x, Opt_set.lb);
-             LS(ii).nominal_x = Opt_set.dp_x + LS(ii).beta_v; % Kolla bara mot de absoluta gränserna!
-             
+            LS(ii).nominal_x = RoC(RBDO_s, pdata, Opt_set, Opt_set.dp_x + LS(ii).beta_v, Opt_set.dp_x, Opt_set.lb);
         else
             LS(ii).nominal_x = Opt_set.dp_x + LS(ii).beta_v;
         end
@@ -111,6 +106,7 @@ while Opt_set.outer_conv
                 end
                 
             end
+        
 
         % save previous value
         Opt_set.dpl_x_old = Opt_set.dpl_x;
@@ -126,7 +122,6 @@ while Opt_set.outer_conv
 
             if pdata.nx > 0
                xs_new = [LS(active).Mpp_x] - [LS(active).beta_v];
-               %xs_new = [LS(active).Mpp_sx]; %shifted Mpp
                  b = diag(A*xs_new);
             elseif pdata.nx == 0 && pdata.nd ~=0
                b = diag(A*xs);
@@ -134,13 +129,16 @@ while Opt_set.outer_conv
                error('Add the last option in b')
             end
 
+ 
             % Uppdatera Move Limits
+            
             lb = max([ Opt_set.lb'; (Opt_set.dp_x' - RBDO_s.roc_dist')]);
             ub = min([ Opt_set.ub'; (Opt_set.dp_x' + RBDO_s.roc_dist')]);
             
+
+
             % Check if inside ROC, then towards optimum.
             %if  sum ( abs(Opt_set.dpl_x - Opt_set.dp_x) < RBDO_s.roc_dist ) > 0
-            
                 options = optimoptions('linprog','Algorithm','dual-simplex','OptimalityTolerance', 1e-10,'ConstraintTolerance',1e-3);
                 [ Opt_set.dpl_x, fval, RBDO_s.f_linprog, output] = linprog(f, A, b, [],[], lb, ub,options);
             %end

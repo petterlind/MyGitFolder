@@ -10,7 +10,7 @@ function position = Experiment(poi, scale)%, alpha, nr, probdata, rbdo_parameter
 
 
 % In x-space.. Otherwise we wouldn't need the scaling \sigma factor.
-
+try
     %Koshal design
     deltax = [ zeros(1,length(poi))
               eye(length(poi)).* scale];
@@ -19,6 +19,10 @@ function position = Experiment(poi, scale)%, alpha, nr, probdata, rbdo_parameter
     % Nx+1 experiments
     position = ones(length(poi)+1,length(poi)).*poi' + deltax; % DoE
    position = position';
+catch
+    error('In experiment.m')
+end
+
     
 %     % Koshal plus
 %         deltax = [ zeros(1,length(poi))

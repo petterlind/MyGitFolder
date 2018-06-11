@@ -12,9 +12,12 @@ classdef Rbdo_settings
     roc_dist          % sidelength of the RoC-cube!
     roc_scale_down         % Scale (shirnking) of the Roc-cube
     roc_scale_up           % Scale (growing= of the Roc_cube
+    roc_lb              % lb for roc
     
     DoE_size_x      % DoE size in u-space
     DoE_size_d      % DoE size in x-space ( deterministic variables)
+    DoE_size_p      % DoE size in u-space for parameters
+    
     tol = 1e-3;
     max_k = 10000;
     max_l = 100;

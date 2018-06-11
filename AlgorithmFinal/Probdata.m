@@ -1,6 +1,6 @@
 classdef Probdata
    properties
-    marg                 %  [  distribuiton(0 - det, 1- normal, 2-lognormal) mean stdv  (0 - parameter, 1 - variable)]
+    marg                 %  [  distribuiton(0 - det, 1- normal, 2-lognormal) mean-normal stdv-normal  (0 - parameter, 1 - variable) mu sigma]
     margp                % probibilistic dp
     
     name

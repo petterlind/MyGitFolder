@@ -15,11 +15,13 @@ for ii = 1:columns
             
         elseif dist(ij) == 2 % lognormal distributed transformation
             
-            c = mu_vec(ij)/ stdv_vec(ij);
-            mu_n = log(mu_vec(ij)/sqrt(1+c^2));
-            std_n = sqrt(log(1+c^2));
-            
-            x_space_vec(ij,ii) =  exp(mu_n + u_space_vec(ij,ii).*std_n);
+            % Using the pseudo-normal variables..
+            x_space_vec(ij,ii) =  mu_vec(ij) + u_space_vec(ij,ii).*stdv_vec(ij);
+%             c = mu_vec(ij)/ stdv_vec(ij);
+%             mu_n = log(mu_vec(ij)/sqrt(1+c^2));
+%             std_n = sqrt(log(1+c^2));
+%             
+%             x_space_vec(ij,ii) =  exp(mu_n + u_space_vec(ij,ii).*std_n);
             
         else
             error('Problem in X_space.m, unknown distribution')

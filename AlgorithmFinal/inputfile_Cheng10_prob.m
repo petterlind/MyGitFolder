@@ -24,8 +24,13 @@ pdata.marg =  [  0  10   0 1
 
 pdata.marg(:,2) = pdata.marg(:,2)*(2.54e-2)^2;
 
+pdata.margp = [2  nan nan 0 4.448*1e5 2.224*1e4
+    2  nan nan 0 4.448*1e5 2.224*1e4
+    1  2.5*1e4 2.5*1e3 0 1.724*1e8 1.724*1e7];
+
+
 pdata = set_numbers(pdata, pdata.marg);
-pdata.np = 0;
+pdata.np = 3;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Optimizer settings
@@ -78,7 +83,7 @@ G10.nominal_x = Opt_set.dp_x; G11.nominal_x = Opt_set.dp_x;
 % G7.Mpp_p = G1.Mpp_p;G8.Mpp_p = G1.Mpp_p;G9.Mpp_p = G1.Mpp_p;
 % G10.Mpp_p = G1.Mpp_p;G11.Mpp_p = G1.Mpp_p;
 
-G1.func = {'[F, U] = Cheng(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,4.4482e5,4.4482e5, 0);'};
+G1.func = {'[F, U] = Cheng(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,P1, P2, 0);'};
 G2.func = G1.func;G3.func = G1.func;G4.func = G1.func;G5.func = G1.func;
 G6.func = G1.func;G7.func = G1.func;G8.func = G1.func;G9.func = G1.func;
 G10.func = G1.func;G11.func = G1.func;
@@ -97,16 +102,16 @@ G10.func = G1.func;G11.func = G1.func;
  
  % Stress
  %G12.expression = {'F = abs(F(1)); G = 172.3689 - 1e-6*F/A1;'};
- G2.expression = {'F = abs(F(1)); G = 17.23689 - 1e-7*F/A1;'};
- G3.expression = {'F = abs(F(2)); G = 17.23689 - 1e-7*F/A2;'};
- G4.expression = {'F = abs(F(3)); G = 17.23689 - 1e-7*F/A3;'};
- G5.expression = {'F = abs(F(4)); G = 17.23689 - 1e-7*F/A4;'};
- G6.expression = {'F = abs(F(5)); G = 17.23689 - 1e-7*F/A5;'};
- G7.expression = {'F = abs(F(6)); G = 17.23689 - 1e-7*F/A6;'};
- G8.expression = {'F = abs(F(7)); G = 17.23689 - 1e-7*F/A7;'};
- G9.expression = {'F = abs(F(8)); G = 17.23689 - 1e-7*F/A8;'};
- G10.expression = {'F = abs(F(9)); G = 17.23689 - 1e-7*F/A9;'};
- G11.expression = {'F = abs(F(10)); G = 17.23689 - 1e-7*F/A10;'};
+ G2.expression = {'F = abs(F(1)); G = 1e-1*sy- 1e-7*F/A1;'};
+ G3.expression = {'F = abs(F(2)); G = 1e-1*sy - 1e-7*F/A2;'};
+ G4.expression = {'F = abs(F(3)); G = 1e-1*sy - 1e-7*F/A3;'};
+ G5.expression = {'F = abs(F(4)); G = 1e-1*sy - 1e-7*F/A4;'};
+ G6.expression = {'F = abs(F(5)); G = 1e-1*sy - 1e-7*F/A5;'};
+ G7.expression = {'F = abs(F(6)); G = 1e-1*sy - 1e-7*F/A6;'};
+ G8.expression = {'F = abs(F(7)); G = 1e-1*sy - 1e-7*F/A7;'};
+ G9.expression = {'F = abs(F(8)); G = 1e-1*sy - 1e-7*F/A8;'};
+ G10.expression = {'F = abs(F(9)); G = 1e-1*sy - 1e-7*F/A9;'};
+ G11.expression = {'F = abs(F(10)); G = 1e-1*sy - 1e-7*F/A10;'};
   LS = [ G1, G2, G3, G4, G5, G6, G7, G8, G9, G10, G11];
 %LS = [G1, G2, G3, G4];
 
