@@ -1,13 +1,14 @@
-function DP1 = RoC(RBDO_s, pdata, Opt_set, DP1, DP0, lbp, type)
+function DP1 = RoC(RBDO_s, pdata, Opt_set, DP1, DP0, lbp)
 % DP0, nominal point
 % DP1, New suggested point
 % DPF, feasible point
 % lbp, lower bound point
-% type 
+% type, Move limit or lower bound only. 
+
+
 % DP1, new suggested point wrt move limits.
 
 % Hypercube. check if change of variable in any direction is greater than
-% allowed.
 
 % 1) Input
 roc_dist = min([RBDO_s.roc_dist'; Opt_set.dp_x' - lbp; Opt_set.ub' - Opt_set.dp_x'])';

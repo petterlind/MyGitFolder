@@ -2,11 +2,7 @@ function obj = do_probe(obj, pdata, Opt_set, RBDO_s)
 
 %  1) RoC for probe point!
 if RBDO_s.f_RoC
-   
-    %obj.probe_x_pos = obj.alpha_x * obj.p_trial + obj.nominal_x;
-    warning('no RoC on probe')
     obj.probe_x_pos = RoC(RBDO_s, pdata, Opt_set, obj.alpha_x * obj.p_trial + obj.nominal_x, obj.nominal_x, RBDO_s.lb_probe);
-
 
     if obj.probe_x_pos < RBDO_s.lb_probe 
         % probe_x_pos(test < Opt_set.lb) = Opt_set.lb;

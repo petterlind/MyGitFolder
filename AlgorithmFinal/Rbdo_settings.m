@@ -9,14 +9,15 @@ classdef Rbdo_settings
     % Solver settings
     RoC_d             % minimum step size deterministic variables, absolute numbers
     RoC_x = 3;        % Minimum step size probibalistic variables, times \beta^T
-    roc_dist          % sidelength of the RoC-cube!
     roc_scale_down         % Scale (shirnking) of the Roc-cube
     roc_scale_up           % Scale (growing= of the Roc_cube
     roc_lb              % lb for roc
+    kappa_n             % vector, distance to nominal point in each direction.
     
-    DoE_size_x      % DoE size in u-space
-    DoE_size_d      % DoE size in x-space ( deterministic variables)
-    DoE_size_p      % DoE size in u-space for parameters
+    size_DoE        % Relative doe_size compared to beta.
+    
+    DoE_size_d      % DoE size in x-space ( deterministic variables) 
+    DoE_size_p      % DoE size in u-space for parameters REMOVE?
     
     tol = 1e-3;
     max_k = 10000;
@@ -37,6 +38,7 @@ classdef Rbdo_settings
     f_probe = true; % Runs probe algorithm
     f_corrector
     f_penal         % penalization algorithm
+    f_nominal_s         % shrinking distance to nominal point to prevent ocillation?
 
  end
 end

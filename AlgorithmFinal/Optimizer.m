@@ -8,12 +8,13 @@ classdef Optimizer
         dp_u_old           % Old design point in u-space
         
         delta = nan %dummy % step between current and last iteration
-        delta_old          % step before that
-        
-        target_beta         % target beta
+        delta_old = nan         % step before that
         
         ob_val             % Objective function value
         ob_val_old = nan   % Old objective function value
+        
+        ML_scale            % Move limit scale parameter
+        roc_dist            % sidelength of the RoC-cube!
         
         % Inner loop
         dpl_x = nan;

@@ -4,6 +4,8 @@ classdef Limitstate
       active = true;        % Active
       nr                    % number.
       
+      DoE_size_x            % DoE size in u-space
+      
       nominal_x             % Nominal x (DP)
       nominal_x_old
       nominal_u
@@ -32,6 +34,8 @@ classdef Limitstate
       alpha_x               % Steepest decent direction probabalistic variables
       alpha_x_old           % Old -- || --
       beta_v = 0
+      
+      target_beta
       
       Mpp_p                 % Paramter set beta- away in u space in alpha p-dir.
       Mpp_x                 % Mpp estimate from probe

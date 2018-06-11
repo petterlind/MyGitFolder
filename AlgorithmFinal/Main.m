@@ -5,15 +5,15 @@ close all
 % 1) Input
 % --------------------------------
 % inputfile_trusses
-% inputfile_YounChoi
+ inputfile_YounChoi
 % inputfile_Jeong_Park
 % inputfile_Madsen
 % inputfile_Cheng
 
- inputfile_Cheng10_prob
+% inputfile_Cheng10_prob
 % inputfile_Cheng10_det
 % inputfile_Cheng3_det
-%  inputfile_Cheng3_prob
+% inputfile_Cheng3_prob
 % inputfile_TANA
 
 %dp_plot = nan(nx,100);
@@ -22,12 +22,11 @@ close all
 %fignr_old = fignr;
 %non_fesible = nan(nx,1);
 
+set_parameters
+
 % Globals
 global Gnum
 Gnum = 0;
-
-% Set the Roc_dist
-RBDO_s.roc_dist = Update_RoC(RBDO_s, Opt_set, pdata);
 
 % --------------------------------
 % 2) Main Loop
@@ -58,12 +57,10 @@ while Opt_set.outer_conv
         LS(ii).nominal_x_old = LS(ii).nominal_x;
         
         if RBDO_s.f_RoC
-            warning('No Roc on nominal point!')
-             % LS(ii).nominal_x = RoC(RBDO_s, pdata, Opt_set, Opt_set.dp_x + LS(ii).beta_v, Opt_set.dp_x, Opt_set.lb);
-             LS(ii).nominal_x = Opt_set.dp_x + LS(ii).beta_v; % Kolla bara mot de absoluta gränserna!
-             
+             LS(ii).nominal_x = RoC(RBDO_s, pdata, Opt_set, Opt_set.dp_x + LS(ii).beta_v.* RBDO_s.kappa_n, Opt_set.dp_x, Opt_set.lb);
+
         else
-            LS(ii).nominal_x = Opt_set.dp_x + LS(ii).beta_v;
+            LS(ii).nominal_x = Opt_set.dp_x + LS(ii).beta_v.* RBDO_s.kappa_n;
         end
         
         if ~sum(pdata.marg(:,1)) == 0 % If not probabilistic variables!
@@ -97,8 +94,6 @@ while Opt_set.outer_conv
         if Opt_set.l>20
             break
         end
-        
-        
             for ii = 1:length(LS)
                 if LS(ii).active
                     LS(ii).Mpp_x_old = LS(ii).Mpp_x; % Save old value
@@ -135,11 +130,11 @@ while Opt_set.outer_conv
             end
 
             % Uppdatera Move Limits
-            lb = max([ Opt_set.lb'; (Opt_set.dp_x' - RBDO_s.roc_dist')]);
-            ub = min([ Opt_set.ub'; (Opt_set.dp_x' + RBDO_s.roc_dist')]);
+            lb = max([ Opt_set.lb'; (Opt_set.dp_x' - Opt_set.roc_dist')]);
+            ub = min([ Opt_set.ub'; (Opt_set.dp_x' + Opt_set.roc_dist')]);
             
             % Check if inside ROC, then towards optimum.
-            %if  sum ( abs(Opt_set.dpl_x - Opt_set.dp_x) < RBDO_s.roc_dist ) > 0
+            %if  sum ( abs(Opt_set.dpl_x - Opt_set.dp_x) < Opt_set.roc_dist ) > 0
             
                 options = optimoptions('linprog','Algorithm','dual-simplex','OptimalityTolerance', 1e-10,'ConstraintTolerance',1e-3);
                 [ Opt_set.dpl_x, fval, RBDO_s.f_linprog, output] = linprog(f, A, b, [],[], lb, ub,options);
@@ -255,7 +250,7 @@ while Opt_set.outer_conv
            % ------------------------
            % plot the iteration
            % ------------------------
-           LS = plotiter(pdata, Opt_set, RBDO_s, LS, Corr);
+           LS = plotiter(pdata, Opt_set, RBDO_s, LS);
 
             if RBDO_s.f_one_probe == 1
                 % One probe, then stop.
@@ -309,8 +304,7 @@ while Opt_set.outer_conv
     
     % Update side length based on last and second last move!
     if RBDO_s.f_SRoC && (Opt_set.k > 1)
-         [RBDO_s.roc_dist, RBDO_s.DoE_size_d, RBDO_s.DoE_size_x] = Update_RoC(RBDO_s, Opt_set, pdata);
-         
+         [Opt_set.roc_dist, Opt_set.ML_scale, RBDO_s.kappa_n] = Update_RoC(RBDO_s, Opt_set);
     end
 
     if ~sum(pdata.marg(:,1)) == 0 % If probabilistic variables!
@@ -326,7 +320,7 @@ while Opt_set.outer_conv
     end
     
     counter = counter + 1;
-    if counter == 10
+    if counter == 5
         fprintf('-')
         counter = 0;
     end

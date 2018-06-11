@@ -1,0 +1,57 @@
+function [roc_dist, DoE_size_d, DoE_size_x, kappa_n] = Update_RoC(LS, RBDO_s, Opt_set,pdata)
+
+
+% Do a scale factor instead and just multiply it to the DOE.
+
+if isnan(Opt_set.delta)
+
+    if pdata.nd >0 % d - a deterministic measure,
+        nrdv = pdata.nd;
+        Opt_set.roc_dist = LS.RoC_d;
+
+    elseif pdata.nx >0  % x - based on beta.
+        min_t = min[LS.RoC_x] .*pdata.marg(:,3)*min([LS.target_beta])
+        Opt_set.roc_dist = ;
+    end
+    
+    roc_dist =  RBDO_s.roc_dist;
+else
+    
+
+    Delta = Opt_set.delta_old .* Opt_set.delta;
+    
+    index_short = Delta <= 0;
+    index_long =  Delta > 0; % CHANGE THIS THING!
+    
+    % lb check -> if 1, then ok!
+    lb = RBDO_s.roc_dist > RBDO_s.roc_lb;
+    % ub =...
+   roc_dist = RBDO_s.roc_dist;
+   
+   kappa_n = RBDO_s.kappa_n;
+   ML_scale = Opt_set.ML_scale;
+   
+   % Shrink
+   roc_dist(index_short & lb)  = RBDO_s.roc_dist(index_short & lb)* RBDO_s.roc_scale_down;
+   %DoE_size_x(index_short & lb) = RBDO_s.DoE_size_x(index_short & lb )* RBDO_s.roc_scale_down;
+   if sum(pdata.nx) > 0 && sum(pdata.nd) == 0
+        ML_scale(index_short & lb) = ML_scale(index_short & lb )* RBDO_s.roc_scale_down;  
+   elseif sum(pdata.nd) > 0 && sum(pdata.nx) == 0
+       ML_scale(index_short & lb) = ML_scale(index_short & lb )* RBDO_s.roc_scale_down;
+   elseif sum(pdata.nx) > 0 && sum(pdata.nd) > 0
+       error('More code needed in Update_RoC')
+   end
+   
+    if RBDO_s.f_nominal_s
+        kappa_n(index_short & lb) = kappa_n(index_short & lb) * RBDO_s.roc_scale_down;
+    end
+   
+   % Grow
+   % RBDO_s.roc_dist(index_long) = RBDO_s.roc_dist(index_long) * RBDO_s.roc_scale_up;
+    end
+end
+
+
+
+
+

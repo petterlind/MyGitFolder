@@ -1,4 +1,4 @@
-function LS = plotiter(pdata, Opt_set, RBDO_s, LS, Corr)
+function LS = plotiter(pdata, Opt_set, RBDO_s, LS)
 
 switch RBDO_s.name
     case {'Cheng', 'TANA'}

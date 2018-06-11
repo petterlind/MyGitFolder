@@ -1,0 +1,52 @@
+% All common options for all files are set here so that they can run using
+% the same options.
+
+
+
+% Initiate settings and variables
+if pdata.nx > 0 
+    
+    
+    Opt_set.roc_dist = 3.*pdata.marg(:,3)* min([LS.target_beta]); % three times beta.
+    
+    % Probabalistic design variables
+    
+    RBDO_s.roc_scale_down = 0.6;
+    %RBDO_s.roc_scale_up
+
+    RBDO_s.f_one_probe = true;
+    RBDO_s.f_RoC = true;
+    RBDO_s.f_SRoC = true;
+    RBDO_s.f_debug = true;
+    RBDO_s.f_probe = true; 
+
+    RBDO_s.f_corrector = false;
+    RBDO_s.f_linprog = true; 
+    RBDO_s.f_penal = false;
+
+    RBDO_s.f_nominal_s = true;
+    RBDO_s.kappa_n = ones(max(pdata.nx, pdata.nd),1);
+
+elseif pdata.nd > 0
+    % Probabalistic parameters!
+    
+    Opt_set.roc_dist = 
+   error('More code in set_parameters') 
+end
+    
+
+% Failsafes
+if pdata.nx > 0 && pdata.nd > 0
+    error('More code needed in main.m!')
+end
+
+
+% Dummys
+counter = 0;
+
+
+% Start values
+
+
+
+

@@ -24,7 +24,7 @@ Opt_set.lb = [0; 0];
 Opt_set.ub = [10; 10];
 Opt_set.dp_x = [5;5];
 
-Opt_set.target_beta = 3;
+target_beta = 3;
 
 if pdata.nx > 0
     Opt_set.dp_u = U_space(Opt_set.dp_x, pdata.marg(:,2), pdata.marg(:,3), pdata.marg(:,1));
@@ -37,7 +37,7 @@ obj = Limitstate;
 obj.expression = {'G = mu1+mu2;'};
 obj.nominal_u = Opt_set.dp_u;
 obj.nominal_x = Opt_set.dp_x;
-obj.nr=0;
+obj.nr = 0;
 
 G1 = Limitstate; G1.nr = 1;
 G2 = Limitstate; G2.nr = 2;
@@ -56,6 +56,15 @@ G2.expression = {'G = (mu1+mu2-5)^2/30+(mu1-mu2-12)^2/120-1;'};
 G3.expression = {'G = 80/(mu1^2+8*mu2+5)-1;'};
 LS = [G1, G2, G3];
 [LS.beta_v] = deal(zeros(pdata.nx,1));
+[LS.target_beta] = deal(target_beta);
+
+%[a,b,c,d] = C{:}
+%[name1,name2] = A(:).name
+
+
+%[LS.target_beta] = 
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % General settings
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -63,24 +72,5 @@ LS = [G1, G2, G3];
 RBDO_s = Rbdo_settings;
 RBDO_s.name = 'YounChoi';
 
-RBDO_s.DoE_size_x = ones(pdata.nx,1).*Opt_set.target_beta/20;
-RBDO_s.roc_scale_down = 0.6;
-RBDO_s.RoC_x = 3*ones(pdata.nx,1); % 3
 RBDO_s.roc_lb = 1e-6;
-RBDO_s.lb_probe = Opt_set.lb; % x-space?
-
-RBDO_s.f_one_probe = true;
-RBDO_s.f_RoC = true;
-RBDO_s.f_SRoC = true;
-RBDO_s.f_debug = true;
-RBDO_s.f_probe = true; 
-
-
-counter = 0;
-
-RBDO_s.f_corrector = false;
-
-RBDO_s.f_linprog = true; 
-RBDO_s.f_penal = false;
-
-Corr = nan;
+RBDO_s.lb_probe = Opt_set.lb; % x-space
