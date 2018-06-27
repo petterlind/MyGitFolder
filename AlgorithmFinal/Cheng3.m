@@ -35,7 +35,7 @@ Re(4,:) = ones(1,3); % Node 1, locked in all DOF
 
 % Definition of Nodal loads 
 Load=zeros(size(Coord));
-Load(1,:)=[ P1 P1 0];
+Load(1,:)=[ P1 0 0];
 
 
 

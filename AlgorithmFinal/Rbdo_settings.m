@@ -14,10 +14,9 @@ classdef Rbdo_settings
     roc_lb              % lb for roc
     kappa_n             % vector, distance to nominal point in each direction.
     
-    size_DoE        % Relative doe_size compared to beta.
+    size_DoE            % Relative doe_size compared to beta, start value
     
-    DoE_size_d      % DoE size in x-space ( deterministic variables) 
-    DoE_size_p      % DoE size in u-space for parameters REMOVE?
+     
     
     tol = 1e-3;
     max_k = 10000;

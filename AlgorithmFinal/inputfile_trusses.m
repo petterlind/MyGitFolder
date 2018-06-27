@@ -13,13 +13,12 @@ pdata.marg =  [  0   1   0 1
                  0   1   0 1
                  ];
               
-% Conversion between in^2 and m^2
 pdata.marg(:,2) = pdata.marg(:,2)*7e-4;
 
-pdata.margp =  [ 1  20e3    0.3*20e3        0
-                 1  15e3    0.2*15e3        0
-                 1  172e6   0.15*172e6      0
-                 1  68950e6 0.1*68950e6     0]; 
+pdata.margp =  [    2  20e3    0.3*20e3        0 20e3    0.3*20e3    
+                    2  15e3    0.2*15e3        0 15e3    0.2*15e3    
+                    2  172e6   0.15*172e6      0 172e6   0.15*172e6  
+                    2  68950e6 0.1*68950e6     0 68950e6 0.1*68950e6 ]; 
           
 pdata = set_numbers(pdata, pdata.marg);
 pdata.np = numel(pdata.margp(:,2));
@@ -29,11 +28,11 @@ pdata.np = numel(pdata.margp(:,2));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Opt_set = Optimizer;
-Opt_set.lb = 0.7854e-4 *ones(5,1); % 0.001 in SAP! 0.1 in TANA
-Opt_set.ub =  78.54e-4 * ones(5,1);
+Opt_set.lb = 0.7854e-4 *ones(5,1); 
+Opt_set.ub =  78.54e-4 * ones(5,1) * 100;
 
 Opt_set.dp_x = pdata.marg(:,2);
-Opt_set.target_beta = 3.719;
+target_beta = 3.719;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Functions, Obj and Limitstate
@@ -42,7 +41,7 @@ Opt_set.target_beta = 3.719;
 obj = Limitstate; 
 obj.expression = {'G = 3.048*((A1+A2+A3) + sqrt(2)*(A4+A5));'};
 obj.nr = 0; 
-obj.nominal_u = Opt_set.dp_u;
+%obj.nominal_u = Opt_set.dp_u;
 obj.nominal_x = Opt_set.dp_x;
 obj.Mpp_p = pdata.margp(:,2);
 
@@ -76,7 +75,11 @@ G7.Mpp_p = G1.Mpp_p;G8.Mpp_p = G1.Mpp_p;G9.Mpp_p = G1.Mpp_p;
 G10.Mpp_p = G1.Mpp_p;G11.Mpp_p = G1.Mpp_p;
 
 %G1.func = {'[F, U] = Cheng5(A1,A2,A3,A4,A5,20e3,15e3,68950e6, 0);'};
+
+
 G1.func = {'[F, U] = Cheng5(A1,A2,A3,A4,A5,F,P,E, 0);'};
+%G1.func = {'[F, U] = Cheng5(A1,A2,A3,A4,A5,20e3,15e3 ,68950e6, 0);'};
+
 G2.func = G1.func;G3.func = G1.func;G4.func = G1.func;G5.func = G1.func;
 G6.func = G1.func;G7.func = G1.func;G8.func = G1.func;G9.func = G1.func;
 G10.func = G1.func;G11.func = G1.func;
@@ -100,11 +103,11 @@ G10.func = G1.func;G11.func = G1.func;
  G4.expression = {'F = F(4); G = 1e-6*(sy - F/A4);'};
  G5.expression = {'F = F(5); G = 1e-6*(sy - F/A5);'};
  
- G6.expression = {'F = F(1); I = A1^2/12 ;G = 1e-6*(pi^2*E*I/3.048^2 + F/A1);'};
- G7.expression = {'F = F(2); I = A2^2/12 ;G = 1e-6*(pi^2*E*I/3.048^2 + F/A2);'};
- G8.expression = {'F = F(3); I = A3^2/12 ;G = 1e-6*(pi^2*E*I/3.048^2 + F/A3);'};
- G9.expression = {'F = F(4); I = A4^2/12 ;G = 1e-6*(pi^2*E*I/(2*3.048^2) + F/A4);'};
- G10.expression = {'F = F(5); I = A5^2/12 ;G = 1e-6*(pi^2*E*I/(2*3.048^2) + F/A5);'};
+ G6.expression = {'F = F(1); I = A1^2/(4*pi) ;G = 1e-6*(pi^2*E*I/3.048^2 + F/A1);'};
+ G7.expression = {'F = F(2); I = A2^2/(4*pi) ;G = 1e-6*(pi^2*E*I/3.048^2 + F/A2);'};
+ G8.expression = {'F = F(3); I = A3^2/(4*pi) ;G = 1e-6*(pi^2*E*I/3.048^2 + F/A3);'};
+ G9.expression = {'F = F(4); I = A4^2/(4*pi) ;G = 1e-6*(pi^2*E*I/(2*3.048^2) + F/A4);'};
+ G10.expression = {'F = F(5); I = A5^2/(4*pi) ;G = 1e-6*(pi^2*E*I/(2*3.048^2) + F/A5);'};
  
  % Rectangular
 % I = A^2/12;
@@ -118,27 +121,9 @@ G10.func = G1.func;G11.func = G1.func;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 RBDO_s = Rbdo_settings;
-RBDO_s.name = 'Cheng';
+RBDO_s.name = 'Truss';
 
-RBDO_s.f_RoC = true;
-RBDO_s.f_RoC_step = false;
-RBDO_s.f_SRoC = true;
+RBDO_s.roc_lb = 1e-5;
+RBDO_s.lb_probe = Opt_set.lb; % x-space
 
-RBDO_s.RoC_d = 1e-3 .*ones(pdata.nd,1); % Max deterministic update of dv.
-
-RBDO_s.roc_scale_down = 0.99;
-RBDO_s.roc_scale_up = 1.2;
-RBDO_s.DoE_size_x = Opt_set.target_beta/4;
-RBDO_s.DoE_size_d =  1e-6;%1e-2*(2.54e-2)^2; % 0.01 inch.
-RBDO_s.f_debug = 1;
-RBDO_s.f_one_probe = 1;
-RBDO_s.f_corrector = false;
-RBDO_s.f_probe = true; % probe algorithm
-
-RBDO_s.lb_probe = Opt_set.lb*1e-2;
-
-RBDO_s.f_linprog = true; 
-RBDO_s.f_penal = false;
-
-counter = 0;
-Corr = nan;
+[LS.DoE_size_d] = deal(ones(pdata.nd,1)* 0.5e-4); %0.5 cm^2 DoE to start with!

@@ -11,7 +11,6 @@ n1 = 1;
 
 % Linewidth!
 lw_ref = 5*(2.54e-2)^2;
-
 %lw_ref = 7e-4;
 
 for ii = 1:length(Ft)

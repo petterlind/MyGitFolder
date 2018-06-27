@@ -15,6 +15,8 @@ for ii = 1:columns
             
         elseif dist(ij) == 2 % lognormal distributed transformation
             
+            % NOT CORRECT.
+            
             % Using the pseudo-normal variables..
             x_space_vec(ij,ii) =  mu_vec(ij) + u_space_vec(ij,ii).*stdv_vec(ij);
 %             c = mu_vec(ij)/ stdv_vec(ij);

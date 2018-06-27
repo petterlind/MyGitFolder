@@ -4,7 +4,9 @@ classdef Limitstate
       active = true;        % Active
       nr                    % number.
       
-      DoE_size_x            % DoE size in u-space
+      DoE_size_d            % DoE size in x-space ( deterministic variables)
+      DoE_size_x            % DoE size in u-space for prob var.
+      DoE_size_p            % DoE size in u-space for parameters
       
       nominal_x             % Nominal x (DP)
       nominal_x_old

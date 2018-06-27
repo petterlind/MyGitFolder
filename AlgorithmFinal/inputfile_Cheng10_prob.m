@@ -24,9 +24,16 @@ pdata.marg =  [  0  10   0 1
 
 pdata.marg(:,2) = pdata.marg(:,2)*(2.54e-2)^2;
 
-pdata.margp = [2  nan nan 0 4.448*1e5 2.224*1e4
-    2  nan nan 0 4.448*1e5 2.224*1e4
-    1  2.5*1e4 2.5*1e3 0 1.724*1e8 1.724*1e7];
+m = 4.448*1e5;    
+v = 2.224*1e4;
+
+mu = log(m/(sqrt(1+v/m^2)));
+sigma = sqrt(log(1+v/m^2));
+
+
+pdata.margp = [2  nan nan 0 mu sigma 
+    2  nan nan 0 mu sigma
+    1  2.5*1e4 2.5*1e3 0  0 0];
 
 
 pdata = set_numbers(pdata, pdata.marg);

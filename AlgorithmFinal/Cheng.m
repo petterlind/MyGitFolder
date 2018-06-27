@@ -74,4 +74,6 @@ if flag_plot == 1
     TP(D,U,100,F,A);
 end
 
+% failsafe
+F(abs(F)<1e-3) = 0;
 end

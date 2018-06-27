@@ -16,8 +16,9 @@ if RBDO_s.f_RoC
     end
     
     if obj.probe_p == 0
-        fprintf('LS %d, probe = 0 \n',obj.nr)
-        obj.probe_s = obj.probe_p;
+        fprintf('LS %d, probe = 0, probe_s = p_trial\n',obj.nr)
+        %obj.probe_s = obj.probe_p;
+        obj.probe_s = obj.p_trial;
         
     elseif (sign(obj.probe_p) ~= sign(obj.p_trial))
         error('SMTH off with Roc, in do_probe.m')
@@ -48,7 +49,7 @@ if obj.probe_p ~= 0
 
             if RBDO_s.f_debug
                 fprintf('No cross LS: %d \n',obj.nr)
-                p_spline(obj, pdata, Opt_set, RBDO_s)
+                %p_spline(obj, pdata, Opt_set, RBDO_s)
             end
         elseif isnan(obj.probe_s)
             error('In do_probe.m, p_s is NaN')

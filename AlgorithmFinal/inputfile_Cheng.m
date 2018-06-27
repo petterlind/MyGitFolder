@@ -6,16 +6,16 @@ pdata = Probdata; %Specify the class
 pdata.name = {'A1','A2','A3','A4','A5','A6','A7','A8','A9','A10'};
 pdata.name_p = {'P1' ,'P2' ,'sy'};
 
-optimum = [    11.6454
-   11.3048
-   11.7211
-   11.8774
-   11.3780
-   11.3048
-   11.6046
-   11.2015
-   12.0000
-   11.3042];
+% optimum = [    11.6454
+%    11.3048
+%    11.7211
+%    11.8774
+%    11.3780
+%    11.3048
+%    11.6046
+%    11.2015
+%    12.0000
+%    11.3042];
 
 pdata.marg =  [  0   10   0 1
                  0   10   0 1
@@ -31,9 +31,15 @@ pdata.marg =  [  0   10   0 1
 pdata.marg(:,2) = pdata.marg(:,2)*(2.54e-2)^2;
 %pdata.marg(:,2) = optimum*(2.54e-2)^2;
 
-pdata.margp =  [ 2   4.448e5    2.224e4 0 
-                 2   4.448e5    2.224e4 0 
-                 1   1.724e8    1.724e7 0]; % Less variation! Allt en tiopotens ned!
+m = 4.448*1e5;
+v = 2.224*1e4;
+
+mu = log(m/(sqrt(1+v/m^2)));
+sigma = sqrt(log(1+v/m^2));
+
+pdata.margp =  [ 2  m v 0 mu sigma
+                 2  m v 0 mu sigma
+                 1  1.724e8 1.724e7  0 1.724e8 1.724e7 ]; 
           
 pdata = set_numbers(pdata, pdata.marg);
 pdata.np = numel(pdata.margp(:,2));
@@ -55,7 +61,7 @@ end
 % Functions, Obj and Limitstate
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Opt_set.target_beta = 3;
+target_beta = 3;
 
 obj = Limitstate;
 obj.expression = {'G = (3.048*((A1+A2+A3+A4+A5+A6) + sqrt(2)*(A7+A8+A9+A10)));'};
@@ -99,20 +105,22 @@ G10.func = G1.func;G11.func = G1.func;
 
 
 % 2 inch^2 in TANA!
-% G1.expression = {'G = 4.5*(2.54e-2) - max(max(abs(U(:,:))));'}; % X OR Y DISPLACEMENT, SHOULD BE X!
+% TANA
+% G1.expression = {'G = 2*(2.54e-2) - max(max(abs(U(:,:))));'}; % X OR Y DISPLACEMENT, SHOULD BE X!
+G1.expression = {'G = 4.5*(2.54e-2) - max(max(abs(U(:,:))));'}; % X OR Y DISPLACEMENT, SHOULD BE X!
 %G2.expression = {' G = 172.3689 - 1e-6*abs(max(F./[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10]));'};
 %G3.expression = {' G = 172.3689 - 1e-6*(min(F./[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10]));'};
- G2.expression = {'F = abs(F(1)); G = sy - F/A1;'};
- G3.expression = {'F = abs(F(2)); G = sy - F/A2;'};
- G4.expression = {'F = abs(F(3)); G = sy - F/A3;'};
- G5.expression = {'F = abs(F(4)); G = sy - F/A4;'};
- G6.expression = {'F = abs(F(5)); G = sy - F/A5;'};
- G7.expression = {'F = abs(F(6)); G = sy - F/A6;'};
- G8.expression = {'F = abs(F(7)); G = sy - F/A7;'};
- G9.expression = {'F = abs(F(8)); G = sy - F/A8;'};
- G10.expression = {'F = abs(F(9)); G = sy - F/A9;'};
- G11.expression = {'F = abs(F(10)); G = sy - F/A10;'};
-  LS = [G2, G3, G4, G5, G6, G7, G8, G9, G10, G11];
+ G2.expression = {'F = abs(F(1)); G = 1e-8*(sy - F/A1);'};
+ G3.expression = {'F = abs(F(2)); G = 1e-8*(sy - F/A2);'};
+ G4.expression = {'F = abs(F(3)); G = 1e-8*(sy - F/A3);'};
+ G5.expression = {'F = abs(F(4)); G = 1e-8*(sy - F/A4);'};
+ G6.expression = {'F = abs(F(5)); G = 1e-8*(sy - F/A5);'};
+ G7.expression = {'F = abs(F(6)); G = 1e-8*(sy - F/A6);'};
+ G8.expression = {'F = abs(F(7)); G = 1e-8*(sy - F/A7);'};
+ G9.expression = {'F = abs(F(8)); G = 1e-8*(sy - F/A8);'};
+ G10.expression = {'F = abs(F(9)); G = 1e-8*(sy - F/A9);'};
+ G11.expression = {'F = abs(F(10)); G = 1e-8*(sy - F/A10);'};
+  LS = [G1, G2, G3, G4, G5, G6, G7, G8, G9, G10, G11];
 %LS = [G1, G2, G3];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -121,21 +129,9 @@ G10.func = G1.func;G11.func = G1.func;
 
 RBDO_s = Rbdo_settings;
 RBDO_s.name = 'Cheng';
+RBDO_s.lb_probe = Opt_set.lb;
 
-RBDO_s.f_RoC = true;
-RBDO_s.f_RoC_step = false;
-RBDO_s.RoC_d = 2*(2.54e-2)^2; % Max deterministic update of dv.
-RBDO_s.DoE_size_d = 0.01*(2.54e-2)^2; % 0.1 inch.
-RBDO_s.DoE_size_x = Opt_set.target_beta/2; % in beta (u-space)!
-
-RBDO_s.f_debug = 1;
-RBDO_s.f_one_probe = 1;
-
-RBDO_s.f_probe = true; % Removes probe algorithm
-
-RBDO_s.lb_probe = ones(10,1)*1e-12;
-
-counter = 0;
-
-
+RBDO_s.roc_lb = 1e-6*(2.54e-2)^2;
+[LS.DoE_size_d] = deal(ones(pdata.nd,1)*3*(2.54e-2)^2);
+ 
 

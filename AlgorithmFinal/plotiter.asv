@@ -1,4 +1,4 @@
-function [LS, theta] = plotiter(pdata, Opt_set, RBDO_s, LS, theta)
+function [LS, theta] = plotiter(pdata, Opt_set, RBDO_s, LS)
 
 switch RBDO_s.name
     case {'Cheng', 'TANA', 'Truss'}
@@ -226,38 +226,42 @@ switch RBDO_s.name
 %             end
 %         end
 
-        legend('G(X)_1','G(X)_2','G(X)_3','Location','northeastoutside')
+        legend('G(X)_1','G(X)_2','G(X)_3','G+','Location','northeastoutside')
 
-        % Plot text next to point
-        r = 0.2;
-        
-        if ~isempty(Opt_set.dp_x_old)
-            if norm(Opt_set.dp_x_old - Opt_set.dp_x)< 2*r
-                theta = theta - 35;
-            else
-                theta = 110;
-            end
-        end
-        
+
         % plot points
         plot(Opt_set.dp_x(1),Opt_set.dp_x(2),'ok','MarkerSize', 10,'MarkerFaceColor','k')
         hold on
         plot(Opt_set.dpl_x(1),Opt_set.dpl_x(2),'ok','MarkerSize', 10)
-        text(Opt_set.dp_x(1)+r*cosd(theta),Opt_set.dp_x(2)+r*sind(theta),num2str(Opt_set.k))
-       
         grid on
         xlabel('X_1')
         ylabel('X_2')
-      
-         
+        
+        % Plot text next to point
+        r = 0.1;
+        
+        if ~isempty(Opt_set.dp_x_old)
+            if norm(Opt_set.dp_x_old - Opt_set.dp_x)< 2*r
+                theta = theta + 10;
+            else
+                theta = 45;
+            end
+        end
+        % At dp
+        text(Opt_set.dp_x(1)+r*cosd(theta),Opt_set.dp_x(2)+r*sind(theta),num2str(Opt_set.k))
+        
+        % At Mpp
+        text(Opt_set.dp_x(1)+r*cosd(theta),Opt_set.dp_x(2)+r*sind(theta),num2str(Opt_set.k))
+        text(Opt_set.dp_x(1)+r*cosd(theta),Opt_set.dp_x(2)+r*sind(theta),num2str(Opt_set.k))
+        text(Opt_set.dp_x(1)+r*cosd(theta),Opt_set.dp_x(2)+r*sind(theta),num2str(Opt_set.k))
+        
+        
         % plot the MPP:s
         color = {'r*','b*','g*'};
-        color2 = {'r','b','g'};
         for ii = 1:numel(LS)
-            if ~isempty(LS(ii).Mpp_x) && LS(ii).nr ~=3
+            if ~isempty(LS(ii).Mpp_x)
                 l1 = LS(ii).Mpp_x; 
                 plot(l1(1,:),l1(2,:),color{ii}, 'MarkerSize',10)
-                text(l1(1,:)+r*cosd(theta),l1(2,:)+r*sind(theta),num2str(Opt_set.k),'Color',color2{ii})
                 hold on
             end
         end        

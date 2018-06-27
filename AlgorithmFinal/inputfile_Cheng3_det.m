@@ -16,10 +16,10 @@ pdata.marg =  [  0  10    0 1
 %pdata.marg(:,2) = optimum;
 pdata.marg(:,2) = pdata.marg(:,2)*(2.54e-2)^2;
 
-pdata.margp =  [];
+pdata.margp =  [2  nan nan 0 1e5    5e3];
 
 pdata = set_numbers(pdata, pdata.marg);
-pdata.np = 0;
+pdata.np = 1;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Optimizer settings
@@ -30,7 +30,8 @@ Opt_set.lb = 0.001 *ones(3,1).* (2.54e-2)^2; % 0.1 in TANA!
 Opt_set.ub = [1.61, 1.61, 1.61 ].*100; % REALLY BIG! = no limit
 
 Opt_set.dp_x = pdata.marg(:,2);
-%Opt_set.target_beta = 3;
+
+target_beta = 3;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Functions, Obj and Limitstate
@@ -101,22 +102,7 @@ LS = [G1, G2, G3];
 
 RBDO_s = Rbdo_settings;
 RBDO_s.name = 'Cheng';
+RBDO_s.lb_probe = Opt_set.lb;
 
-RBDO_s.f_RoC = true;
-RBDO_s.f_RoC_step = false;
-RBDO_s.f_SRoC = true;
-RBDO_s.roc_scale_down = 0.99;
-RBDO_s.roc_scale_up = 1.2;
-
-RBDO_s.RoC_d = 4*(2.54e-2)^2 .*ones(pdata.nd,1);
-RBDO_s.DoE_size_d = 0.01*(2.54e-2)^2; % 0.1 inch.
-RBDO_s.f_debug = 1;
-RBDO_s.f_one_probe = 1;
-
-RBDO_s.f_probe = true; % Removes probe algorithm
-RBDO_s.lb_probe = Opt_set.lb*1e-2;
-
-RBDO_s.f_linprog = true; 
-RBDO_s.f_penal = false;
-counter = 0;
-Corr = nan;
+RBDO_s.roc_lb = 1e-6*(2.54e-2)^2;
+[LS.DoE_size_d] = deal(ones(pdata.nd,1)*3*(2.54e-2)^2);

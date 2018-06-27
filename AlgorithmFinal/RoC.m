@@ -64,7 +64,7 @@ index_brake = DP1 < lbp;
          nr2 = nr_vec(index_brake);
         for ij = 1:sum(index_brake)
             ind2 = nr2(ij);
-            nb = sgn*RoC_p(:,ind2);
+            nb = -1*RoC_p(:,ind2); %SGN?
             brake =  plane_line_intersect(DP0, DP1, lbp, nb);
             
             % Check if closer than previous point.

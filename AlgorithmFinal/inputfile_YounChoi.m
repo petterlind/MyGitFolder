@@ -3,7 +3,7 @@
 % Probdata
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-pdata = Probdata; %Specify the class
+pdata = Probdata; 
 pdata.name = {'mu1','mu2'};
 
 pdata.marg =  [  1   5   0.3 1
@@ -55,20 +55,10 @@ G1.expression = {'G = mu1^2*mu2/20-1;'};
 G2.expression = {'G = (mu1+mu2-5)^2/30+(mu1-mu2-12)^2/120-1;'};
 G3.expression = {'G = 80/(mu1^2+8*mu2+5)-1;'};
 LS = [G1, G2, G3];
-[LS.beta_v] = deal(zeros(pdata.nx,1));
-[LS.target_beta] = deal(target_beta);
-
-%[a,b,c,d] = C{:}
-%[name1,name2] = A(:).name
-
-
-%[LS.target_beta] = 
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % General settings
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 RBDO_s = Rbdo_settings;
 RBDO_s.name = 'YounChoi';
 
