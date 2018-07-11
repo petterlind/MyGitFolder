@@ -11,7 +11,8 @@ norm_x = sum(x.^2,1);
 x_normed = x./ sqrt(norm_x);
 
 % Check if direction is same as alpha with tolerance, using scalar product.
-same_dir = abs((abs(alpha_x' * x_normed) - 1)) < 2e-2; % acosd(1-2e-2) = 11 grad
+% same_dir = abs((abs(alpha_x' * x_normed) - 1)) < 2e-2; % acosd(1-2e-2) = 11 grad
+same_dir = ones(1,length(norm_x));
 
 % Check if dp is in the vector and add it
 if ~isempty(find(norm_x ==0))

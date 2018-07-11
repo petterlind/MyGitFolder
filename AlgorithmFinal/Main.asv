@@ -4,16 +4,13 @@ close all
 % --------------------------------
 % 1) Input
 % --------------------------------
-% inputfile_trusses
+ %inputfile_trusses
  inputfile_YounChoi
 % inputfile_Jeong_Park
 % inputfile_Madsen
-% inputfile_Cheng
-
-% inputfile_Cheng10_prob
-% inputfile_Cheng10_det
-% inputfile_Cheng3_det
+ inputfile_Cheng
 % inputfile_Cheng3_prob
+
 % inputfile_TANA
 
 set_parameters
@@ -138,8 +135,9 @@ end
    % ------------------------
    % plot the iteration
    % ------------------------
-   LS = plotiter(pdata, Opt_set, RBDO_s, LS);
-
+   [LS, theta] = plotiter(pdata, Opt_set, RBDO_s, LS, theta);
+    %p_tot = [p_tot; pvec];
+    
     if RBDO_s.f_one_probe == 1
         % One probe, then stop.
         Opt_set.inner_conv = 0;
@@ -164,13 +162,14 @@ end
     % Update objective value and dp
     Opt_set.ob_val_old = Opt_set.ob_val;
     Opt_set.ob_val = ObjectiveFunction(Opt_set, obj, pdata);
+    Objective_v(Opt_set.k) = Opt_set.ob_val;
     
     % Convergence check outer loop
     if ~isempty(Opt_set.ob_val_old)
         v_diff = abs(Opt_set.dp_x_old- Opt_set.dp_x); 
-        if abs(Opt_set.ob_val - Opt_set.ob_val_old)/ Opt_set.ob_val_old < RBDO_s.tol && max(v_diff)< RBDO_s.tol
-           %Opt_set.outer_conv = 0; 
-           disp('NEVER CONVERGE!!!')
+        if abs((Opt_set.ob_val - Opt_set.ob_val_old)/ Opt_set.ob_val_old) < RBDO_s.tol || max(v_diff)< RBDO_s.tol
+           Opt_set.outer_conv = 0; 
+           %disp('NEVER CONVERGE!!!')
         end
     end
     
@@ -201,9 +200,10 @@ end
     end
     
     counter = counter + 1;
-    if counter == 5
-        fprintf('-')
+    if counter == 40
+        fprintf(' BRAKE AFTER %d iter', counter)
         counter = 0;
+        Opt_set.outer_conv = 0
     end
 end
 % Display the result
@@ -214,4 +214,8 @@ fprintf('\n DONE! \n')
 
 % And plot the last step
 Opt_set.k = Opt_set.k + 1;
-plotiter(pdata, Opt_set, RBDO_s, LS)
+[LS, theta] = plotiter(pdata, Opt_set, RBDO_s, LS, theta);
+Objective_v(Opt_set.k) = ObjectiveFunction(Opt_set, obj, pdata);
+
+%p_tot = [p_tot; pvec];
+% extra_plot

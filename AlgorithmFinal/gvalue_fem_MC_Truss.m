@@ -1,4 +1,4 @@
-function G = gvalue_fem(type, point, pdata, Opt_set, RBDO_s, obj, f_count, f_plot)
+function G_mat = gvalue_fem(type, point, pdata, Opt_set, RBDO_s, LS, f_count, f_plot)
                     
 global Gnum
 if f_count == 1
@@ -51,13 +51,21 @@ switch type
 end
 
 % Function call
+obj = LS(1); %NOTE: Uses SAME result (at dp) for all evaluations.
 if ~isempty(obj.func)
     eval(sprintf( '%s',obj.func{1}));
+    F_vec = F;
 end
 
 % Evaluate expression
-if ~isempty(obj.expression)
-    eval(sprintf('%s',obj.expression{1}));
-
+G_mat = nan(numel(LS),1);
+for ii = 1:numel(LS)
+    obj = LS(ii);
+    F = F_vec; % Is overwritten every loop by expression...
+    if ~isempty(obj.expression)
+        eval(sprintf('%s',obj.expression{1}));
+    end
+    G_mat(ii,1)=G;
 end
+
 end

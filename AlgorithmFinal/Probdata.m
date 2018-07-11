@@ -7,9 +7,9 @@ classdef Probdata
     name_x
     name_p
     name_d
-    nx                  % Number of design variables
-    np                  % Number of probabalistic parameters
-    nd                  % Numbers of determensitic variables
+    nx                  % Number of probabalistic design variables
+    np                  % Number of probabalistic  design parameters
+    nd                  % Numbers of determensitic design variables
     
     cov
     stdv_x

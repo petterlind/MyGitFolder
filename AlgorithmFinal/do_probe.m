@@ -35,7 +35,7 @@ if obj.probe_p ~= 0
     obj.probe_val = gvalue_fem('variables', obj.nominal_x + obj.probe_p*obj.alpha_x, pdata, Opt_set, RBDO_s, obj, 1,0);
 
     % 4) adapt spline  
-    [obj.spline, obj.probe_s] = spline(obj, 1);
+    [obj.spline, obj.probe_s] = spline(obj, nan);
 
     % 5) Has to be in same direction as the trial point. Otherwise no cross
     % or error

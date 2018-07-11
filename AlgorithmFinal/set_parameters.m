@@ -75,3 +75,8 @@ theta = 110; % for the plot
 % Common start values
 [Opt_set.roc_dist, Opt_set.ML_scale, RBDO_s.kappa_n] = Update_RoC(RBDO_s, Opt_set);
 Opt_set.ML_scale = ones(max(pdata.nx, pdata.nd),1);
+
+% Saving
+Objective_v = nan(100,1);
+%Objective_v(1) = ObjectiveFunction(Opt_set, obj, pdata);
+p_tot = [];

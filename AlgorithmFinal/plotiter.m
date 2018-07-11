@@ -1,5 +1,5 @@
 function [LS, theta] = plotiter(pdata, Opt_set, RBDO_s, LS, theta)
-
+%[LS, theta, P_vec]
 switch RBDO_s.name
     case {'Cheng', 'TANA', 'Truss'}
         
@@ -9,14 +9,13 @@ switch RBDO_s.name
     
             for ij = 1:pdata.nx
                 hold on
-                plot( [Opt_set.k-1 , Opt_set.k] , [Opt_set.dp_x_old(ij) Opt_set.dp_x(ij)]./(2.54e-2)^2, '-ok') %./(2.54e-2)^2
+                plot( [Opt_set.k-1 , Opt_set.k] , [Opt_set.dp_x_old(ij) Opt_set.dp_x(ij)]./(2.54e-2)^2, '-ok', 'HandleVisibility','off') %./(2.54e-2)^2
             end
 
             for ij = 1:pdata.nd
                 hold on
                 try
-
-                    plot( [Opt_set.k-1 , Opt_set.k] , [Opt_set.dp_x_old(ij) Opt_set.dp_x(ij)]./(2.54e-2)^2, '-ok') %./(2.54e-2)^2
+                    plot( [Opt_set.k-1 , Opt_set.k] , [Opt_set.dp_x_old(ij) Opt_set.dp_x(ij)]./(2.54e-2)^2, '-ok', 'HandleVisibility','off') %./(2.54e-2)^2
                 catch
                     error('in Plotiter')
                 end
@@ -46,9 +45,20 @@ switch RBDO_s.name
                 end
 
                 clf
-                [~,~] = Cheng(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,P1,P2, 1);
-                %[~,~] = Aoues(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,P1,P2, 1);
+                [F,~] = Cheng(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,P1,P2, 1);
                 
+                F_vec = [LS.nominal_val];
+                P_vec = [LS.probe_p];
+                
+                SF_Min = min(F_vec(F<0));
+                TF_Min = min(F_vec(F>0));
+                
+                SP_Min = max(P_vec(F<0));
+                TP_Min = max(P_vec(F>0));
+                
+                D_Min = LS(1).probe_p;
+                P_vec = [SF_Min TF_Min SP_Min TP_Min D_Min];
+
             elseif numel(Opt_set.dp_x) == 5
                 
                 t = num2cell(Opt_set.dp_x);
@@ -124,17 +134,17 @@ switch RBDO_s.name
         intervall = [ 0 10 0 10];
         levels = 0; 
         levels2 = linspace(-0.3,0,100);
-        fc1 = fcontour(g1, intervall,'LineWidth',4);
+        fc1 = fcontour(g1, intervall,'LineWidth',4,'HandleVisibility','off');
         fc1.LevelList = levels; % Possibility to also show gradient here!
         fc1.LineColor = 'red';
         hold on
 
-        fc2 = fcontour(g2, intervall,'LineWidth',4);
+        fc2 = fcontour(g2, intervall,'LineWidth',4,'HandleVisibility','off');
         fc2.LevelList = levels; % Possibility to also show gradient here!
         fc2.LineColor = 'blue';
 
         hold on
-        fc3 = fcontour(g3, intervall,'LineWidth',4);
+        fc3 = fcontour(g3, intervall,'LineWidth',4,'HandleVisibility','off');
         fc3.LineColor = 'green';
         fc3.LevelList = levels; % Possibility to also show gradient here!
         hold on
@@ -206,25 +216,25 @@ switch RBDO_s.name
         
 
 
-%         % Plot the probe points
-%         color = {'ro','bo','go'};
-%         for ii = 1:numel(LS)
-%             if ~isempty(LS(ii).probe_x_pos)
-%                 l1 = LS(ii).probe_x_pos; 
-%                 plot(l1(1,:),l1(2,:),color{ii}, 'MarkerSize',20)
-%                 hold on
-%             end
-%         end
-% 
-%         % Plot the nominal points
-%         color = {'rs','bs','gs'};
-%         for ii = 1:numel(LS)
-%             if ~isempty(LS(ii).nominal_x)
-%                 l1 = LS(ii).nominal_x; 
-%                 plot(l1(1,:),l1(2,:),color{ii}, 'MarkerSize',20)
-%                 hold on
-%             end
-%         end
+        % Plot the probe points
+        color = {'ro','bo','go'};
+        for ii = 1:numel(LS)
+            if ~isempty(LS(ii).probe_x_pos)
+                l1 = LS(ii).probe_x_pos; 
+                plot(l1(1,:),l1(2,:),color{ii}, 'MarkerSize',20)
+                hold on
+            end
+        end
+
+        % Plot the nominal points
+        color = {'rs','bs','gs'};
+        for ii = 1:numel(LS)
+            if ~isempty(LS(ii).nominal_x)
+                l1 = LS(ii).nominal_x; 
+                plot(l1(1,:),l1(2,:),color{ii}, 'MarkerSize',20)
+                hold on
+            end
+        end
 
         legend('G(X)_1','G(X)_2','G(X)_3','Location','northeastoutside')
 
@@ -240,15 +250,15 @@ switch RBDO_s.name
         end
         
         % plot points
-        plot(Opt_set.dp_x(1),Opt_set.dp_x(2),'ok','MarkerSize', 10,'MarkerFaceColor','k')
-        hold on
-        plot(Opt_set.dpl_x(1),Opt_set.dpl_x(2),'ok','MarkerSize', 10)
+%         scatter(Opt_set.dp_x(1),Opt_set.dp_x(2),100,'MarkerFaceColor','b','MarkerEdgeColor','b',...
+%     'MarkerFaceAlpha',.2,'MarkerEdgeAlpha',.2)
+% hold on
+       plot(Opt_set.dp_x(1),Opt_set.dp_x(2),'ok','MarkerSize', 10)
         text(Opt_set.dp_x(1)+r*cosd(theta),Opt_set.dp_x(2)+r*sind(theta),num2str(Opt_set.k))
-       
+
         grid on
         xlabel('X_1')
         ylabel('X_2')
-      
          
         % plot the MPP:s
         color = {'r*','b*','g*'};
@@ -256,14 +266,12 @@ switch RBDO_s.name
         for ii = 1:numel(LS)
             if ~isempty(LS(ii).Mpp_x) && LS(ii).nr ~=3
                 l1 = LS(ii).Mpp_x; 
-                plot(l1(1,:),l1(2,:),color{ii}, 'MarkerSize',10)
+                plot(l1(1,:),l1(2,:),color{ii}, 'MarkerSize',10, 'HandleVisibility','off')
                 text(l1(1,:)+r*cosd(theta),l1(2,:)+r*sind(theta),num2str(Opt_set.k),'Color',color2{ii})
                 hold on
             end
         end        
-        
-        
-        
+
         axis equal
         warning(orig_state);
 end

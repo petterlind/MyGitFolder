@@ -4,11 +4,11 @@ close all
 % --------------------------------
 % 1) Input
 % --------------------------------
-% inputfile_trusses
-% inputfile_YounChoi
+ %inputfile_trusses
+ inputfile_YounChoi
 % inputfile_Jeong_Park
 % inputfile_Madsen
- inputfile_Cheng
+% inputfile_Cheng
 % inputfile_Cheng3_prob
 
 % inputfile_TANA
@@ -49,7 +49,6 @@ while Opt_set.outer_conv
         
         if RBDO_s.f_RoC
              LS(ii).nominal_x = RoC(RBDO_s, pdata, Opt_set, Opt_set.dp_x + LS(ii).beta_v.* RBDO_s.kappa_n, Opt_set.dp_x, Opt_set.lb);
-
         else
             LS(ii).nominal_x = Opt_set.dp_x + LS(ii).beta_v.* RBDO_s.kappa_n;
         end
@@ -117,8 +116,7 @@ if RBDO_s.f_linprog
     % Uppdatera Move Limits
     lb = max([ Opt_set.lb'; (Opt_set.dp_x' - Opt_set.roc_dist')]);
     ub = min([ Opt_set.ub'; (Opt_set.dp_x' + Opt_set.roc_dist')]);
-    
-
+   
     options = optimoptions('linprog','Algorithm','dual-simplex','OptimalityTolerance', 1e-10,'ConstraintTolerance',1e-3);
     [ Opt_set.dpl_x, fval, RBDO_s.f_linprog, output] = linprog(f, A, b, [],[], lb, ub,options);
     
@@ -136,7 +134,8 @@ end
    % plot the iteration
    % ------------------------
    [LS, theta] = plotiter(pdata, Opt_set, RBDO_s, LS, theta);
-
+    %p_tot = [p_tot; pvec];
+    
     if RBDO_s.f_one_probe == 1
         % One probe, then stop.
         Opt_set.inner_conv = 0;
@@ -161,6 +160,7 @@ end
     % Update objective value and dp
     Opt_set.ob_val_old = Opt_set.ob_val;
     Opt_set.ob_val = ObjectiveFunction(Opt_set, obj, pdata);
+    Objective_v(Opt_set.k) = Opt_set.ob_val;
     
     % Convergence check outer loop
     if ~isempty(Opt_set.ob_val_old)
@@ -198,9 +198,10 @@ end
     end
     
     counter = counter + 1;
-    if counter == 15
-        fprintf('-')
+    if counter == 17
+        fprintf(' BRAKE AFTER %d iter', counter)
         counter = 0;
+        Opt_set.outer_conv = 0
     end
 end
 % Display the result
@@ -211,4 +212,12 @@ fprintf('\n DONE! \n')
 
 % And plot the last step
 Opt_set.k = Opt_set.k + 1;
-plotiter(pdata, Opt_set, RBDO_s, LS, theta)
+[LS, theta] = plotiter(pdata, Opt_set, RBDO_s, LS, theta);
+Objective_v(Opt_set.k) = ObjectiveFunction(Opt_set, obj, pdata);
+
+% Set final result for MC run.
+pdata.marg(:,2) = Opt_set.dp_x;
+
+Monte_Carlo
+%p_tot = [p_tot; pvec];
+% extra_plot

@@ -5,11 +5,9 @@ function [parameters, p_s] = spline(obj, p_I)
     pm_num = obj.p_x(Index);
     gm_num = obj.p_val(Index); 
 
-    else % Some fixed, ex first index. (midpoint of doe.)
+    else
     pm_num = obj.p_x(p_I);
     gm_num = obj.p_val(p_I); 
-    end
-    
     pt_num = obj.probe_p;
     Gt_num = obj.probe_val;
     k_num = obj.slope; 

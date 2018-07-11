@@ -3,11 +3,17 @@
 % Probdata
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+m = 5;
+v = 0.3;
+
+mu = log(m/(sqrt(1+v/m^2)));
+sigma = sqrt(log(1+v/m^2));
+
 pdata = Probdata; 
 pdata.name = {'mu1','mu2'};
 
-pdata.marg =  [  1   5   0.3 1
-                 1   5   0.3 1
+pdata.marg =  [  2   5   0.3 1 mu sigma
+                 2   5   0.3 1 mu sigma
               ];
           
 pdata.margp =  [];

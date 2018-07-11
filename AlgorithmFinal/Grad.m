@@ -10,7 +10,8 @@ case 'parameters'
         pdata.margp(:,2:3) = psedo_dist;
         obj.doe_u = Experiment(u_vec, obj.DoE_size_p );
         obj.doe_x = X_space( obj.doe_u, pdata.margp(:,2) ,pdata.margp(:,3),pdata.margp(:,1)); % Transformation back to X-space
-
+        
+        
         % Experiment - in x-space!
         obj.doe_val = nan(pdata.np+1,1);
         for ij=1:(pdata.np+1) 
@@ -99,13 +100,21 @@ switch type
     end
     
     case 'parameters'
-       obj.alpha_p = X_space(alpha_u, pdata.margp(:,2),pdata.margp(:,3),pdata.margp(:,1));
-       obj.Mpp_p = X_space( alpha_u * obj.target_beta, pdata.margp(:,2),pdata.margp(:,3),pdata.margp(:,1));
+       %obj.alpha_p = X_space(alpha_u, pdata.margp(:,2),pdata.margp(:,3),pdata.margp(:,1));
        
-       if sum(isnan(obj.Mpp_p))>0
-           fprintf('one or more value of MPP_p, NR: %d, is NaN \n', obj.nr)
-           obj.Mpp_p(isnan(obj.Mpp_p)) = pdata.margp(isnan(obj.Mpp_p),2);
+       Mpp_old = obj.Mpp_p;
+       obj.Mpp_p = X_space( alpha_u * obj.target_beta, pdata.margp(:,2),pdata.margp(:,3),pdata.margp(:,1));
+       dif = (obj.Mpp_p-Mpp_old);
+       
+       if obj.nr == 1
+         obj.Mpp_p
+        disp(dif)
        end
+       
+       %if sum(isnan(obj.Mpp_p))>0 % WHY WOULD THIS EVEN BE A PROBLEM
+       %    fprintf('one or more value of MPP_p, NR: %d, is NaN \n', obj.nr)
+       %    obj.Mpp_p(isnan(obj.Mpp_p)) = pdata.margp(isnan(obj.Mpp_p),2);
+       %end
        
             
     otherwise

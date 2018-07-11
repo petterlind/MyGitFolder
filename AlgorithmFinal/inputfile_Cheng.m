@@ -107,7 +107,7 @@ G10.func = G1.func;G11.func = G1.func;
 % 2 inch^2 in TANA!
 % TANA
 % G1.expression = {'G = 2*(2.54e-2) - max(max(abs(U(:,:))));'}; % X OR Y DISPLACEMENT, SHOULD BE X!
-G1.expression = {'G = 4.5*(2.54e-2) - max(max(abs(U(:,:))));'}; % X OR Y DISPLACEMENT, SHOULD BE X!
+G1.expression = {'G = 1e7*(4.5*(2.54e-2) - max(max(abs(U(:,:)))));'}; % X OR Y DISPLACEMENT, SHOULD BE X!
 %G2.expression = {' G = 172.3689 - 1e-6*abs(max(F./[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10]));'};
 %G3.expression = {' G = 172.3689 - 1e-6*(min(F./[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10]));'};
  G2.expression = {'F = abs(F(1)); G = 1e-8*(sy - F/A1);'};
@@ -129,7 +129,7 @@ G1.expression = {'G = 4.5*(2.54e-2) - max(max(abs(U(:,:))));'}; % X OR Y DISPLAC
 
 RBDO_s = Rbdo_settings;
 RBDO_s.name = 'Cheng';
-RBDO_s.lb_probe = Opt_set.lb;
+RBDO_s.lb_probe = Opt_set.lb*0.1;
 
 RBDO_s.roc_lb = 1e-6*(2.54e-2)^2;
 [LS.DoE_size_d] = deal(ones(pdata.nd,1)*3*(2.54e-2)^2);
