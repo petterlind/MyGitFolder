@@ -35,13 +35,7 @@ while Opt_set.outer_conv
     Opt_set.inner_conv = 1;
 
     % Update mean values
-    pdata.marg(:,2) = Opt_set.dp_x;
-
-    % Update stdv.
-    if RBDO_s.f_COV
-        pdata.marg(:,3) = pdata.marg(:,2) * pdata.cov;
-        Opt_set.dp_u = zeros(size(pdata.marg(:,3)));
-    end
+    pdata.marg(:,2) = Opt_set.dp_x; % mean of equivalent normal dist?
 
     % Update the MPP search point. If pdata.marg(:,3) == 0 nothing changes.
     for ii = 1:numel(LS)
@@ -53,14 +47,32 @@ while Opt_set.outer_conv
             LS(ii).nominal_x = Opt_set.dp_x + LS(ii).beta_v.* RBDO_s.kappa_n;
         end
         
-        if ~sum(pdata.marg(:,1)) == 0 % If not probabilistic variables!
-            LS(ii).nominal_u = U_space(LS(ii).nominal_x, pdata.marg(:,2), pdata.marg(:,3), pdata.marg(:,1)); % LS object
+        if ~sum(pdata.marg(:,1)) == 0 % If probabilistic variables!
+            pdata.marg(:,2:3) =  Eq_dist( LS(ii).nominal_x, pdata.marg(:,5), pdata.marg(:,6), pdata.marg(:,1));
+            
+            %%%
+            % plot
+%              for ii = 1: numel(pdata.marg(:,2))
+%                     
+%                  xp = linspace(0.7*LS(ii).nominal_x(ii),2*LS(ii).nominal_x(ii),10000);
+%                  
+%                  pd1 = makedist('Lognormal',pdata.marg(ii,5) ,pdata.marg(ii,6));         
+%                  pdf_lognormal = pdf(pd1,xp);
+% 
+%                  pd2 = makedist('normal',pdata.marg(ii,2) ,pdata.marg(ii,3)); 
+%                  pdf_normal = pdf(pd2,xp);
+%                  plot(xp,pdf_lognormal,'LineWidth',2)
+%                  hold on
+%                  plot(xp,pdf_normal,'LineWidth',2)
+%                  legend('log-normal','normal')
+%              end
+%         
+        %%%
+            
+            LS(ii).nominal_u = U_space(LS(ii).nominal_x, pdata.marg(:,2), pdata.marg(:,3));%, pdata.marg(:,1)); % LS object
         end     
     end
-
-    % Update objective-gradient direction, doe, alpha
-    obj.nominal_u = Opt_set.dp_u; % Objective is from nominal point!
-    obj.nominal_x = Opt_set.dp_x;
+    
     obj = Grad(obj, pdata, Opt_set, RBDO_s, 'variables');
 
     for ii = 1:numel(LS) %For all active constraints
@@ -89,7 +101,6 @@ while Opt_set.outer_conv
                LS(ii) = do_probe(LS(ii), pdata, Opt_set, RBDO_s);
             end
         end
-
     end
 
 % save previous value
@@ -120,8 +131,6 @@ if RBDO_s.f_linprog
     options = optimoptions('linprog','Algorithm','dual-simplex','OptimalityTolerance', 1e-10,'ConstraintTolerance',1e-3);
     [ Opt_set.dpl_x, fval, RBDO_s.f_linprog, output] = linprog(f, A, b, [],[], lb, ub,options);
     
-    %[ Opt_set.dpl_x, fval, RBDO_s.f_linprog, output] = linprog(f, A, b, [],[], ones(numel(b),1)*1e-6, [],options);
-
     if RBDO_s.f_linprog ~= 1
         % Optimizer, towards feasible
         FUN = @(X1) norm( X1 - Opt_set.dp_x)^2;
@@ -134,7 +143,6 @@ end
    % plot the iteration
    % ------------------------
    [LS, theta] = plotiter(pdata, Opt_set, RBDO_s, LS, theta);
-    %p_tot = [p_tot; pvec];
     
     if RBDO_s.f_one_probe == 1
         % One probe, then stop.
@@ -177,16 +185,16 @@ end
     
     % Update DP, old and new for the outer loop
     Opt_set.dp_x_old = Opt_set.dp_x;
-    Opt_set.dp_u_old = Opt_set.dp_u;
     Opt_set.dp_x = Opt_set.dpl_x;
+    obj.nominal_x = Opt_set.dp_x;
     
     % Update side length based on last and second last move!
     if RBDO_s.f_SRoC && (Opt_set.k > 1)
-         [Opt_set.roc_dist, Opt_set.ML_scale, RBDO_s.kappa_n] = Update_RoC(RBDO_s, Opt_set);
+         [Opt_set.roc_dist, ~, RBDO_s.kappa_n] = Update_RoC(RBDO_s, Opt_set);
     end
 
     if ~sum(pdata.marg(:,1)) == 0 % If probabilistic variables!
-        Opt_set.dp_u = U_space(Opt_set.dpl_x, pdata.marg(:,2),pdata.marg(:,3),pdata.marg(:,1));
+        [pdata.marg(:,5), pdata.marg(:,6)] = Update_dist(Opt_set.dp_x, pdata.marg(:,7), pdata.marg(:,1)); % Update distributions!
     end
 
     if RBDO_s.f_debug == 1
@@ -198,7 +206,7 @@ end
     end
     
     counter = counter + 1;
-    if counter == 17
+    if counter == 30
         fprintf(' BRAKE AFTER %d iter', counter)
         counter = 0;
         Opt_set.outer_conv = 0
@@ -214,9 +222,6 @@ fprintf('\n DONE! \n')
 Opt_set.k = Opt_set.k + 1;
 [LS, theta] = plotiter(pdata, Opt_set, RBDO_s, LS, theta);
 Objective_v(Opt_set.k) = ObjectiveFunction(Opt_set, obj, pdata);
-
-% Set final result for MC run.
-pdata.marg(:,2) = Opt_set.dp_x;
 
 Monte_Carlo
 %p_tot = [p_tot; pvec];

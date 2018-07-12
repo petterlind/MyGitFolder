@@ -2,7 +2,7 @@ classdef Optimizer
    properties
        % Outer loop
         dp_x               % Design point in x-space
-        dp_u               % Design point in u-space
+        %dp_u               % Design point in u-space
  
         dp_x_old           % Old design point in x-space
         dp_u_old           % Old design point in u-space

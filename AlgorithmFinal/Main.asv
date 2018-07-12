@@ -8,7 +8,7 @@ close all
  inputfile_YounChoi
 % inputfile_Jeong_Park
 % inputfile_Madsen
- inputfile_Cheng
+% inputfile_Cheng
 % inputfile_Cheng3_prob
 
 % inputfile_TANA
@@ -35,12 +35,13 @@ while Opt_set.outer_conv
     Opt_set.inner_conv = 1;
 
     % Update mean values
-    pdata.marg(:,2) = Opt_set.dp_x;
+    pdata.marg(:,2) = Opt_set.dp_x; % mean of equivalent normal dist?
 
     % Update stdv.
     if RBDO_s.f_COV
         pdata.marg(:,3) = pdata.marg(:,2) * pdata.cov;
         Opt_set.dp_u = zeros(size(pdata.marg(:,3)));
+        error('COV NOT USED IN THE BENCHMARKS')
     end
 
     % Update the MPP search point. If pdata.marg(:,3) == 0 nothing changes.
@@ -49,13 +50,13 @@ while Opt_set.outer_conv
         
         if RBDO_s.f_RoC
              LS(ii).nominal_x = RoC(RBDO_s, pdata, Opt_set, Opt_set.dp_x + LS(ii).beta_v.* RBDO_s.kappa_n, Opt_set.dp_x, Opt_set.lb);
-
         else
             LS(ii).nominal_x = Opt_set.dp_x + LS(ii).beta_v.* RBDO_s.kappa_n;
         end
         
-        if ~sum(pdata.marg(:,1)) == 0 % If not probabilistic variables!
-            LS(ii).nominal_u = U_space(LS(ii).nominal_x, pdata.marg(:,2), pdata.marg(:,3), pdata.marg(:,1)); % LS object
+        if ~sum(pdata.marg(:,1)) == 0 % If probabilistic variables!
+            pdata.marg(:,2:3) =  Eq_dist( LS(ii).nominal_x, pdata.marg(:,5), pdata.marg(:,6), pdata.marg(:,1));
+            LS(ii).nominal_u = U_space(LS(ii).nominal_x, pdata.marg(:,2), pdata.marg(:,3));%, pdata.marg(:,1)); % LS object
         end     
     end
 
@@ -117,8 +118,7 @@ if RBDO_s.f_linprog
     % Uppdatera Move Limits
     lb = max([ Opt_set.lb'; (Opt_set.dp_x' - Opt_set.roc_dist')]);
     ub = min([ Opt_set.ub'; (Opt_set.dp_x' + Opt_set.roc_dist')]);
-    
-
+   
     options = optimoptions('linprog','Algorithm','dual-simplex','OptimalityTolerance', 1e-10,'ConstraintTolerance',1e-3);
     [ Opt_set.dpl_x, fval, RBDO_s.f_linprog, output] = linprog(f, A, b, [],[], lb, ub,options);
     
@@ -168,8 +168,8 @@ end
     if ~isempty(Opt_set.ob_val_old)
         v_diff = abs(Opt_set.dp_x_old- Opt_set.dp_x); 
         if abs((Opt_set.ob_val - Opt_set.ob_val_old)/ Opt_set.ob_val_old) < RBDO_s.tol || max(v_diff)< RBDO_s.tol
-           Opt_set.outer_conv = 0; 
-           %disp('NEVER CONVERGE!!!')
+           %Opt_set.outer_conv = 0; 
+           disp('NEVER CONVERGE!!!')
         end
     end
     
@@ -188,7 +188,8 @@ end
     end
 
     if ~sum(pdata.marg(:,1)) == 0 % If probabilistic variables!
-        Opt_set.dp_u = U_space(Opt_set.dpl_x, pdata.marg(:,2),pdata.marg(:,3),pdata.marg(:,1));
+        pdata.marg(:,5) = Update_dist(Opt_set.dpl_x, pdata.marg(:,6), pdata.marg(:,1)); % Update distributions!
+        Opt_set.dp_u = U_space(Opt_set.dpl_x, pdata.marg(:,5),pdata.marg(:,6));
     end
 
     if RBDO_s.f_debug == 1
@@ -200,7 +201,7 @@ end
     end
     
     counter = counter + 1;
-    if counter == 40
+    if counter == 30
         fprintf(' BRAKE AFTER %d iter', counter)
         counter = 0;
         Opt_set.outer_conv = 0
@@ -217,5 +218,9 @@ Opt_set.k = Opt_set.k + 1;
 [LS, theta] = plotiter(pdata, Opt_set, RBDO_s, LS, theta);
 Objective_v(Opt_set.k) = ObjectiveFunction(Opt_set, obj, pdata);
 
+% Set final result for MC run.
+pdata.marg(:,2) = Opt_set.dp_x; % mean value
++pdata.marg(ih,3) % standard dev - of variable -, not pseudo 
+Monte_Carlo
 %p_tot = [p_tot; pvec];
 % extra_plot

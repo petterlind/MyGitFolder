@@ -4,16 +4,21 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 m = 5;
-v = 0.3;
+v = 0.3^2;
 
+% log normal
 mu = log(m/(sqrt(1+v/m^2)));
 sigma = sqrt(log(1+v/m^2));
+
+% normal
+%mu = 5;
+%sigma = 0.3;
 
 pdata = Probdata; 
 pdata.name = {'mu1','mu2'};
 
-pdata.marg =  [  2   5   0.3 1 mu sigma
-                 2   5   0.3 1 mu sigma
+pdata.marg =  [  2   nan nan 1 mu sigma sqrt(v)
+                 2   nan nan 1 mu sigma sqrt(v)
               ];
           
 pdata.margp =  [];
@@ -32,16 +37,18 @@ Opt_set.dp_x = [5;5];
 
 target_beta = 3;
 
-if pdata.nx > 0
-    Opt_set.dp_u = U_space(Opt_set.dp_x, pdata.marg(:,2), pdata.marg(:,3), pdata.marg(:,1));
-end
+%if pdata.nx > 0
+%    pdata.marg(:,2:3) =  Eq_dist(Opt_set.dp_x, pdata.marg(:,5), pdata.marg(:,6), pdata.marg(:,1));
+%    Opt_set.dp_u = U_space(Opt_set.dp_x, pdata.marg(:,2), pdata.marg(:,3));
+%end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Functions, Obj and Limitstate
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 obj = Limitstate;
 obj.expression = {'G = mu1+mu2;'};
-obj.nominal_u = Opt_set.dp_u;
+%obj.nominal_u = Opt_set.dp_u;
 obj.nominal_x = Opt_set.dp_x;
 obj.nr = 0;
 
@@ -49,9 +56,9 @@ G1 = Limitstate; G1.nr = 1;
 G2 = Limitstate; G2.nr = 2;
 G3 = Limitstate; G3.nr = 3;
 
-G1.nominal_u = Opt_set.dp_u;
-G2.nominal_u = Opt_set.dp_u;
-G3.nominal_u = Opt_set.dp_u;
+%G1.nominal_u = Opt_set.dp_u;
+%G2.nominal_u = Opt_set.dp_u;
+%G3.nominal_u = Opt_set.dp_u;
 
 G1.nominal_x = Opt_set.dp_x; % First guess of Mpp....
 G2.nominal_x = Opt_set.dp_x;

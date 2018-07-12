@@ -15,7 +15,7 @@ ML_scale = Opt_set.ML_scale;
 
 % Shrink
 % ML_scale parameter, used with size of DoE.
-ML_scale(index_short & lb) = ML_scale(index_short & lb )* RBDO_s.roc_scale_down;  
+ML_scale(index_short & lb) = ML_scale(index_short & lb )* RBDO_s.roc_scale_down;  % REMOVE
 
 % Adapt distance to nominal point
 if RBDO_s.f_nominal_s

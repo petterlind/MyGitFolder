@@ -1,5 +1,5 @@
 % Monte Carlo
-ne = 1e2; % number experiments
+ne = 1e5; % number experiments
 
 % Waitbar
 f = waitbar(0,sprintf('Worst %5.2f',0));
@@ -37,11 +37,12 @@ for ih = 1:nv % Prob dv
     if ~isempty(pdata.nx) && pdata.nx ~= 0
         
         if pdata.marg(ih,1) == 1 % Prob dp
-            pd = makedist('Normal',Opt_set.dp_x(ih),pdata.marg(ih,3));
+            pd = makedist('Normal',Opt_set.dp_x(ih),pdata.marg(ih,7));
+            
         elseif  pdata.marg(ih,1) == 2
             
-            mu = log(pdata.marg(ih,2)/(sqrt(1+pdata.marg(ih,3)/pdata.marg(ih,2)^2)));
-            sigma = sqrt(log(1+pdata.marg(ih,3)/pdata.marg(ih,2)^2)); % Check this by plotting distribution!
+            mu = log(Opt_set.dp_x(ih)/(sqrt(1+pdata.marg(ih,7)^2/Opt_set.dp_x(ih)^2)));
+            sigma = sqrt(log(1+pdata.marg(ih,7)^2/Opt_set.dp_x(ih)^2));
             pd = makedist('Lognormal',mu ,sigma);
         else
             error('unknown distrubution in Monte_Carlo.m')

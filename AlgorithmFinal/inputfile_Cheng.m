@@ -32,7 +32,7 @@ pdata.marg(:,2) = pdata.marg(:,2)*(2.54e-2)^2;
 %pdata.marg(:,2) = optimum*(2.54e-2)^2;
 
 m = 4.448*1e5;
-v = 2.224*1e4;
+v = 2.224*1e4^2; % Variance, std square.
 
 mu = log(m/(sqrt(1+v/m^2)));
 sigma = sqrt(log(1+v/m^2));

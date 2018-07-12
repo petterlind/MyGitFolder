@@ -6,12 +6,12 @@ switch type
 case 'parameters'
     
     % Probabilistic parameters
-        [u_vec, psedo_dist] = U_space(obj.Mpp_p, pdata.margp(:,5), pdata.margp(:,6), pdata.margp(:,1));
-        pdata.margp(:,2:3) = psedo_dist;
+        pdata.margp(:,2:3) =  Eq_dist(obj.Mpp_p, pdata.margp(:,5), pdata.margp(:,6), pdata.margp(:,1));
+        
+        u_vec = U_space(obj.Mpp_p, pdata.margp(:,2), pdata.margp(:,3));%, pdata.margp(:,1));
         obj.doe_u = Experiment(u_vec, obj.DoE_size_p );
-        obj.doe_x = X_space( obj.doe_u, pdata.margp(:,2) ,pdata.margp(:,3),pdata.margp(:,1)); % Transformation back to X-space
-        
-        
+        obj.doe_x = X_space( obj.doe_u, pdata.margp(:,2) ,pdata.margp(:,3));%,pdata.margp(:,1)); % Transformation back to X-space
+       
         % Experiment - in x-space!
         obj.doe_val = nan(pdata.np+1,1);
         for ij=1:(pdata.np+1) 
@@ -26,9 +26,13 @@ case 'variables'
     
     if pdata.nx > 0     
         % Probabilistic variables
-        obj.doe_u = Experiment(obj.nominal_u, obj.DoE_size_x.*Opt_set.ML_scale);
-        obj.doe_x = X_space( obj.doe_u, pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1)); % Transformation back to X-space
-
+        
+        pdata.marg(:,2:3) =  Eq_dist(obj.nominal_x, pdata.marg(:,5), pdata.marg(:,6), pdata.marg(:,1));
+        u_vec = U_space(obj.nominal_x , pdata.marg(:,2), pdata.marg(:,3));
+        obj.doe_u = Experiment(u_vec, obj.DoE_size_x.*Opt_set.ML_scale);
+        
+        % Approximation of isoprobibilistic dist around point x.
+        obj.doe_x = X_space( obj.doe_u, pdata.marg(:,2) , pdata.marg(:,3));%, pdata.marg(:,1)); % Transformation back to X-space
         % Experiment - in x-space!
         obj.doe_val = nan(pdata.nx+1,1);
         for ij=1:(pdata.nx+1)
@@ -74,8 +78,8 @@ switch type
     
     if pdata.nx > 0
         obj.slope =  obj.alpha_x' * gradient_x; %Slope in x-space
-        obj.beta_v = X_space(obj.target_beta * alpha_u , pdata.marg(:,2), pdata.marg(:,3),pdata.marg(:,1)) - pdata.marg(:,2);
-       
+        obj.beta_v = X_space(obj.target_beta * alpha_u , pdata.marg(:,2), pdata.marg(:,3)) - pdata.marg(:,2);
+
         [obj.p_x, obj.p_val] = P_val(obj.doe_x, obj.doe_val, obj.nominal_x, obj.alpha_x);
         obj.x_trial = obj.nominal_x + obj.alpha_x*(-obj.nominal_val/obj.slope);
         obj.p_trial = obj.alpha_x.'*(obj.x_trial-obj.nominal_x);
@@ -110,13 +114,7 @@ switch type
          obj.Mpp_p
         disp(dif)
        end
-       
-       %if sum(isnan(obj.Mpp_p))>0 % WHY WOULD THIS EVEN BE A PROBLEM
-       %    fprintf('one or more value of MPP_p, NR: %d, is NaN \n', obj.nr)
-       %    obj.Mpp_p(isnan(obj.Mpp_p)) = pdata.margp(isnan(obj.Mpp_p),2);
-       %end
-       
-            
+        
     otherwise
         error('Unknown type in Grad.m')
 end

@@ -1,4 +1,7 @@
 function obj = do_probe(obj, pdata, Opt_set, RBDO_s)
+%
+% does probe in x-space
+%
 
 %  1) RoC for probe point!
 if RBDO_s.f_RoC
@@ -29,13 +32,12 @@ else
     obj.probe_x_pos = obj.alpha_x * obj.probe_p + obj.nominal_x;
 end
 
-
 if obj.probe_p ~= 0
     % 2) Probe val - Do experiments
     obj.probe_val = gvalue_fem('variables', obj.nominal_x + obj.probe_p*obj.alpha_x, pdata, Opt_set, RBDO_s, obj, 1,0);
 
     % 4) adapt spline  
-    [obj.spline, obj.probe_s] = spline(obj, nan);
+    [obj.spline, obj.probe_s] = spline(obj, 1); %nan
 
     % 5) Has to be in same direction as the trial point. Otherwise no cross
     % or error
@@ -84,6 +86,6 @@ end
 % 6) Update the Mpp
 obj.Mpp_x = obj.nominal_x + obj.probe_s * obj.alpha_x;
 if ~sum(pdata.marg(:,1)) == 0 % If probabilistic variables!
-    obj.Mpp_u = U_space(obj.Mpp_x, pdata.marg(:,2),pdata.marg(:,3),pdata.marg(:,1));
+    obj.Mpp_u = U_space(obj.Mpp_x, pdata.marg(:,2),pdata.marg(:,3));%,pdata.marg(:,1));
 end
 
