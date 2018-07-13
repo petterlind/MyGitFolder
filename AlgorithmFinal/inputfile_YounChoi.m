@@ -3,23 +3,14 @@
 % Probdata
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-m = 5;
-v = 0.3^2;
-
-% log normal
-mu = log(m/(sqrt(1+v/m^2)));
-sigma = sqrt(log(1+v/m^2));
-
-% normal
-%mu = 5;
-%sigma = 0.3;
+mean = 5;
+std = 0.3;
 
 pdata = Probdata; 
 pdata.name = {'mu1','mu2'};
-
-pdata.marg =  [  2   nan nan 1 mu sigma sqrt(v)
-                 2   nan nan 1 mu sigma sqrt(v)
-              ];
+% dist, mean, std.
+pdata.marg =  [  2   mean std 1
+                 2   mean std 1];
           
 pdata.margp =  [];
           

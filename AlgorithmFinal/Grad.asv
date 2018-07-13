@@ -6,12 +6,21 @@ switch type
 case 'parameters'
     
     % Probabilistic parameters
-       % pdata.margp(:,2:3) =  Eq_dist(obj.Mpp_p, pdata.margp(:,5), pdata.margp(:,6), pdata.margp(:,1));
+        pdata.margp(:,2:3) =  Eq_dist(obj.Mpp_p, pdata.margp(:,5), pdata.margp(:,6), pdata.margp(:,1));
         
-        u_vec = U_space(obj.Mpp_p, pdata.margp(:,2), pdata.margp(:,3), pdata.margp(:,1));
+        %u_vec = U_space(obj.Mpp_p, pdata.margp(:,2), pdata.margp(:,3));%, pdata.margp(:,1));
+        
+        %debug!
+        v = 0.3^2;
+        mu = log(Opt_set.dp_x/(sqrt(1+v/Opt_set.dp_x^2)));
+        sigma = sqrt(log(1+v/Opt_set.dp_x^2));
+        u_vec = U_space(obj.Mpp_p, pdata.margp(:,2), pdata.margp(:,3));%, pdata.margp(:,1));
+        
+        
+        %%%
         
         obj.doe_u = Experiment(u_vec, obj.DoE_size_p );
-        obj.doe_x = X_space( obj.doe_u, pdata.margp(:,2) ,pdata.margp(:,3),pdata.margp(:,1)); % Transformation back to X-space
+        obj.doe_x = X_space( obj.doe_u, pdata.margp(:,2) ,pdata.margp(:,3));%,pdata.margp(:,1)); % Transformation back to X-space
        
         % Experiment - in x-space!
         obj.doe_val = nan(pdata.np+1,1);
@@ -28,13 +37,12 @@ case 'variables'
     if pdata.nx > 0     
         % Probabilistic variables
         
-        %pdata.marg(:,2:3) =  Eq_dist(obj.nominal_x, pdata.marg(:,2), pdata.marg(:,3), pdata.marg(:,1));
-        u_vec = U_space(obj.nominal_x , pdata.marg(:,2), pdata.marg(:,3),pdata.marg(:,1));
-      
+        pdata.marg(:,2:3) =  Eq_dist(obj.nominal_x, pdata.marg(:,5), pdata.marg(:,6), pdata.marg(:,1));
+        u_vec = U_space(obj.nominal_x , pdata.marg(:,2), pdata.marg(:,3));
         obj.doe_u = Experiment(u_vec, obj.DoE_size_x.*Opt_set.ML_scale);
         
         % Approximation of isoprobibilistic dist around point x.
-        obj.doe_x = X_space( obj.doe_u, pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1)); % Transformation back to X-space
+        obj.doe_x = X_space( obj.doe_u, pdata.marg(:,2) , pdata.marg(:,3));%, pdata.marg(:,1)); % Transformation back to X-space
         % Experiment - in x-space!
         obj.doe_val = nan(pdata.nx+1,1);
         for ij=1:(pdata.nx+1)
@@ -82,19 +90,22 @@ switch type
        % obj.slope =  obj.alpha_x' * gradient_x; %Slope in x-space
         obj.slope = obj.alpha_u' * gradient; % Slope in u-space
         
+        % obj.beta_v = X_space(obj.target_beta * alpha_u , pdata.marg(:,2), pdata.marg(:,3)) - pdata.marg(:,2);
+
         [obj.p_u, obj.p_val] = P_val(obj.doe_u, obj.doe_val,  obj.doe_u(:,1), obj.alpha_u);
         
         obj.p_trial = -obj.nominal_val/obj.slope; % x-space!
         obj.u_trial =  obj.doe_u(:,1) + obj.p_trial*obj.alpha_u;
+        obj.x_trial = X_space(obj.u_trial, pdata.marg(:,2) , pdata.marg(:,3));
         
         alpha_start = Opt_set.dp_x;
-        alpha_end = X_space(obj.alpha_u, pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1));
+        alpha_end = X_space(obj.alpha_u, pdata.marg(:,2) , pdata.marg(:,3));
         
         obj.alpha_x = (alpha_end-alpha_start)/norm(alpha_end-alpha_start);
         
         if ~RBDO_s.f_probe % Linear guess is Mpp-guess if no probe
-        obj.Mpp_x = X_space(obj.u_trial, pdata.marg(:,2) , pdata.marg(:,3),pdata.marg(:,1));
-        obj.Mpp_sx = X_space(obj.u_trial - (obj.alpha_u'*obj.target_beta)', pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1));
+        obj.Mpp_x = X_space(obj.u_trial, pdata.marg(:,2) , pdata.marg(:,3));
+        obj.Mpp_sx = X_space(obj.u_trial - (obj.alpha_u'*obj.target_beta)', pdata.marg(:,2) , pdata.marg(:,3));
         end        
     end
     
@@ -106,7 +117,8 @@ switch type
         
         obj.p_trial = -obj.nominal_val/obj.slope; % x-space!
         obj.u_trial =  obj.doe_u(:,1) + obj.p_trial*obj.alpha_u;
-        obj.x_trial = X_space(obj.u_trial, pdata.marg(:,2) , pdata.marg(:,3),  pdata.marg(:,1));
+        obj.x_trial = X_space(obj.u_trial, pdata.marg(:,2) , pdata.marg(:,3));
+        
         
         if ~RBDO_s.f_probe % Linear guess is Mpp-guess if no probe
             obj.Mpp_x = obj.x_trial;

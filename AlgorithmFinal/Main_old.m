@@ -41,10 +41,9 @@ while Opt_set.outer_conv
         LS(ii).nominal_x_old = LS(ii).nominal_x;
         
         if RBDO_s.f_RoC
-             % LS(ii).nominal_x = RoC(RBDO_s, pdata, Opt_set, Opt_set.dp_x + LS(ii).beta_v.* RBDO_s.kappa_n, Opt_set.dp_x, Opt_set.lb);
-             LS(ii).nominal_x = RoC(RBDO_s, pdata, Opt_set,  Opt_set.dp_x + (LS(ii).Mpp_x - Opt_set.dp_x_old).* RBDO_s.kappa_n, Opt_set.dp_x, Opt_set.lb);
+             LS(ii).nominal_x = RoC(RBDO_s, pdata, Opt_set, Opt_set.dp_x + LS(ii).beta_v.* RBDO_s.kappa_n, Opt_set.dp_x, Opt_set.lb);
         else
-            LS(ii).nominal_x = Opt_set.dp_x + (LS(ii).Mpp_x - Opt_set.dp_x).* RBDO_s.kappa_n;
+            LS(ii).nominal_x = Opt_set.dp_x + LS(ii).beta_v.* RBDO_s.kappa_n;
         end
         
         if ~sum(pdata.marg(:,1)) == 0 % If probabilistic variables!
@@ -113,11 +112,12 @@ if RBDO_s.f_linprog
     f = -obj.alpha_x; % x-space
     active = [LS.active] & ~[LS.no_cross] ;
     A = [LS(active).alpha_x]';
-    xs = [LS(active).Mpp_x];
+    xs = [LS(active).Mpp_x]; % Add some shifted xs!?!!
 
     if pdata.nx > 0
-       xs_new = [LS(active).Mpp_x]; %- [LS(active).beta_v];
-         b = diag(A*(xs_new));
+       xs_new = [LS(active).Mpp_x] - [LS(active).beta_v];
+       %xs_new = [LS(active).Mpp_sx]; %shifted Mpp
+         b = diag(A*xs_new);
     elseif pdata.nx == 0 && pdata.nd ~=0
        b = diag(A*xs);
     else
@@ -127,14 +127,7 @@ if RBDO_s.f_linprog
     % Uppdatera Move Limits
     lb = max([ Opt_set.lb'; (Opt_set.dp_x' - Opt_set.roc_dist')]);
     ub = min([ Opt_set.ub'; (Opt_set.dp_x' + Opt_set.roc_dist')]);
-    
-    %%% DEBUG
-    P1=Opt_set.dp_x;
-    P2= Opt_set.dp_x+ A(1,:)';
-    D = P2 - P1;
-    quiver( P1(1), P1(2), D(1), D(2), 0 )
-
-    
+   
     options = optimoptions('linprog','Algorithm','dual-simplex','OptimalityTolerance', 1e-10,'ConstraintTolerance',1e-3);
     [ Opt_set.dpl_x, fval, RBDO_s.f_linprog, output] = linprog(f, A, b, [],[], lb, ub,options);
     
@@ -150,12 +143,6 @@ end
    % plot the iteration
    % ------------------------
    [LS, theta] = plotiter(pdata, Opt_set, RBDO_s, LS, theta);
-   
-   %%% debug
-   hold on
-   figure(1)
-   plot(Opt_set.dpl_x(1), Opt_set.dpl_x(2),'mo')
-   
    
     % Update objective value and dp
     Opt_set.ob_val_old = Opt_set.ob_val;
@@ -198,7 +185,7 @@ end
     end
     
     counter = counter + 1;
-    if counter == 17
+    if counter == 7
         fprintf(' BRAKE AFTER %d iter', counter)
         counter = 0;
         Opt_set.outer_conv = 0

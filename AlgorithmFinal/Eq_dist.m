@@ -25,3 +25,22 @@ for ii = 1:columns
         end
     end
 end
+
+            %%%
+            % plot
+%              for ii = 1: numel(pdata.marg(:,2))
+%                     
+%                  xp = linspace(0.7*LS(ii).nominal_x(ii),2*LS(ii).nominal_x(ii),10000);
+%                  
+%                  pd1 = makedist('Lognormal',pdata.marg(ii,5) ,pdata.marg(ii,6));         
+%                  pdf_lognormal = pdf(pd1,xp);
+% 
+%                  pd2 = makedist('normal',pdata.marg(ii,2) ,pdata.marg(ii,3)); 
+%                  pdf_normal = pdf(pd2,xp);
+%                  plot(xp,pdf_lognormal,'LineWidth',2)
+%                  hold on
+%                  plot(xp,pdf_normal,'LineWidth',2)
+%                  legend('log-normal','normal')
+%              end
+%         
+        %%%

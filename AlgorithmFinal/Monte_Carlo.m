@@ -41,8 +41,8 @@ for ih = 1:nv % Prob dv
             
         elseif  pdata.marg(ih,1) == 2
             
-            mu = log(Opt_set.dp_x(ih)/(sqrt(1+pdata.marg(ih,7)^2/Opt_set.dp_x(ih)^2)));
-            sigma = sqrt(log(1+pdata.marg(ih,7)^2/Opt_set.dp_x(ih)^2));
+            mu = log(Opt_set.dp_x(ih)/(sqrt(1+pdata.marg(ih,3)^2/Opt_set.dp_x(ih)^2)));
+            sigma = sqrt(log(1+pdata.marg(ih,3)^2/Opt_set.dp_x(ih)^2));
             pd = makedist('Lognormal',mu ,sigma);
         else
             error('unknown distrubution in Monte_Carlo.m')

@@ -2,12 +2,10 @@
 % the same options.
 
 % flags
-RBDO_s.f_one_probe = true;
 RBDO_s.f_RoC = true;
 RBDO_s.f_SRoC = true;
 RBDO_s.f_debug = true;
-RBDO_s.f_probe = true; 
-RBDO_s.f_corrector = false;
+RBDO_s.f_probe = false 
 RBDO_s.f_linprog = true; 
 RBDO_s.f_penal = false;
 RBDO_s.f_nominal_s = false; % no scale of distance to nominal point
@@ -32,7 +30,7 @@ if pdata.nx > 0
         end
     end
     % Values
-    Opt_set.roc_dist = 3*pdata.marg(:,7)* min([LS.target_beta]); % three times smallest beta
+    Opt_set.roc_dist = 3*pdata.marg(:,3)* min([LS.target_beta]); % three times smallest beta
     obj.DoE_size_x = ones(pdata.nx,1).*min([LS.target_beta])*RBDO_s.size_DoE; % objective
 
 elseif pdata.nd > 0
@@ -71,6 +69,9 @@ counter = 0;
 obj.target_beta = 0;
 [LS.beta_v] = deal(zeros(max(pdata.nx, pdata.nd),1));
 theta = 110; % for the plot
+[LS.Mpp_x] = deal(Opt_set.dp_x); % start
+[LS.Mpp_sx] = deal(Opt_set.dp_x); %start
+Opt_set.dp_x_old = Opt_set.dp_x; % start 
 
 % Common start values
 [Opt_set.roc_dist, Opt_set.ML_scale, RBDO_s.kappa_n] = Update_RoC(RBDO_s, Opt_set);

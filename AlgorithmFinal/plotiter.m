@@ -148,73 +148,8 @@ switch RBDO_s.name
         fc3.LineColor = 'green';
         fc3.LevelList = levels; % Possibility to also show gradient here!
         hold on
-        
-        % Plot the corr function
-        if RBDO_s.f_penal && true
-        g4 = @(mu1,mu2) penalfun([mu1;mu2], LS); 
-        hold on
 
-        p_size = 100;
-        X =linspace(0,10,p_size);
-        Y = X;
-        Zp1 = nan(p_size,p_size);
-        Zp2 = nan(p_size,p_size);
-        Xp = nan(p_size,p_size);
-        Yp = nan(p_size,p_size);
-        for ij = 1:p_size
-            for ii = 1:p_size
-                
-                all_values = g4(X(ii),Y(ij));
-                Zp1(ii,ij) = all_values(1);
-                Zp2(ii,ij) = all_values(2);
-                Xp(ii,ij) = X(ii);
-                Yp(ii,ij) = Y(ij);
-            end
-        end
-        
-        % Plot whitin an interval
-        %Zp(Zp < -0.5  | Zp > 0.5) = nan;
-        %Zp1(Zp1 < -1000 | Zp1 > 1000 ) = nan;
-        %Zp2(Zp2 < -1 | Zp2 > 1 ) = nan;
-        %Zp = Zp/ (max(max(Zp)));
-        
-        hold on    
-        figure(3)
-        clf
-        surf(Xp,Yp,Zp1)
-        figure(4)
-        clf
-        hold on
-        surf(Xp,Yp,Zp2)
-        end
         figure(1)
-        
-        if RBDO_s.f_corrector
-        g4 = @(mu1,mu2) G_ppFUN([mu1;mu2], LS([LS.active]), Corr.In_cor, Corr.lambda, Opt_set, Corr.G_plus); 
-        hold on
-        
-        p_size = 100;
-        X =linspace(0,10,p_size);
-        Y = X;
-        Zp = nan(p_size,p_size);
-        Xp = nan(p_size,p_size);
-        Yp = nan(p_size,p_size);
-        for ij = 1:p_size
-            for ii = 1:p_size
-                Zp(ii,ij) = g4(X(ii),Y(ij)); 
-                Xp(ii,ij) = X(ii);
-                Yp(ii,ij) = Y(ij);
-            end
-        end
-        
-        %Zp(Zp < -0.5  | Zp > 0.5) = nan;
-        Zp(Zp < 0 ) = nan;
-        Zp = Zp/ (max(max(Zp)));
-        hold on    
-        surf(Xp,Yp,Zp)
-        end
-        
-
 
         % Plot the probe points
         color = {'ro','bo','go'};
@@ -226,6 +161,9 @@ switch RBDO_s.name
             end
         end
 
+        
+
+        legend('G(X)_1','G(X)_2','G(X)_3','Location','northeastoutside')
         % Plot the nominal points
         color = {'rs','bs','gs'};
         for ii = 1:numel(LS)
@@ -235,9 +173,7 @@ switch RBDO_s.name
                 hold on
             end
         end
-
-        legend('G(X)_1','G(X)_2','G(X)_3','Location','northeastoutside')
-
+        
         % Plot text next to point
         r = 0.2;
         
@@ -249,10 +185,7 @@ switch RBDO_s.name
             end
         end
         
-        % plot points
-%         scatter(Opt_set.dp_x(1),Opt_set.dp_x(2),100,'MarkerFaceColor','b','MarkerEdgeColor','b',...
-%     'MarkerFaceAlpha',.2,'MarkerEdgeAlpha',.2)
-% hold on
+
        plot(Opt_set.dp_x(1),Opt_set.dp_x(2),'ok','MarkerSize', 10)
         text(Opt_set.dp_x(1)+r*cosd(theta),Opt_set.dp_x(2)+r*sind(theta),num2str(Opt_set.k))
 

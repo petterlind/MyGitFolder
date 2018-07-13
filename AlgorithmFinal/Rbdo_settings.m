@@ -26,7 +26,6 @@ classdef Rbdo_settings
 
     
     %Flags
-    f_one_probe
     f_RoC = true;        % Step box constraint with move in feasible dir first!
     f_RoC_step = false;  % Step length constraint
     f_SRoC               % Scaling Roc!
@@ -35,7 +34,6 @@ classdef Rbdo_settings
     f_linprog
     f_COV = false;
     f_probe = true; % Runs probe algorithm
-    f_corrector
     f_penal         % penalization algorithm
     f_nominal_s         % shrinking distance to nominal point to prevent ocillation?
 

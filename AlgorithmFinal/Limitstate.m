@@ -20,9 +20,10 @@ classdef Limitstate
       doe_val               % Corresponding values
       
       slope
-      x_trial               % Point in steapest decent where g = 0
+      x_trial               % Point in stepest descent where g = 0, x-space
+      u_trial               % Point in stepest descent where g = 0, u-space
       p_trial               % Linear estimate for probe point from DoE.
-      p_x                   % pvalues
+      p_u                   % pvalues in u-space
       p_val                 % p funtion values (based on probe points)
       probe_p               % probe coordinate in p-space - x-space! from nominal!
       probe_val             % probe function value
@@ -34,6 +35,7 @@ classdef Limitstate
       
       alpha_p               % Steepest decent direction probabalistic para
       alpha_x               % Steepest decent direction probabalistic variables
+      alpha_u
       alpha_x_old           % Old -- || --
       beta_v = 0
       
