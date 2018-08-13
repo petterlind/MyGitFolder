@@ -2,11 +2,11 @@ function [parameters, p_s] = spline(obj, p_I)
 
     if isnan(p_I)
     [~,Index] = min(abs(obj.p_val));
-    pm_num = obj.p_x(Index);
+    pm_num = obj.p_u(Index);
     gm_num = obj.p_val(Index); 
 
-    else % Some fixed, ex first index. (midpoint of doe.)
-    pm_num = obj.p_x(p_I);
+    else % Some fixed, ex first index. (centerpoint of FFD DoE.)
+    pm_num = obj.p_u(p_I);
     gm_num = obj.p_val(p_I); 
     end
     

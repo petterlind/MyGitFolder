@@ -5,10 +5,10 @@
 RBDO_s.f_RoC = true;
 RBDO_s.f_SRoC = true;
 RBDO_s.f_debug = true;
-RBDO_s.f_probe = false 
+RBDO_s.f_probe = true; 
 RBDO_s.f_linprog = true; 
 RBDO_s.f_penal = false;
-RBDO_s.f_nominal_s = false; % no scale of distance to nominal point
+RBDO_s.f_nominal_s = false; % no scale of distance to nominal point, not used in article 1!
 
 % Initiate settings and variables
 RBDO_s.kappa_n = ones(max(pdata.nx, pdata.nd),1); % DoE

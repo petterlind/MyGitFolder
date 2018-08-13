@@ -9,8 +9,8 @@ std = 0.3;
 pdata = Probdata; 
 pdata.name = {'mu1','mu2'};
 % dist, mean, std.
-pdata.marg =  [  2   mean std 1
-                 2   mean std 1];
+pdata.marg =  [  1   mean std 1
+                 1   mean std 1];
           
 pdata.margp =  [];
           

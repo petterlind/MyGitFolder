@@ -5,10 +5,10 @@ close all
 % 1) Input
 % --------------------------------
  %inputfile_trusses
- inputfile_YounChoi
+% inputfile_YounChoi
 % inputfile_Jeong_Park
 % inputfile_Madsen
-% inputfile_Cheng
+ inputfile_Cheng
 % inputfile_Cheng3_prob
 
 % inputfile_TANA

@@ -31,15 +31,15 @@ pdata.marg =  [  0   10   0 1
 pdata.marg(:,2) = pdata.marg(:,2)*(2.54e-2)^2;
 %pdata.marg(:,2) = optimum*(2.54e-2)^2;
 
-m = 4.448*1e5;
-v = 2.224*1e4^2; % Variance, std square.
+m = 4.448*1e5; %mean
+std = 2.224*1e4; %std
 
-mu = log(m/(sqrt(1+v/m^2)));
-sigma = sqrt(log(1+v/m^2));
+%mu = log(m/(sqrt(1+v/m^2)));
+%sigma = sqrt(log(1+v/m^2));
 
-pdata.margp =  [ 2  m v 0 mu sigma
-                 2  m v 0 mu sigma
-                 1  1.724e8 1.724e7  0 1.724e8 1.724e7 ]; 
+pdata.margp =  [ 2  m std 0
+                 2  m std 0
+                 1  1.724e8 1.724e7  0]; 
           
 pdata = set_numbers(pdata, pdata.marg);
 pdata.np = numel(pdata.margp(:,2));
@@ -54,9 +54,10 @@ Opt_set.ub = 25* ones(10,1).* (2.54e-2)^2;
 
 Opt_set.dp_x = pdata.marg(:,2);
 
-if pdata.nx > 0
-    Opt_set.dp_u = U_space(Opt_set.dp_x, pdata.marg(:,2), pdata.marg(:,3),pdata.marg(:,1));
-end
+%if pdata.nx > 0
+%    Opt_set.dp_u = U_space(Opt_set.dp_x, pdata.marg(:,2), pdata.marg(:,3),pdata.marg(:,1));
+%end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Functions, Obj and Limitstate
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -81,10 +82,10 @@ G9 = Limitstate; G9.nr = 9;
 G10 = Limitstate; G10.nr = 10; 
 G11 = Limitstate; G11.nr = 11; % Max/min stress
 
-G1.nominal_u = Opt_set.dp_u;G2.nominal_u = Opt_set.dp_u;G3.nominal_u = Opt_set.dp_u;
-G4.nominal_u = Opt_set.dp_u;G5.nominal_u = Opt_set.dp_u;G6.nominal_u = Opt_set.dp_u;
-G7.nominal_u = Opt_set.dp_u;G8.nominal_u = Opt_set.dp_u;G9.nominal_u = Opt_set.dp_u;
-G10.nominal_u = Opt_set.dp_u;G11.nominal_u = Opt_set.dp_u;
+%G1.nominal_u = Opt_set.dp_u;G2.nominal_u = Opt_set.dp_u;G3.nominal_u = Opt_set.dp_u;
+%G4.nominal_u = Opt_set.dp_u;G5.nominal_u = Opt_set.dp_u;G6.nominal_u = Opt_set.dp_u;
+%G7.nominal_u = Opt_set.dp_u;G8.nominal_u = Opt_set.dp_u;G9.nominal_u = Opt_set.dp_u;
+%G10.nominal_u = Opt_set.dp_u;G11.nominal_u = Opt_set.dp_u;
 
 % First guess of Mpp
 G1.nominal_x = Opt_set.dp_x; G2.nominal_x = Opt_set.dp_x;G3.nominal_x = Opt_set.dp_x;

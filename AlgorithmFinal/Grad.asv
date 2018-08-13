@@ -102,10 +102,9 @@ switch type
         obj.alpha_x = obj.alpha_u;
         obj.slope =  obj.alpha_x' * gradient;
         
-        [obj.p_u, obj.p_val] = P_val(obj.doe_u, obj.doe_val,  obj.doe_u(:,1), obj.alpha_u); % OBS DETTA ÄR I X_SPACE FÖR DETERMINISTISKA DV!
+        [obj.p_u, obj.p_val] = P_val(obj.doe_u, obj.doe_val,  obj.doe_u(:,1), obj.alpha_u);
         
-        
-        obj.p_trial = -obj.nominal_val/obj.slope; 
+        obj.p_trial = -obj.nominal_val/obj.slope; % x-space!
         obj.u_trial =  obj.doe_u(:,1) + obj.p_trial*obj.alpha_u;
         obj.x_trial = X_space(obj.u_trial, pdata.marg(:,2) , pdata.marg(:,3),  pdata.marg(:,1));
         
