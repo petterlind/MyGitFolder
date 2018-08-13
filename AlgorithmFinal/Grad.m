@@ -84,17 +84,17 @@ switch type
         
         [obj.p_u, obj.p_val] = P_val(obj.doe_u, obj.doe_val,  obj.doe_u(:,1), obj.alpha_u);
         
-        obj.p_trial = -obj.nominal_val/obj.slope; % x-space!
+        obj.p_trial = -obj.nominal_val/obj.slope; % u-space!
         obj.u_trial =  obj.doe_u(:,1) + obj.p_trial*obj.alpha_u;
         
         alpha_start = Opt_set.dp_x;
         alpha_end = X_space(obj.alpha_u, pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1));
         
-        obj.alpha_x = (alpha_end-alpha_start)/norm(alpha_end-alpha_start);
+        obj.alpha_x = (alpha_end-alpha_start)/norm(alpha_end-alpha_start); % Vector from dp towards Mpp.
         
         if ~RBDO_s.f_probe % Linear guess is Mpp-guess if no probe
         obj.Mpp_x = X_space(obj.u_trial, pdata.marg(:,2) , pdata.marg(:,3),pdata.marg(:,1));
-        obj.Mpp_sx = X_space(obj.u_trial - (obj.alpha_u'*obj.target_beta)', pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1));
+        obj.Mpp_sx = X_space(obj.u_trial - (obj.alpha_u'*obj.target_beta)', pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1)); % shifted in u_space!
         end        
     end
     
