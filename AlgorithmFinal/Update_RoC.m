@@ -19,7 +19,9 @@ ML_scale(index_short & lb) = ML_scale(index_short & lb )* RBDO_s.roc_scale_down;
 
 % Adapt distance to nominal point
 if RBDO_s.f_nominal_s
-    kappa_n(index_short & lb) = kappa_n(index_short & lb) * RBDO_s.roc_scale_down;
+    kappa_n = ones(size(kappa_n))*0.75;
+    %kappa_n(index_short & lb) = kappa_n(index_short & lb) * RBDO_s.roc_scale_down;
+   % kappa_n(kappa_n < 0.5) = 0.5;
 end
 
 % Adapt size of ML-box

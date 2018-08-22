@@ -36,6 +36,6 @@ classdef Rbdo_settings
     f_probe = true; % Runs probe algorithm
     f_penal         % penalization algorithm
     f_nominal_s         % shrinking distance to nominal point to prevent ocillation?
-
+    f_MC            % Do mc at converged points or not.
  end
 end

@@ -5,11 +5,11 @@
 RBDO_s.f_RoC = true;
 RBDO_s.f_SRoC = true;
 RBDO_s.f_debug = true;
-RBDO_s.f_probe = true; 
+RBDO_s.f_probe = false; 
 RBDO_s.f_linprog = true; 
 RBDO_s.f_penal = false;
 RBDO_s.f_nominal_s = false; % no scale of distance to nominal point, not used in article 1!
-
+RBDO_s.f_MC = false;
 % Initiate settings and variables
 RBDO_s.kappa_n = ones(max(pdata.nx, pdata.nd),1); % DoE
 RBDO_s.roc_scale_down = 0.6; % Scale
@@ -81,3 +81,6 @@ Opt_set.ML_scale = ones(max(pdata.nx, pdata.nd),1);
 Objective_v = nan(100,1);
 %Objective_v(1) = ObjectiveFunction(Opt_set, obj, pdata);
 p_tot = [];
+
+% Class instance
+Results = Result;

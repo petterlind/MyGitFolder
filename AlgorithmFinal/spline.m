@@ -1,18 +1,18 @@
-function [parameters, p_s] = spline(obj, p_I)
+function [parameters, p_s] = spline(pm_num, gm_num, pt_num, Gt_num, k_num)
 
-    if isnan(p_I)
-    [~,Index] = min(abs(obj.p_val));
-    pm_num = obj.p_u(Index);
-    gm_num = obj.p_val(Index); 
+    %if isnan(p_I)
+    %[~,Index] = min(abs(obj.p_val));
+    %pm_num = obj.p_u(Index);
+    %gm_num = obj.p_val(Index); 
 
-    else % Some fixed, ex first index. (centerpoint of FFD DoE.)
-    pm_num = obj.p_u(p_I);
-    gm_num = obj.p_val(p_I); 
-    end
+    %else % Some fixed, ex first index. (centerpoint of FFD DoE.)
+    %pm_num = obj.p_u(p_I);
+    %gm_num = obj.p_val(p_I); 
+    %end
     
-    pt_num = obj.probe_p;
-    Gt_num = obj.probe_val;
-    k_num = obj.slope; 
+    %pt_num = obj.probe_p;
+    %Gt_num = obj.probe_val;
+    %k_num = obj.slope; 
 
     syms r(p) A B C D gm Gt pm pt k
 

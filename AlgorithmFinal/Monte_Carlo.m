@@ -1,5 +1,5 @@
 % Monte Carlo
-ne = 1e5; % number experiments
+ne = 1e6; % number experiments
 
 % Waitbar
 f = waitbar(0,sprintf('Worst %5.2f',0));
@@ -23,10 +23,10 @@ for ih = 1:nv % Prob dv
             pd = makedist('Normal',pdata.margp(ih,2),pdata.margp(ih,3));
         elseif pdata.margp(ih,1) == 2
             mu = log(pdata.margp(ih,2)/(sqrt(1+pdata.margp(ih,3)/pdata.margp(ih,2)^2)));
-            sigma = sqrt(log(1+pdata.margp(ih,3)/pdata.margp(ih,2)^2)); % Check this by plotting distribution!
+            sigma = sqrt(log(1+pdata.margp(ih,3)/pdata.margp(ih,2)^2));
             pd = makedist('Lognormal',mu ,sigma);
             
-             x =linspace(pdata.margp(ih,2)*0.8,pdata.margp(ih,2)*1.2,10000);
+             x =linspace(4.44e5,4.454e5,10000);
              pdf_log =  pdf(pd,x);
             plot(x,pdf_log,'LineWidth',2)
         else
@@ -37,7 +37,7 @@ for ih = 1:nv % Prob dv
     if ~isempty(pdata.nx) && pdata.nx ~= 0
         
         if pdata.marg(ih,1) == 1 % Prob dp
-            pd = makedist('Normal',Opt_set.dp_x(ih),pdata.marg(ih,7));
+            pd = makedist('Normal',Opt_set.dp_x(ih),pdata.marg(ih,3));
             
         elseif  pdata.marg(ih,1) == 2
             

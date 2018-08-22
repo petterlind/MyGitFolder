@@ -131,7 +131,7 @@ switch RBDO_s.name
         g3 = @(mu1,mu2) 80/(mu1^2+8*mu2+5)-1;
 
         %intervall = [-10 4 -10 2];
-        intervall = [ 0 10 0 10];
+        intervall = [ 3.5 7 0.5 3.5];
         levels = 0; 
         levels2 = linspace(-0.3,0,100);
         fc1 = fcontour(g1, intervall,'LineWidth',4,'HandleVisibility','off');

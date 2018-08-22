@@ -455,3 +455,5 @@ scatter(slsv(:,1),slsv(:,2), a_slsv,'MarkerFaceColor','c','MarkerEdgeColor','c',
 legend('SLSVP','SLSVCG','SLSV')
 
 
+% http://interfacegroup.ch/preparing-matlab-figures-for-publication/
+

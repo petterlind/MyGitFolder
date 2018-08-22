@@ -13,7 +13,7 @@ classdef Limitstate
       nominal_u
       nominal_val           % Nominal value (at DP)
       nominal_val_old
-      lambda  =0 % dummy    % Direction orthogonal to alpha towards new nominal point
+      lambda                % Direction towards MPP estimate in x-space
       
       doe_x                 % Doe coordinates - in x-space
       doe_u                 % Doe coordinates - in u-space
@@ -24,6 +24,7 @@ classdef Limitstate
       u_trial               % Point in stepest descent where g = 0, u-space
       p_trial               % Linear estimate for probe point from DoE.
       p_u                   % pvalues in u-space
+      p_x                   % pvalues in x-space for deterministic dv.
       p_val                 % p funtion values (based on probe points)
       probe_p               % probe coordinate in p-space - x-space! from nominal!
       probe_val             % probe function value
@@ -41,12 +42,12 @@ classdef Limitstate
       
       target_beta
       
-      Mpp_p                 % Paramter set beta- away in u space in alpha p-dir.
+      Mpp_p                 % Parameter set beta- away in u space in alpha p-dir.
       Mpp_x                 % Mpp estimate from probe
       Mpp_sx                % Shifted Mpp for dv
       Mpp_x_old             % Old Mpp LS.
-      Mpp_u                 % Mpp estimate from probe, u-space
-      
+      Mpp_ud = [];                % Distance to Mpp in u-space, dummy value
+      Mpp_ud_old =[];           % Distance to Mpp in u-space old, dummy value
       
       no_cross = 0;
        
