@@ -6,13 +6,10 @@
 pdata = Probdata; %Specify the class
 pdata.name = {'mu1','mu2'};
 
-%pdata.marg =  [  1   5.1969  0.3 1
-%                 1   0.7405   0.3 1
-%              ];
-          
-pdata.marg =  [  1   5  0.3 1
-                 1   5   0.3 1
+pdata.marg =  [  1   5.1969  0.3 1
+                 1   0.7405   0.3 1
               ];
+          
           
 pdata.margp =  [];
           

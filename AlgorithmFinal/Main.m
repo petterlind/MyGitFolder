@@ -5,10 +5,10 @@ close all
 % 1) Input
 % --------------------------------
  %inputfile_trusses
- inputfile_YounChoi
+% inputfile_YounChoi
 % inputfile_Jeong_Park
 % inputfile_Madsen
-% inputfile_Cheng
+ inputfile_Cheng
 % inputfile_Cheng3_prob
 % inputfile_TANA
 
@@ -64,7 +64,7 @@ while Opt_set.outer_conv
 
             % FORM estimate of limit states
             LS(ii) = Grad(LS(ii), pdata, Opt_set, RBDO_s, 'variables', true);
-            LS(ii).active = obj.alpha_x' * LS(ii).lambda  >  cosd(135);
+            LS(ii).active = obj.alpha_x' * LS(ii).alpha_x  >  cosd(135);
             
         end
     end
@@ -94,8 +94,8 @@ if RBDO_s.f_linprog
     % Set up optimization
     f = -obj.alpha_x; % x-space
     active = [LS.active] & ~[LS.no_cross] ;
-    %A = [LS(active).alpha_x]';
-    A = [LS(active).lambda]';
+    A = [LS(active).alpha_x]';
+    %A = [LS(active).lambda]';
     xs = [LS(active).Mpp_x];
 
     if pdata.nx > 0
@@ -162,16 +162,11 @@ end
            end
         end
         
-        try
         if max(abs(([LS.Mpp_ud]-[LS.Mpp_ud_old])./[LS.Mpp_ud_old]))< RBDO_s.tol &&  Results.c_conv == false
             Results.c_conv = true; 
             Results.c_nr = Gnum;
             Results.c_iter = Opt_set.k;
             Results.c_obj = Opt_set.ob_val;
-        end
-        
-        catch
-            disp('error')
         end
         
         if Results.s_conv && Results.v_conv && Results.c_conv

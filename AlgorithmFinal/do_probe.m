@@ -104,8 +104,8 @@ if pdata.nx > 0
     obj.Mpp_ud_old = obj.Mpp_ud;
     obj.Mpp_ud = norm(u_Mpp);
     obj.Mpp_x = X_space(u_Mpp, pdata.marg(:,2) , pdata.marg(:,3),pdata.marg(:,1));
-    %obj.Mpp_sx = X_space(u_Mpp - (obj.alpha_u'*obj.target_beta)', pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1)); % shifted in u_space!
-    obj.Mpp_sx = X_space(u_Mpp - u_Mpp*obj.target_beta/ norm(u_Mpp), pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1)); % shifted in u_space!
+    obj.Mpp_sx = X_space(u_Mpp - (obj.alpha_u'*obj.target_beta)', pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1)); % shifted in u_space!
+    %obj.Mpp_sx = X_space(u_Mpp - u_Mpp*obj.target_beta/ norm(u_Mpp), pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1)); % shifted in u_space!
     obj.lambda = (obj.Mpp_x - Opt_set.dp_x) / norm(obj.Mpp_x - Opt_set.dp_x);
     
     

@@ -51,8 +51,7 @@ G2.nominal_x = Opt_set.dp_x;
 G3.nominal_x = Opt_set.dp_x;
 
 G1.expression = {'G = mu1^2*mu2/20-1;'};
-G2.expression = {'Y=0.9063*mu1 + 0.4226*mu2 ;Z=0.4226*mu1-0.9063*mu2 ;G = -1*(-1+(Y-6)^2+(Y-6)^3-0.6*(Y-6)^4+Z);'};
-%G2.expression = {'G = (mu1+mu2-5)^2/30+(mu1-mu2-12)^2/120-1;'};
+G2.expression = {'G = (mu1+mu2-5)^2/30+(mu1-mu2-12)^2/120-1;'};
 G3.expression = {'G = 80/(mu1^2+8*mu2+5)-1;'};
 LS = [G1, G2, G3];
 

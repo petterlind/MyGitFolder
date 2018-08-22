@@ -171,6 +171,19 @@ switch RBDO_s.name
             end
         end
         
+       % Plot direction cosines.
+        color = {'rx','bx','gx'};
+        for ii = 1:numel(LS)
+            if ~isempty(LS(ii).probe_x_pos)
+                l1 = LS(ii).probe_x_pos; 
+                plot(l1(1,:),l1(2,:),color{ii}, 'MarkerSize',20)
+                hold on
+            end
+        end
+        
+        
+        
+        
 
         
 
@@ -214,19 +227,7 @@ switch RBDO_s.name
                 text(l1(1,:)+r*cosd(theta),l1(2,:)+r*sind(theta),num2str(Opt_set.k),'Color',color2{ii})
                 hold on
             end
-        end
-        
-        % Plot direction cosines.
-        color = {'r','x','g'};
-        for ii = 1:numel(LS)
-            if ~isempty(LS(ii).alpha_x)
-                l1 = LS(ii).nominal_x; 
-                l2 = LS(ii).alpha_x;
-                %plot( l1', l1'+l2' ,color{ii}, 'MarkerSize',5)
-                quiver( l1(1,:), l1(2,:), l2(1,:), l2(2,:),0);
-                hold on
-            end
-        end
+        end        
 
         axis equal
         warning(orig_state);

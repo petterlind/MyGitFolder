@@ -89,21 +89,24 @@ switch type
 
         
         %alpha_start = Opt_set.dp_x;
-        alpha_start = obj.nominal_x;
-        %alpha_end = X_space(obj.alpha_u, pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1));
-        alpha_end = X_space(obj.u_trial, pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1));
+        %alpha_start = obj.doe_x(:,1);
+        alpha_start =  Opt_set.dp_x;
+        %alpha_end = X_space(obj.u_trial, pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1));
+        alpha_end = X_space(obj.alpha_u, pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1));
         obj.alpha_x = (alpha_end-alpha_start)/norm(alpha_end-alpha_start); % Vector from dp towards Mpp.
+        
+      
         
         Mpp_x = X_space(obj.u_trial, pdata.marg(:,2) , pdata.marg(:,3),pdata.marg(:,1)); % Temp Mpp!
         obj.lambda =(Mpp_x - Opt_set.dp_x) / norm(Mpp_x - Opt_set.dp_x);
         
         if ~RBDO_s.f_probe % Linear guess is Mpp-guess if no probe
         obj.Mpp_x = Mpp_x;
-        %obj.Mpp_sx = X_space(obj.u_trial - (obj.alpha_u'*obj.target_beta)', pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1)); % shifted in u_space!
-        obj.Mpp_sx = X_space(obj.u_trial - obj.u_trial*obj.target_beta/ norm(obj.u_trial), pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1)); % shifted in u_space!
+        obj.Mpp_sx = X_space(obj.u_trial - (obj.alpha_u'*obj.target_beta)', pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1));
+        %obj.Mpp_sx = X_space(obj.u_trial - obj.u_trial*obj.target_beta/ norm(obj.u_trial), pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1)); % shifted in u_space!
 
         obj.Mpp_ud_old =  obj.Mpp_ud; % used for constraint verification.
-        obj.Mpp_ud = norm(obj.alpha_x* obj.p_trial);
+        obj.Mpp_ud = norm(obj.alpha_u* obj.p_trial);
         
 
         
