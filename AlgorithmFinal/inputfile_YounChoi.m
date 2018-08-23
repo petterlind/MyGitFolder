@@ -26,7 +26,7 @@ Opt_set.lb = [0; 0];
 Opt_set.ub = [10; 10];
 Opt_set.dp_x = [5;5];
 
-target_beta = 3;
+target_beta = 2;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Functions, Obj and Limitstate

@@ -14,6 +14,7 @@ classdef Result
         c_iter
         MC          % Mc result at every limitstate
         Max_iterations % Max number of iteration reached
+        dv          % Save for design variable
    end
 %    methods
 %    end 

@@ -84,3 +84,4 @@ p_tot = [];
 
 % Class instance
 Results = Result;
+Results.dv = nan(100,numel(Opt_set.dp_x));

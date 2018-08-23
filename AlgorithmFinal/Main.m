@@ -6,9 +6,9 @@ close all
 % --------------------------------
  %inputfile_trusses
 % inputfile_YounChoi
-% inputfile_Jeong_Park
+ inputfile_Jeong_Park
 % inputfile_Madsen
- inputfile_Cheng
+% inputfile_Cheng
 % inputfile_Cheng3_prob
 % inputfile_TANA
 
@@ -42,8 +42,10 @@ while Opt_set.outer_conv
         if RBDO_s.f_RoC
              % LS(ii).nominal_x = RoC(RBDO_s, pdata, Opt_set, Opt_set.dp_x + LS(ii).beta_v.* RBDO_s.kappa_n, Opt_set.dp_x, Opt_set.lb);
              LS(ii).nominal_x = RoC(RBDO_s, pdata, Opt_set,  Opt_set.dp_x + (LS(ii).Mpp_x - LS(ii).Mpp_sx).* RBDO_s.kappa_n, Opt_set.dp_x, Opt_set.lb);
+             %LS(ii).nominal_x = RoC(RBDO_s, pdata, Opt_set,  Opt_set.dp_x + (LS(ii).Mpp_x - Opt_set.dp_x_old).* RBDO_s.kappa_n, Opt_set.dp_x, Opt_set.lb);
         else
             LS(ii).nominal_x = Opt_set.dp_x + (LS(ii).Mpp_x - Opt_set.dp_x).* RBDO_s.kappa_n;
+            %LS(ii).nominal_x = Opt_set.dp_x + (LS(ii).Mpp_x - Opt_set.dp_x_old).* RBDO_s.kappa_n;
         end
         
         if ~sum(pdata.marg(:,1)) == 0 % If probabilistic variables!
@@ -161,14 +163,14 @@ end
               Results.MC = Monte_Carlo(SMTH);
            end
         end
-        
-        if max(abs(([LS.Mpp_ud]-[LS.Mpp_ud_old])./[LS.Mpp_ud_old]))< RBDO_s.tol &&  Results.c_conv == false
+            
+        if max(abs(([LS.Mpp_ud]-[LS.Mpp_ud_old])./[LS(active).target_beta]))< RBDO_s.tol &&  Results.c_conv == false
             Results.c_conv = true; 
             Results.c_nr = Gnum;
             Results.c_iter = Opt_set.k;
             Results.c_obj = Opt_set.ob_val;
         end
-        
+
         if Results.s_conv && Results.v_conv && Results.c_conv
             % All convergence criterias met. stop iteration.
             Opt_set.outer_conv = 0; 
@@ -204,14 +206,20 @@ end
         fprintf(' \n The maximum difference in u since last step is (componentwise): %1.7f \n', Opt_set.dp_x - Opt_set.dp_x_old)
     end
     
+    
+    % Save iteration history
+    Results.dv(Opt_set.k,:) = Opt_set.dp_x_old;
+
     counter = counter + 1;
-    if counter == 50
+    if counter == 40
         fprintf(' BRAKE AFTER %d iter', counter)
         Results.Max_iterations = true;
         counter = 0;
         Opt_set.outer_conv = 0;
     end
 end
+
+
 % Display the result
 fprintf('\n Number of function evaluation %d', Gnum)
 fprintf('\n with value of objective function, %1.4f', Opt_set.ob_val)
@@ -220,6 +228,7 @@ fprintf('\n DONE! \n')
 
 % And plot the last step
 Opt_set.k = Opt_set.k + 1;
+Results.dv(Opt_set.k,:) = Opt_set.dp_x;
 [LS, theta] = plotiter(pdata, Opt_set, RBDO_s, LS, theta);
 Objective_v(Opt_set.k) = ObjectiveFunction(Opt_set, obj, pdata);
 
