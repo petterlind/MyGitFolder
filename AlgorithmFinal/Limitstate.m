@@ -10,6 +10,8 @@ classdef Limitstate
       
       nominal_x             % Nominal x (DP)
       nominal_x_old
+      nominal_x_v             % vector from dp to nominal value
+      nominal_x_v_old
       nominal_u
       nominal_val           % Nominal value (at DP)
       nominal_val_old
@@ -18,6 +20,8 @@ classdef Limitstate
       doe_x                 % Doe coordinates - in x-space
       doe_u                 % Doe coordinates - in u-space
       doe_val               % Corresponding values
+      delta                 % used for move limit
+      delta_old             % used for move limit
       
       slope
       x_trial               % Point in stepest descent where g = 0, x-space
@@ -30,6 +34,8 @@ classdef Limitstate
       probe_val             % probe function value
       probe_s               % probe Mpp estimate
       probe_x_pos           % Position of probe in x-space!
+      
+      roc_dist_n            % move limit, limitstate, x-space.
       
       spline                % Spline constants
       c = 0;                    % penalize constant

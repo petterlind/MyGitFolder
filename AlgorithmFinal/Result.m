@@ -15,6 +15,8 @@ classdef Result
         MC          % Mc result at every limitstate
         Max_iterations % Max number of iteration reached
         dv          % Save for design variable
+        obj         % Save space for objective value.
+        con         % Save space for constraint fulfillment
    end
 %    methods
 %    end 

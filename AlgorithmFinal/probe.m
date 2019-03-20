@@ -20,15 +20,11 @@ end
 % Pick values in the alpha direction
 [p_val, p_fun, slope] = P_values(x_values, limit_values, alpha_values, dp, slope_values);
 
-try
 % The last one is the latest update.
 gm_num = p_fun(end);
 pm_num = p_val(end);
 k_num = slope(end);
 dp_fun = p_fun(1);
-catch
-    disp('brake')
-end
 
 
 % Intersection with y =0
@@ -36,16 +32,7 @@ p_trial = pm_num - gm_num/k_num;
 
 % fprintf('Linear approx: %1.4f \n', p_trial )
 
-if l==7
-    disp('brake')
-end
-
-try
 [pt_num, step, max_t_bounds, active_l] = Next_probe(p_val, p_fun, p_trial, l, nr, RBDO_settings, dp, alpha_values, lb, dp_fun, flag);
-
-catch
-    disp('BRAKE')
-end
 
 [pt_final, ps_final, limit_new, slope_new, no_cross, exit_val, active_l] = Check_probe(pt_num, pm_num, gm_num, k_num, step, dp, alpha_values, probdata, rbdo_parameters, gfundata, nr, RBDO_settings, active_l, flag.debug);
 

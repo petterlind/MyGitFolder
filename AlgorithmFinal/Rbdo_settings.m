@@ -12,6 +12,7 @@ classdef Rbdo_settings
     roc_scale_down         % Scale (shirnking) of the Roc-cube
     roc_scale_up           % Scale (growing= of the Roc_cube
     roc_lb              % lb for roc
+    roc_ub
     kappa_n             % vector, distance to nominal point in each direction.
     
     size_DoE            % Relative doe_size compared to beta, start value
@@ -37,5 +38,6 @@ classdef Rbdo_settings
     f_penal         % penalization algorithm
     f_nominal_s         % shrinking distance to nominal point to prevent ocillation?
     f_MC            % Do mc at converged points or not.
+    f_active        % Turn on off check for nonactive limitstate fun.
  end
 end

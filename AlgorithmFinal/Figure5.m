@@ -56,12 +56,9 @@ xy_SLSV = [
 4.3318 4.1754
 5.0000 5.0000];
 
-xy_probe = [    5.0000    5.0000
-    3.6667    3.8390
-    3.4446    3.2793
-    3.4391    3.2862
-    3.4390    3.2867
-    3.4391    3.2864];
+xy_probe = [ 5.0000    3.6667    3.4446    3.4391    3.4390    3.4391
+5.0000    3.8390    3.2793    3.2862    3.2867    3.2864]';
+
 
 a_SAP = 100*ones(length(xy_SAP),1);
 a_SLSV = 100*ones(length(xy_SLSV),1);
@@ -87,6 +84,7 @@ legend('SLSVP','SLA','SLSV','Location','SouthEast')
 text(2.1,2.7,'G_1=0','Color','red')
 text(3.9,2.3,'G_2=0','Color','blue')
 text(5.4,4.9,'G_3=0','Color','green')
+text(4.4, 5.3, 'Start point')
 
 % scaling
 fig.Units               = 'centimeters';

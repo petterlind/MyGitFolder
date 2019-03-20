@@ -1,4 +1,4 @@
-function DP1 = RoC(RBDO_s, pdata, Opt_set, DP1, DP0, lbp)
+function DP1 = RoC(RBDO_s, pdata, Opt_set, DP1, DP0, lbp, ubp)
 % DP0, nominal point
 % DP1, New suggested point
 % DPF, feasible point
@@ -57,7 +57,12 @@ RoC_p = diag(ones(nrdv,1));
 %     
 %    index_brake = sol_dp < lbp;
 
-index_brake = DP1 < lbp;
+if ~isempty(ubp)
+index_brake = DP1 < lbp | DP1 > ubp;
+else
+ index_brake = DP1 < lbp;
+end
+
 
     % If breaking a lb, check where that intersection is
     if sum(index_brake) > 0
@@ -67,6 +72,9 @@ index_brake = DP1 < lbp;
             nb = -1*RoC_p(:,ind2); %SGN?
             brake =  plane_line_intersect(DP0, DP1, lbp, nb);
             
+            if ~isempty(ubp)
+                brake =  plane_line_intersect(DP0, DP1, ubp, nb);
+            end
             % Check if closer than previous point.
             [~,I] = min([norm(DP0-DP1), norm(DP0-brake)]);
 

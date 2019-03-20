@@ -10,7 +10,7 @@ end
     
 %  1) RoC for probe point!
 if RBDO_s.f_RoC
-    obj.probe_x_pos = RoC(RBDO_s, pdata, Opt_set, probe_pos, obj.nominal_x, RBDO_s.lb_probe);
+    obj.probe_x_pos = RoC(RBDO_s, pdata, Opt_set, probe_pos, obj.nominal_x, RBDO_s.lb_probe,[]);
 
     if obj.probe_x_pos < RBDO_s.lb_probe 
         % probe_x_pos(test < Opt_set.lb) = Opt_set.lb;
@@ -113,7 +113,8 @@ if pdata.nx > 0
 elseif pdata.nd > 0
     x_Mpp =  obj.nominal_x(:,1) + obj.probe_s*obj.alpha_x;
     obj.Mpp_ud_old =  obj.Mpp_ud;
-    obj.Mpp_ud = norm( obj.probe_s*obj.alpha_x);
+    obj.Mpp_ud = obj.probe_s;
+    %obj.Mpp_ud = obj.nominal_val; 
     obj.Mpp_x = x_Mpp;  
     obj.Mpp_sx = x_Mpp;
     obj.lambda = (obj.Mpp_x - Opt_set.dp_x) / norm(obj.Mpp_x - Opt_set.dp_x);

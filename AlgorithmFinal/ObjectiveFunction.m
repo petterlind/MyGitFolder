@@ -2,7 +2,7 @@ function G = ObjectiveFunction(Opt_set, obj, pdata)
 
 global Cnum
 Cnum = Cnum + 1;
-points = Opt_set.dp_x;
+points = Opt_set.dpl_x;
 % Set variables equal to points
 
 for ii = 1:pdata.nx

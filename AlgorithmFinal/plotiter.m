@@ -1,7 +1,7 @@
 function [LS, theta] = plotiter(pdata, Opt_set, RBDO_s, LS, theta)
 %[LS, theta, P_vec]
 switch RBDO_s.name
-    case {'Cheng', 'TANA', 'Truss'}
+    case {'Abaqus','Cheng', 'TANA', 'Truss'}
         
         % Plot DV
         if Opt_set.k>1
@@ -9,13 +9,13 @@ switch RBDO_s.name
     
             for ij = 1:pdata.nx
                 hold on
-                plot( [Opt_set.k-1 , Opt_set.k] , [Opt_set.dp_x_old(ij) Opt_set.dp_x(ij)]./(2.54e-2)^2, '-ok', 'HandleVisibility','off') %./(2.54e-2)^2
+                plot( [Opt_set.k-1 , Opt_set.k] , [Opt_set.dp_x_old(ij) Opt_set.dp_x(ij)], '-ok', 'HandleVisibility','off') %./(2.54e-2)^2
             end
 
             for ij = 1:pdata.nd
                 hold on
                 try
-                    plot( [Opt_set.k-1 , Opt_set.k] , [Opt_set.dp_x_old(ij) Opt_set.dp_x(ij)]./(2.54e-2)^2, '-ok', 'HandleVisibility','off') %./(2.54e-2)^2
+                    plot( [Opt_set.k-1 , Opt_set.k] , [Opt_set.dp_x_old(ij) Opt_set.dp_x(ij)], '-ok', 'HandleVisibility','off') %./(2.54e-2)^2
                 catch
                     error('in Plotiter')
                 end
@@ -32,7 +32,7 @@ switch RBDO_s.name
         % Plot fig of trusses
         figure(2)
         clf
-            if numel(Opt_set.dp_x) == 10
+            if numel(Opt_set.dp_x) == 10 && strcmp(RBDO_s.name,'Truss')
                 t = num2cell(Opt_set.dp_x);
                 [A1,A2,A3,A4,A5,A6,A7,A8,A9,A10] = deal(t{:});
 
@@ -89,8 +89,8 @@ switch RBDO_s.name
                 
                 [~,~] = Cheng3(A1,A2,A3,P,1);
                 
-            else
-                error('Number of DV does not match any truss structure. in plotiter.m')
+%             else
+%                 error('Number of DV does not match any truss structure. in plotiter.m')
             end
         
         % Plot Ls at nominal point!
@@ -161,15 +161,15 @@ switch RBDO_s.name
             end
         end
         
-        % Plot shifted MPP
-        color = {'rp','bp','gp'};
-        for ii = 1:numel(LS)
-            if ~isempty(LS(ii).Mpp_sx)
-                l1 = LS(ii).Mpp_sx; 
-                plot(l1(1,:),l1(2,:),color{ii}, 'MarkerSize',20)
-                hold on
-            end
-        end
+%         % Plot shifted MPP
+%         color = {'rp','bp','gp'};
+%         for ii = 1:numel(LS)
+%             if ~isempty(LS(ii).Mpp_sx)
+%                 l1 = LS(ii).Mpp_sx; 
+%                 plot(l1(1,:),l1(2,:),color{ii}, 'MarkerSize',20)
+%                 hold on
+%             end
+%         end
         
 
         

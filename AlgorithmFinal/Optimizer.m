@@ -14,6 +14,7 @@ classdef Optimizer
         ob_val_old = nan   % Old objective function value
         
         ML_scale            % Move limit scale parameter
+        ML_scale_n          % Move limit scale parameter for nominal p.
         roc_dist            % sidelength of the RoC-cube!
         
         % Inner loop

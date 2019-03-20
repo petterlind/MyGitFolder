@@ -30,11 +30,32 @@ case 'variables'
         
         %pdata.marg(:,2:3) =  Eq_dist(obj.nominal_x, pdata.marg(:,2), pdata.marg(:,3), pdata.marg(:,1));
         u_vec = U_space(obj.nominal_x , pdata.marg(:,2), pdata.marg(:,3),pdata.marg(:,1));
-      
-        obj.doe_u = Experiment(u_vec, obj.DoE_size_x.*Opt_set.ML_scale);
+        
+        % Minimum! Fix for garanteeing minum DoE
+         scale = ones(10,1)*2;
+         scale(1) = scale(1) * 1.3;
+         scale(3) = scale(3) * 1.3; 
+         scale(4) = scale(4) * 0.6;
+         scale(5) = scale(5) * 0.7;
+         scale(8) = scale(8)*2;
+         scale(9) = scale(9)*1.7;
+%         scale(10) = scale(10)*2
+         obj.doe_u = Experiment(u_vec, scale);
+         
+         
+         %obj.doe_u = Experiment(u_vec, obj.DoE_size_x.*Opt_set.ML_scale);
+         %Before abaqus
+         
         
         % Approximation of isoprobibilistic dist around point x.
         obj.doe_x = X_space( obj.doe_u, pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1)); % Transformation back to X-space
+        
+        
+        obj.doe_x = obj.doe_x(:,1).*ones(size(obj.doe_x));
+        for i = 1:10
+        obj.doe_x(i,i+1) = obj.doe_x(i,i+1) + 1e-3;
+        end
+        
         % Experiment - in x-space!
         obj.doe_val = nan(pdata.nx+1,1);
         for ij=1:(pdata.nx+1)
@@ -94,9 +115,7 @@ switch type
         %alpha_end = X_space(obj.u_trial, pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1));
         alpha_end = X_space(obj.alpha_u, pdata.marg(:,2) , pdata.marg(:,3), pdata.marg(:,1));
         obj.alpha_x = (alpha_end-alpha_start)/norm(alpha_end-alpha_start); % Vector from dp towards Mpp.
-        
-      
-        
+              
         Mpp_x = X_space(obj.u_trial, pdata.marg(:,2) , pdata.marg(:,3),pdata.marg(:,1)); % Temp Mpp!
         obj.lambda =(Mpp_x - Opt_set.dp_x) / norm(Mpp_x - Opt_set.dp_x);
         
@@ -125,7 +144,8 @@ switch type
         
         if ~RBDO_s.f_probe % Linear guess is Mpp-guess if no probe
             obj.Mpp_x = obj.x_trial; % (Uses the shifted parameters, ie this one is shifted already..)
-            obj.Mpp_xs = obj.x_trial; % (Uses the shifted parameters)
+            %obj.Mpp_xs = obj.x_trial; % (Uses the shifted parameters)
+            obj.Mpp_sx = obj.x_trial;  % 2019-03-08 ?! Correct
             obj.Mpp_ud_old =  obj.Mpp_ud; % used for constraint verification.
             obj.Mpp_ud = norm(obj.alpha_x* obj.p_trial);
             
